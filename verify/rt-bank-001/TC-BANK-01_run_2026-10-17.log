@@ -1,0 +1,20 @@
+# TC-BANK-01 (RT-BANK-001) first run, saved verbatim from the original run (not re-run)
+# when: 2026-10-17 ~14:1x KST, before the commit d8111af; the test file and tests/run.py that ran are identical to d8111af
+# base: main 1ecdc53e851d8a19b083122d19edfb40cfab60d5 (src/ unchanged)
+# environment: Node v22.22.0, Python 3.13.16
+# expected result: the test FAILS on purpose (reproduces the defect)
+
+$ VERBOSE=1 python3 tests/run.py bank
+---- t_bank_writeoff.js
+before   bank A 1000, cash 100, deposits 1000, book equity 100, reserve llr 50.5700 | borrower loan 200, chapter 11 count 0
+after ch11   bank A 940, book equity 40, NI field unchanged, quarter record unchanged, reserve llr 50.5700, bank stake in borrower 80.0%
+ok   write-off = 30% of the 200 loan = 60 (got 60)
+bank close   NI 3.4753 (op 3.5897, tax 1.4894, dividends 1.3901), provision in close 0.7050, reserve llr 50.5700
+window   book equity moved -57.9148, explained by results 2.0852, unexplained -60.0000
+counterfactual   bank NI without the loss 4.3247 -> NI difference caused by the 60 loss -0.8494
+FAIL bank book-equity change over write-off + next close is explained by its results (unexplained -60.0000)
+errs 0 fails 1
+FAIL t_bank_writeoff.js
+FAIL bank book-equity change over write-off + next close is explained by its results (unexplained -60.0000)
+1 test file(s) failed
+exit code: 1
