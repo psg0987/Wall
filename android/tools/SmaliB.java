@@ -1,0 +1,1 @@
+public class SmaliB { public static void main(String[] a) throws Exception { brut.androlib.src.SmaliBuilder.build(new brut.androlib.res.util.ExtFile(new java.io.File(a[0])), new java.io.File(a[1]), false); } }

@@ -1,0 +1,15 @@
+# build output (rebuild with build/build.py and android/*.py)
+dist/
+android/out/
+android/proj/assets/
+
+# signing key: never commit (a different key cannot update the installed app)
+android/keys/
+*.p12
+*.jks
+*.keystore
+
+*.apk
+__pycache__/
+node_modules/
+.DS_Store

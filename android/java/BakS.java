@@ -1,0 +1,2 @@
+import org.jf.dexlib2.DexFileFactory; import org.jf.baksmali.baksmali; import org.jf.baksmali.baksmaliOptions;
+public class BakS{public static void main(String[] a)throws Exception{org.jf.dexlib2.iface.DexFile d=DexFileFactory.loadDexFile(new java.io.File(a[0]),24,false);baksmaliOptions o=new baksmaliOptions();o.outputDirectory=a[1];o.apiLevel=24;o.jobs=1;System.out.println(baksmali.disassembleDexFile(d,o));}}

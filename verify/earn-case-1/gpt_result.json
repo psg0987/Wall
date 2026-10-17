@@ -1,0 +1,17 @@
+{
+ "source": "GPT Plus, card A (2026-10-17). Computed in Python from the card's formulas only; no game code, no sealed values.",
+ "spread_mult": 1.02097714,
+ "bank_loans": 846.62032515,
+ "interest_expense": 38.83962387,
+ "int_income": 3.11125850,
+ "cash_profit": 104.94397915,
+ "goodwill_amortization": 0,
+ "pretax": 104.94397915,
+ "tax": 36.73039270,
+ "net_income": 68.21358645,
+ "dividends": 20.46407593,
+ "cash_end": 219.25042811,
+ "total_debt_end": 1540.96941490,
+ "assets_end": 3735.94486013,
+ "sweep": false
+}

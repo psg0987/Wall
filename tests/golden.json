@@ -1,0 +1,19 @@
+{
+ "day": 720,
+ "companies": 532,
+ "alive": 524,
+ "listed": 524,
+ "netWorth": 484,
+ "totalMarketCap": 724138.578739,
+ "totalBookAssets": 1459681.858813,
+ "totalDebt": 626588.662071,
+ "lastQuarterNI": 30656.536326,
+ "prime": 8.540277,
+ "firstPrices": [
+  "PNPL:13689.560268",
+  "MCSF:14591.060485",
+  "ALPB:9720.37048",
+  "ORCX:12058.734333",
+  "ADBO:40500.842166"
+ ]
+}

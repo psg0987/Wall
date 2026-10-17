@@ -1,0 +1,7 @@
+java/util/Comparator
+java/util/function/Function
+java/util/stream/Collector
+java/util/stream/DoubleStream
+java/util/stream/IntStream
+java/util/stream/LongStream
+java/util/stream/Stream

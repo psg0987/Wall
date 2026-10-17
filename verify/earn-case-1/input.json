@@ -1,0 +1,21 @@
+{
+ "company": "LOTX 롯대쇼핑",
+ "day": 361,
+ "assets_A": 3699.108164809582,
+ "cash": 208.33761292569235,
+ "goodwill": 0,
+ "total_debt_D": 1540.9694149011748,
+ "bonds": 694.3490897558585,
+ "bond_coupon_pct": 10.162853081244975,
+ "bank_loans": 846.6203251453163,
+ "rating": "A",
+ "rating_spread_pctpt": 2,
+ "prime_rate_pct": 7.973493619493279,
+ "credit_spread_index": 1.862931427808303,
+ "tax_rate": 0.35,
+ "loss_carryforward_nol": 0,
+ "payout_ratio": 0.3,
+ "growth_rate_annual_g": 0.039833055624999995,
+ "sweep_target_cash_ratio": 0.06,
+ "operating_profit_op": 140.67234451337598
+}

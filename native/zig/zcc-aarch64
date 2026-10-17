@@ -1,0 +1,2 @@
+#!/bin/sh
+exec python3 -m ziglang cc -target aarch64-linux-musl -mcpu=${ZMCPU:-cortex_a76} "$@"
