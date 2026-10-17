@@ -77,6 +77,15 @@ ok(Math.abs(A.cf.oth - B.cf.oth) <= TOL, 'R1 the other cash flow line does not a
 ok(alike(A.cf, B.cf, A.exact, B.exact), 'the twins differ only in net income: ' + alikeMsg(A.cf, A.exact) + ' (same in the twin)');
 ok(A.cf.capex === 0 && B.cf.capex === 0 && A.cf.shown.fcf === '–' && B.cf.shown.fcf === '–', 'a bank has no capital spending (' + f1(A.cf.capex) + ') and the tab shows no free cash flow line (' + A.cf.shown.fcf + ')');
 ok(shownOk(A.cf, 1) && shownOk(B.cf, 1), 'the 현금흐름 tab shows the computed lines: CFO ' + A.cf.shown.cfo + ' / ' + B.cf.shown.cfo + ', financing ' + A.cf.shown.cff + ' / ' + B.cf.shown.cff + ', other ' + A.cf.shown.oth + ' / ' + B.cf.shown.oth);
+// records written before the imp/wo fields existed (the history rows made at the start of the game have 22 fields):
+// the statement reads both as 0, so operating cash flow there is ni - eq + ga + dep, and the tab renders numbers
+{
+  const b = B.b, L = fqL(b), old = b.fq.map((r, j) => r.length < 24 ? j : -1).filter(j => j > 0);
+  const same0 = old.length > 0 && old.every(j => { const q = L[j], d = fqDerive(b, q, L[j - 1]); return Number.isFinite(d.cfo) && d.cfo === q.ni - q.eq + q.ga + d.dep && Number.isFinite(d.oth) });
+  sel = -1; pg = ''; tab = 'h'; S.spd = 0; G.pick(b.id); G.stab('f'); G.fseg(3); render();
+  const h = document.getElementById('sh').innerHTML;
+  ok(same0 && !/NaN|undefined|Infinity|\[object/.test(h), 'records without the imp/wo fields (' + old.length + ' of ' + b.fq.length + ' rows, ' + (old.length ? b.fq[old[0]].length : '-') + ' fields) read them as 0, and the tab renders clean');
+}
 
 // ---- second case: asset impairment (impair). Finds the first impairment on the test seeds, then replays the seed
 // with impair doing nothing: earn has already cut the assets, only the net income charge is left out.

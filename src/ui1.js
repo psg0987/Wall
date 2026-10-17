@@ -60,8 +60,11 @@ return h+`<h4>하드볼</h4><div class="bs">${B("하락 루머 퍼뜨리기 (주
 // ---- v11 financial statements: 8 quarters of income statement, balance sheet, cash flow, ratios with industry comparison ----
 let fseg=0;G.fseg=n=>{fseg=n;render()};
 const fqL=c=>(c.fq||[]).map(fqo);
+// operating cash flow adds back the non-cash charges inside net income: goodwill amortization, depreciation, asset
+// impairment (imp) and bank loan write-off (wo, RT-BANK-001-R1); records from before those fields read them as 0.
+// '기타·투자 매매' (oth) is what is left of the cash change, so it follows automatically.
 function fqDerive(c,q,prev){const x=SX[c.i]||SX[0],fin=c.kd,gp=fin?q.rev:Math.max(q.op+q.rd+q.rev*.04,q.rev*x.gm),sga=fin?Math.max(0,q.rev-q.op):gp-q.op-q.rd,cogs=fin?0:q.rev-gp,
-pre=q.op-q.it+q.ii-q.ga,dep=fin?0:q.A*.02,cfo=q.ni-q.eq+q.ga+dep,capex=fin?0:q.gr+dep,dD=prev?q.D-prev.D:null,iss=prev&&q.sh!==prev.sh?(q.sh-prev.sh)*q.p/1e4:0,
+pre=q.op-q.it+q.ii-q.ga,dep=fin?0:q.A*.02,cfo=q.ni-q.eq+q.ga+dep+(q.imp||0)+(q.wo||0),capex=fin?0:q.gr+dep,dD=prev?q.D-prev.D:null,iss=prev&&q.sh!==prev.sh?(q.sh-prev.sh)*q.p/1e4:0,
 cff=prev?dD-q.dv+iss:null,dc=prev?q.cs-prev.cs:null,oth=prev?dc-cfo+capex-cff:null,bank=fin?0:Math.max(0,q.D-q.bond-q.pa),eq0=q.A+q.cs+q.gw+q.pv-q.D;
 return{gp,sga,cogs,pre,dep,cfo,capex,cff,dc,oth,bank,eqv:eq0,wc:fin?0:q.A*.18,ppe:fin?0:q.A*.82,fcf:cfo-capex,iss}}
 function ttm(L,k){if(L.length<4)return null;return L.slice(-4).reduce((a,q)=>a+q[k],0)}

@@ -1,4 +1,4 @@
-"""Do the RT-BANK-001 tests catch wrong implementations? Runs the bank tests against deliberately broken copies of the
+"""Do the RT-BANK-001 tests (incl. R1, the cash flow statement) catch wrong implementations? Runs the bank tests against deliberately broken copies of the
 built game (dist/game.js changed in memory only; src/ and dist/ are not touched).
 usage: python3 build/build.py && python3 verify/rt-bank-001/mutation_check.py
 Each mutant must make at least one of the listed tests fail; the unmutated game must pass all of them."""
@@ -7,7 +7,7 @@ V = os.path.dirname(os.path.abspath(__file__)); R = os.path.dirname(os.path.dirn
 rd = lambda p: open(p, encoding='utf-8').read()
 SEED = ("Math.random=(()=>{let a=20261016;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);"
         "t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})();\n")
-TESTS = ['t_bank_writeoff.js', 't_clean_surplus.js', 't_bank_writeoff_cases.js']
+TESTS = ['t_bank_writeoff.js', 't_clean_surplus.js', 't_bank_writeoff_cases.js', 't_bank_writeoff_cashflow.js']
 game0, stub = rd(os.path.join(R, 'dist', 'game.js')), rd(os.path.join(T, 'stub.js'))
 WB = 'function woBook(c){const w=c.woq||0;if(!(w>0))return;c.woq=0;c.ni-=w;'
 MUTANTS = [
@@ -25,6 +25,11 @@ MUTANTS = [
     ('M9 quarter record misses the write-off (fq)', [('c.er.imp||0,c.er.wo||0]);', 'c.er.imp||0,0]);')]),
     ('M10 old saves not given woq = 0', [('if(c.woq==null)c.woq=0}', '}')]),
     ('M11 parent equity-method income not corrected', [('S.co[+k.slice(1)].eqi-=w*c.own[k]/100;if(c.own.P||mine(c))L(c.tk+" 대손상각비', 'if(c.own.P||mine(c))L(c.tk+" 대손상각비')]),
+    ('M12 cash flow: no add-back at all (the statement before R1)', [('cfo=q.ni-q.eq+q.ga+dep+(q.imp||0)+(q.wo||0),', 'cfo=q.ni-q.eq+q.ga+dep,')]),
+    ('M13 cash flow: write-off not added back (impairment only)', [('cfo=q.ni-q.eq+q.ga+dep+(q.imp||0)+(q.wo||0),', 'cfo=q.ni-q.eq+q.ga+dep+(q.imp||0),')]),
+    ('M14 cash flow: impairment not added back (write-off only)', [('cfo=q.ni-q.eq+q.ga+dep+(q.imp||0)+(q.wo||0),', 'cfo=q.ni-q.eq+q.ga+dep+(q.wo||0),')]),
+    ('M15 cash flow: add-back counted twice', [('cfo=q.ni-q.eq+q.ga+dep+(q.imp||0)+(q.wo||0),', 'cfo=q.ni-q.eq+q.ga+dep+2*((q.imp||0)+(q.wo||0)),')]),
+    ('M16 cash flow: records without imp/wo not read as 0', [('cfo=q.ni-q.eq+q.ga+dep+(q.imp||0)+(q.wo||0),', 'cfo=q.ni-q.eq+q.ga+dep+q.imp+q.wo,')]),
 ]
 def run(game, name):
     code = SEED + stub + '\n' + game + '\n' + rd(os.path.join(T, name))
