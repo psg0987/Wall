@@ -1,0 +1,11 @@
+item                            sealed (game)          independent    abs error
+interest_expense                  38.83962387          38.83962387     4.07e-10
+goodwill_amortization              0.00000000           0.00000000     0.00e+00
+tax                               36.73039270          36.73039270     1.65e-09
+net_income                        68.21358645          68.21358645     4.08e-09
+dividends                         20.46407593          20.46407593     3.77e-09
+cash_end                         219.25042811         219.25042811     4.90e-09
+total_debt_end                  1540.96941490        1540.96941490     1.17e-09
+assets_end                      3735.94486013        3735.94486013     2.52e-09
+not compared (not in the result): goodwill_end
+compared 8 items, max abs error 4.90e-09 (tolerance 0.01) -> PASS

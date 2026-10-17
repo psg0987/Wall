@@ -1,0 +1,10 @@
+{
+ "_note": "Values inside the game's own close, captured 2026-10-17 by re-running seed 12345 with an instrumented copy of earn() (assignments only, no logic change). The re-run reproduced every value in expected_SEALED.json exactly, so it is the same close.",
+ "spread_mult": 1.3675020937849025,
+ "bank_loans": 2767.5799037102606,
+ "int_income": 8.169833293180934,
+ "cash_profit": 300.97230640349375,
+ "pretax": 300.97230640349375,
+ "nol_used": 7.2735585396018365,
+ "sweep_x": 292.30867552946904
+}

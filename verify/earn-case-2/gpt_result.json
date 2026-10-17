@@ -1,0 +1,21 @@
+{
+ "source": "GPT Plus, card A2 (2026-10-17). Python from the card's inputs and formulas only; no game code, no GitHub, no sealed values.",
+ "spread_mult": 1.36750209,
+ "bank_loans": 2767.57990371,
+ "interest_expense": 55.29639663,
+ "int_income": 8.16983329,
+ "cash_profit": 300.9723064,
+ "goodwill_amortization": 0.0,
+ "pretax": 300.9723064,
+ "nol_used": 7.27355854,
+ "tax": 88.10962436,
+ "net_income": 218.20540314,
+ "dividends": 63.85880461,
+ "sweep_x": 292.30867553,
+ "cash_end": 486.05329517,
+ "total_debt_end": 2475.27122818,
+ "assets_end": 8100.88825285,
+ "goodwill_end": 0.0,
+ "nol_end": 0.0,
+ "sweep": true
+}

@@ -9,6 +9,7 @@
 - GPT 블라인드 검산 1번 통과(verify/compare.py, verify/earn-case-1/gpt_result.json).
 - 테스트 t_close_spec: 결산 7,381번을 문서 공식으로 다시 계산해 게임과 비교.
 - 블라인드 검산 2번 봉인(verify/earn-case-2: 이월결손금·지분법 이익·현금 정리 갈래).
+- GPT 블라인드 검산 2번 통과(17개 항목, 최대 오차 3.8e-09). compare.py가 게임 내부 중간값(game_intermediates.json)도 비교.
 
 ## v23 · APK 2.3 (2026-10-16)
 - 부실 기업 자산 손상차손을 그 분기 순이익·EPS·재무제표에 반영(전에는 자산에서 바로 빠짐).

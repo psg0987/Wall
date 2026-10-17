@@ -1,0 +1,20 @@
+item                            sealed (game)          independent    abs error
+interest_expense                  55.29639663          55.29639663     5.05e-10
+goodwill_amortization              0.00000000           0.00000000     0.00e+00
+tax                               88.10962436          88.10962436     8.32e-10
+net_income                       218.20540314         218.20540314     1.06e-09
+dividends                         63.85880461          63.85880461     3.30e-09
+cash_end                         486.05329517         486.05329517     8.88e-10
+total_debt_end                  2475.27122818        2475.27122818     7.92e-10
+assets_end                      8100.88825285        8100.88825285     1.86e-09
+goodwill_end                       0.00000000           0.00000000     0.00e+00
+nol_end                            0.00000000           0.00000000     0.00e+00
+spread_mult                        1.36750209           1.36750209     3.78e-09
+bank_loans                      2767.57990371        2767.57990371     2.61e-10
+int_income                         8.16983329           8.16983329     3.18e-09
+cash_profit                      300.97230640         300.97230640     3.49e-09
+pretax                           300.97230640         300.97230640     3.49e-09
+nol_used                           7.27355854           7.27355854     3.98e-10
+sweep_x                          292.30867553         292.30867553     5.31e-10
+not compared (not in the result): none
+compared 17 items, max abs error 3.78e-09 (tolerance 0.01) -> PASS
