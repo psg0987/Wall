@@ -1,0 +1,12 @@
+# RT-BANK-001: whole games before and after the fix (720 days, no player actions)
+# when: 2026-10-17 16:47:57 KST; same files as fix_run_2026-10-17.log
+$ python3 verify/rt-bank-001/compare_with_main.py
+== before the fix (1ecdc53)
+seed 12345: first chapter 11s with a bank loan 1, write-offs reported none | net worth 484, market cap 810338.839451, assets 1481818.833611, debt 640620.733749, last-quarter NI 33653.025948, alive 523, state hash 9f1a5d6c41710f0a
+seed 777: first chapter 11s with a bank loan 0, write-offs reported none | net worth 484, market cap 586153.391932, assets 1467043.443324, debt 628414.306082, last-quarter NI 30382.611767, alive 526, state hash e4b1bd253082a603
+seed 20261016: first chapter 11s with a bank loan 0, write-offs reported none | net worth 484, market cap 724138.578739, assets 1459681.858813, debt 626588.662071, last-quarter NI 30656.536326, alive 524, state hash c4343340c9ee1756
+== after the fix (dist/game.js)
+seed 12345: first chapter 11s with a bank loan 1, write-offs reported BOAX day 494 286.97 | net worth 484, market cap 810590.287834, assets 1481818.833611, debt 640620.705284, last-quarter NI 33652.371076, alive 523, state hash d3c6a8e4c6813a64
+seed 777: first chapter 11s with a bank loan 0, write-offs reported none | net worth 484, market cap 586153.391932, assets 1467043.443324, debt 628414.306082, last-quarter NI 30382.611767, alive 526, state hash e4b1bd253082a603
+seed 20261016: first chapter 11s with a bank loan 0, write-offs reported none | net worth 484, market cap 724138.578739, assets 1459681.858813, debt 626588.662071, last-quarter NI 30656.536326, alive 524, state hash c4343340c9ee1756
+exit code: 0

@@ -39,9 +39,12 @@ console.log('window   book equity moved ' + moved.toFixed(4) + ', explained by r
 const niWith = er.ni;
 
 // run 2: identical, but the bank's assets are given back right after the write-off (no loss); only the loss differs
+// (diagnostic print only, no assertion. Since the RT-BANK-001 fix the write-off is also queued for the next close in
+// woq, so the run with no loss clears that too)
 ({ b, c } = scenario());
 ch11(c, 'TC-BANK-01');
 b.A += wo;
+b.woq = 0;
 earn(b);
 const niWithout = b.er.ni;
 console.log('counterfactual   bank NI without the loss ' + niWithout.toFixed(4) + ' -> NI difference caused by the 60 loss ' + (niWith - niWithout).toFixed(4));

@@ -1,0 +1,14 @@
+# After the src/ fix, before tests/t_clean_surplus.js was updated (RT-BANK-001)
+# when: 2026-10-17 16:22:57 KST; base commit 91bca8ce70f6d42e2bf4a8a8cbf939c85a191f36 + uncommitted src/ changes (sim.js woBook/ch11x/earn/FQ, core.js v8prep, ui1.js sFi)
+# shows why the per-close identity needs one more term: the only mismatch is the bank close that reports a write-off booked 63 days earlier
+
+$ VERBOSE=1 python3 tests/run.py clean_surplus
+---- t_clean_surplus.js
+seed 12345 quarterly closes 4169 mismatches 1 skipped (cooked books) 0
+FAIL BOAX day 494 residual 286.970 (equity 85.5, NI -273.43)
+seed 777 quarterly closes 4171 mismatches 0 skipped (cooked books) 0
+errs 0 fails 1
+FAIL t_clean_surplus.js
+FAIL BOAX day 494 residual 286.970 (equity 85.5, NI -273.43)
+1 test file(s) failed
+exit code: 1

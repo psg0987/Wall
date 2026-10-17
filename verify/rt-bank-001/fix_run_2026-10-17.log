@@ -1,0 +1,156 @@
+# RT-BANK-001 fix (policy P1-b + T0): full suite and verbose outputs, saved verbatim
+# when: 2026-10-17 16:41:55 KST; base commit 91bca8ce70f6d42e2bf4a8a8cbf939c85a191f36 (rt-bank-001) + the changes committed together with this log
+# environment: Node v22.22.0, Python 3.13.16
+# sha256 of the files that ran (compare with the commit that adds this log):
+#   cf9fa92ffaf5470db51f55cce650090751c2b78a4819dcb479c8d1b7cd58869e  src/act1.js
+#   8383cdf73b1afd69e91338b639f491926bc0aedae8f37a42f004a12ee6c93369  src/act2.js
+#   2afa0d72bd0f5f8dffec55815bd5bda0477b030333a291275fadf772cdf10700  src/base_v5.js
+#   22ed8832c921cbf8c235c8bbf86c3f69017feda79ca7af0674eb80bbb951ae04  src/core.js
+#   edcc9c24b9344218c3d839d8a2c426b05eb6ff520bc7a8bea1084f62b901512a  src/data.js
+#   fc00285d8248f27b62c1e906c6c79d62617aa90c809eea0e72a8116c2d78d439  src/sim.js
+#   e7e900af4b2fd201972836f61205222d30a7e7339626afdf2baec858ddbf753e  src/ui1.js
+#   70e416ddca6bc2d47b1a3ccdd8a283b868858c221fb66d3c9f009d409867902e  src/ui2.js
+#   5125ff3a2f2ce03827a11212c7d9a9319e7b30b7d3622cb48e91f2e8ac37ad17  src/head.html
+#   89203abc2789115fbaf388562b074d5eb3c7606a7b3f29ce04d64acba6dd5fb5  tests/ai_native_fake.js
+#   b225d730b5f46d40118e3a443adef2e609c5591d74afb7cc7c3a0e17e5c4ae16  tests/stub.js
+#   b83fea744bf59b9d0b9fb46d0ed7118bf06b93d257e5ec2b514d5e6e2e557719  tests/t12_sim.js
+#   9d98d23052819a5a2a5f1a830041607c24c5663b093a2b8723fa573a7abbdc81  tests/t13_ui.js
+#   58dbca9d2c47e8ef21238148b304d89afa3244acc5cd43457bcdf36c9852afdc  tests/t14_advisor.js
+#   05094fd835d5d5999817203a188113195d15a4ddae00bdf6e8b95048a2716ea1  tests/t18_ai_native.js
+#   67cfb09112b3f0b6d08b78484569fddaef929dcb4435ebfbb2d474d30877def4  tests/t18_ai_web.js
+#   cb518078b538bb44e085fb5212f7507da5719919e87d0307c4e1e059bacc7c75  tests/t_bank_writeoff.js
+#   ebd6649ddcea6e057218982f47e004fd321d4870d4dbea6b5bfe655a7d31349f  tests/t_bank_writeoff_cases.js
+#   e7b9fd9ebd4a9dca6f9978b9d9c14977050d6e0908a4035c028e55c760f2140c  tests/t_clean_surplus.js
+#   332bc414adc6ce8ce927d7525dabe90d9fd9d73b5dc86a62c998f7be7952283e  tests/t_close_spec.js
+#   b080a6651bcd1e1424e728a48405cb3d8910631f024fb168d84f512302f02a7c  tests/t_golden.js
+#   41dcbc7fd1d992da15d5112cbf7a22093ca41e37a091e4a0b634743fb5690193  tests/t_impair_ui.js
+#   70f69d6953777982277b1ac760549ca38af5f4a75b3a24fa83a2ccd738b18dff  tests/run.py
+#   77c1708ba43fb94812daea4e3fa8b9c539d0b351ee4f1603189b6f57143fab4b  tests/fixtures/old_save_1ecdc53_seed12345_day440.wsr
+
+$ python3 tests/run.py
+PASS t12_sim.js
+PASS t13_ui.js
+PASS t14_advisor.js
+PASS t18_ai_native.js
+PASS t18_ai_web.js
+PASS t_clean_surplus.js
+PASS t_close_spec.js
+PASS t_impair_ui.js
+PASS t_bank_writeoff.js
+PASS t_bank_writeoff_cases.js
+PASS t_golden.js
+ALL PASS
+exit code: 0
+
+$ VERBOSE=1 python3 tests/run.py bank
+---- t_bank_writeoff.js
+before   bank A 1000, cash 100, deposits 1000, book equity 100, reserve llr 50.5700 | borrower loan 200, chapter 11 count 0
+after ch11   bank A 940, book equity 40, NI field unchanged, quarter record unchanged, reserve llr 50.5700, bank stake in borrower 80.0%
+ok   write-off = 30% of the 200 loan = 60 (got 60)
+bank close   NI -56.5247 (op 3.5897, tax 1.4894, dividends 1.3901), provision in close 0.7050, reserve llr 50.5700
+window   book equity moved -57.9148, explained by results -57.9148, unexplained 0.0000
+counterfactual   bank NI without the loss 4.3247 -> NI difference caused by the 60 loss -60.8494
+ok   bank book-equity change over write-off + next close is explained by its results (unexplained 0.0000)
+errs 0 fails 0
+PASS t_bank_writeoff.js
+---- t_bank_writeoff_cases.js
+-- TC-BANK-02 event order (real days) and TC-BANK-03 reported once
+ok   another day: the borrower went into its first chapter 11 at its own close (PNPL, bank JPMX closes on day % 90 = 60)
+     write-off day 25 (borrower PNPL @25), loan 200.4927, cut 60.1478 | bank closes after it: day 60 reported 60.1478, day 150 reported 0.0000, day 240 reported 0.0000
+ok   another day: write-off day 25 is not a bank close day
+ok   another day: assets cut by 30% of the loan 200.4927 = 60.1478, same amount queued 60.1478
+ok   another day: reported by the bank close on day 60 (first close after the write-off: day 60)
+ok   another day: that close reports 60.1478, what was waiting (60.1478), and leaves nothing waiting (0)
+ok   another day: no close before the write-off reports anything ()
+ok   another day: equity from just before the write-off to just after that close is explained by its results (unexplained 0.0000)
+ok   TC-BANK-03 another day: the next 2 closes report nothing (day 150 er.wo 0, fq 0; day 240 er.wo 0, fq 0)
+ok   TC-BANK-03 another day: reported in all closes together 60.1478 = booked 60.1478
+ok   same day, borrower closes first: the borrower went into its first chapter 11 at its own close (PNPL, bank JPMX closes on day % 90 = 60)
+     write-off day 60 (borrower PNPL @60 > bank @60), loan 195.0030, cut 58.5009 | bank closes after it: day 60 reported 58.5009, day 150 reported 0.0000, day 240 reported 0.0000
+ok   same day, borrower closes first: on day 60 the borrower closed (and defaulted) before the bank closed
+ok   same day, borrower closes first: assets cut by 30% of the loan 195.0030 = 58.5009, same amount queued 58.5009
+ok   same day, borrower closes first: reported by the bank close on day 60 (first close after the write-off: day 60)
+ok   same day, borrower closes first: that close reports 58.5009, what was waiting (58.5009), and leaves nothing waiting (0)
+ok   same day, borrower closes first: no close before the write-off reports anything ()
+ok   same day, borrower closes first: equity from just before the write-off to just after that close is explained by its results (unexplained 0.0000)
+ok   TC-BANK-03 same day, borrower closes first: the next 2 closes report nothing (day 150 er.wo 0, fq 0; day 240 er.wo 0, fq 0)
+ok   TC-BANK-03 same day, borrower closes first: reported in all closes together 58.5009 = booked 58.5009
+ok   same day, bank closes first: the borrower went into its first chapter 11 at its own close (DOWC, bank JPMX closes on day % 90 = 60)
+     write-off day 60 (bank @60 > borrower DOWC @60), loan 200.0000, cut 60.0000 | bank closes after it: day 150 reported 60.0000, day 240 reported 0.0000, day 330 reported 0.0000
+ok   same day, bank closes first: on day 60 the bank closed before the borrower closed (and defaulted)
+ok   same day, bank closes first: assets cut by 30% of the loan 200.0000 = 60.0000, same amount queued 60.0000
+ok   same day, bank closes first: reported by the bank close on day 150 (first close after the write-off: day 150)
+ok   same day, bank closes first: that close reports 60.0000, what was waiting (60.0000), and leaves nothing waiting (0)
+ok   same day, bank closes first: no close before the write-off reports anything (day 60)
+ok   same day, bank closes first: equity from just before the write-off to just after that close is explained by its results (unexplained -0.0000)
+ok   TC-BANK-03 same day, bank closes first: the next 2 closes report nothing (day 240 er.wo 0, fq 0; day 330 er.wo 0, fq 0)
+ok   TC-BANK-03 same day, bank closes first: reported in all closes together 60.0000 = booked 60.0000
+ok   TC-BANK-03 two write-offs (day 25 60.1478, day 40 60.0625) before one bank close (day 60)
+ok   TC-BANK-03 that close reports both together once: 120.2103 = 120.2103
+ok   TC-BANK-03 the closes after it report nothing (day 150)
+ok   TC-BANK-03 equity from before the first write-off to that close is explained by its results (unexplained -0.0000)
+-- TC-BANK-04 saves
+ok   TC-BANK-04 autosave (full): saved on day 26 with 60.1478 waiting, loaded: woq 60.1478
+ok   TC-BANK-04 autosave (full): the close after loading (day 60) reports 60.1478 once, nothing left waiting
+ok   TC-BANK-04 autosave (full): equity from before the write-off (before saving) to that close is explained by its results (unexplained 0.0000)
+ok   TC-BANK-04 autosave (full): same close as the run without saving (NI -55.7685 vs -55.7685, equity 192.4798 vs 192.4798)
+ok   TC-BANK-04 export (packS(1), histories left out): saved on day 26 with 60.1478 waiting, loaded: woq 60.1478
+ok   TC-BANK-04 export (packS(1), histories left out): the close after loading (day 60) reports 60.1478 once, nothing left waiting
+ok   TC-BANK-04 export (packS(1), histories left out): equity from before the write-off (before saving) to that close is explained by its results (unexplained 0.0000)
+ok   TC-BANK-04 old save: day 440, 530 companies, none has a woq field
+ok   TC-BANK-04 old save: after loading every company has woq = 0
+ok   TC-BANK-04 old save: played days 441-500 without errors
+ok   TC-BANK-04 old save: 325 closes balance and none reports or keeps a write-off
+ok   TC-BANK-04 old save: BOAX (wrote off 286.97 on day 431, before the save, in the old version) closes on day 494 reporting 0 (no catch-up for write-offs made before the fix), new record row has 24 fields
+ok   TC-BANK-04 old save: BOAX income statement renders clean (old 22-field and new 24-field quarter rows mixed), no write-off row
+ok   TC-BANK-04 new save with the new fields removed: after loading every company has woq = 0
+ok   TC-BANK-04 new save with the new fields removed: the bank closes day 60, day 150 with nothing reported
+-- TC-BANK-05 records and TC-BANK-06 policy (twin runs: same world, the twin drops the queued amount)
+ok   twins reached the same bank close (day 60)
+     write-off 60.1478 | NI -55.7685 vs twin 4.3793 | tax 1.8769/1.8769 | dividends 1.7517/1.7517 | EPS -220.6/17.3
+ok   TC-BANK-05 er.wo = 60.1478 (twin: none)
+ok   TC-BANK-05 net income = twin - write-off: -55.7685 = 4.3793 - 60.1478, and er.ni is the bank's ni
+ok   TC-BANK-05 statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   TC-BANK-05 fq row of that close: day 60, ni -56, wo 60, imp 0 (24 fields)
+ok   TC-BANK-05 EPS history -220.6 won matches net income (twin 17.3)
+ok   TC-BANK-05 yearly net income lower by the write-off: -55.7685 vs 4.3793
+ok   TC-BANK-05 25% holder's equity-method income from this close -13.9421 = 25% of net income (twin 1.0948)
+ok   TC-BANK-05 income statement shows a 대손상각비 row only with a write-off: -60.0 | -60.0 | 0.0
+ok   TC-BANK-05 statement EPS -221 and net income -56.0 match the quarter record
+ok   TC-BANK-06 tax 1.8769, loss carryforward 0.0000, dividends 1.7517, operating profit 4.8812 same as the twin
+ok   TC-BANK-06 balance sheet after the close same as the twin (the loss already left the assets on the write-off day)
+ok   TC-BANK-06 statistical loss 0.7049 and provision 1.6964 unchanged, both still charged (overlap kept, docs/MODEL.md)
+ok   TC-BANK-06 llr untouched by the write-off (10.0000 before and after) and by reporting it
+ok   TC-BANK-06 stake received 80% at cost 0 (worth 20.0976), not offset: write-off stays 30% of the loan = 60.1478
+ok   TC-BANK-06 TC-BANK-01 with starting llr 50.5700 (inherited, as in TC-BANK-01): write-off 60.0000, reported 60.0000, unexplained 0.0000, NI -56.5247 = 3.4753 - 60
+ok   TC-BANK-06 TC-BANK-01 with starting llr 0.0000: write-off 60.0000, reported 60.0000, unexplained -0.0000, NI -61.0948 = -1.0948 - 60
+ok   TC-BANK-06 TC-BANK-01 with starting llr 10.0000: write-off 60.0000, reported 60.0000, unexplained 0.0000, NI -57.2272 = 2.7728 - 60
+errs 0 fails 0
+PASS t_bank_writeoff_cases.js
+ALL PASS
+exit code: 0
+
+$ VERBOSE=1 python3 tests/run.py clean_surplus
+---- t_clean_surplus.js
+seed 12345 quarterly closes 4169 mismatches 0 skipped (cooked books) 0 | bank write-offs booked 1 (286.97), reported in closes 1 (286.97), still waiting 0.00
+seed 777 quarterly closes 4171 mismatches 0 skipped (cooked books) 0 | bank write-offs booked 0 (0.00), reported in closes 0 (0.00), still waiting 0.00
+errs 0 fails 0
+PASS t_clean_surplus.js
+ALL PASS
+exit code: 0
+
+$ VERBOSE=1 python3 tests/run.py close_spec
+---- t_close_spec.js
+{"closes":8340,"checked":7381,"skipped":959,"goodwill":68,"nolUsed":68,"lossToNol":82,"eqi":166,"dr":295,"payout0":157,"sweep":594,"sweepCapped":0,"shrink":0,"borrow":57,"playerLoan":0}
+errs 0 fails 0
+PASS t_close_spec.js
+ALL PASS
+exit code: 0
+
+$ VERBOSE=1 python3 tests/run.py golden
+---- t_golden.js
+errs 0 fails 0
+PASS t_golden.js
+ALL PASS
+exit code: 0
+

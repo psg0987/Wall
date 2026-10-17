@@ -4,6 +4,11 @@ if(k==="P"){S.cash+=a*.6;if(S.qs)S.qs.div+=a*.6}else if(k[0]==="r"){S.R[+k.slice
 // asset impairment of a chronically distressed company: a loss of this quarter, reported like any other (docs/MODEL.md)
 function impair(c,wd){c.ni-=wd;c.yni=(c.yni||0)-wd;c.er.imp=(c.er.imp||0)+wd;c.er.ni=c.ni;if(c.eh&&c.eh.length)c.eh[c.eh.length-1]=Math.round(c.ni*1e5/c.sh)/10;
 for(const k in c.own)if(k[0]==="c"&&c.own[k]>=20)S.co[+k.slice(1)].eqi-=wd*c.own[k]/100;if(c.own.P||mine(c))L(c.tk+" 자산 손상차손 "+F(wd)+" (순이익에 반영)")}
+// bank loan write-off (RT-BANK-001): ch11x takes 30% of a defaulted borrower's loan off the bank's assets on the day of the
+// default and queues the same amount in woq. The bank's first close after that reports it once, after tax like an
+// impairment: tax, loss carryforward and dividends were already computed and do not change (docs/MODEL.md)
+function woBook(c){const w=c.woq||0;if(!(w>0))return;c.woq=0;c.ni-=w;c.yni=(c.yni||0)-w;c.er.wo=(c.er.wo||0)+w;c.er.ni=c.ni;if(c.eh&&c.eh.length)c.eh[c.eh.length-1]=Math.round(c.ni*1e5/c.sh)/10;
+for(const k in c.own)if(k[0]==="c"&&c.own[k]>=20)S.co[+k.slice(1)].eqi-=w*c.own[k]/100;if(c.own.P||mine(c))L(c.tk+" 대손상각비 "+F(w)+" (순이익에 반영)")}
 function earn(c){const r=rating(c),rt=(S.prime+SPR[r]*sprM())/100;let op;
 if(c.kd===1)op=bankOp(c);else if(c.kd)op=c.A*(.0035+(S.prime-7.5)*.0002+c.mg*.0004+(c.kd===2?S.mood*.004:0)-Math.max(0,-S.mood-.15)*.012)*(1+eShock(c,.8));
 else op=c.A*(SEC[c.i][1]+(S.dg[c.i]-S.cg[c.i])*.5+c.mg*.003+(c.g-.04)*.03+(share(c)>.5?.004:0)+c.edge)*(1+eShock(c,.6));
@@ -15,7 +20,7 @@ c.gw-=ga;c.cs+=cp-tax;c.pni=c.ni;c.ni=pre-tax+c.eqi+c.dr;c.yni=(c.yni||0)+c.ni;
 if(c.cook){c.ni=Math.abs(c.ni)*1.2+c.A*.004;c.cook=0;c.fr=1}
 const smsg=surprise(c),dv=Math.max(0,cp-tax+c.dr)*(c.dban?0:c.pay);c.cs-=dv;payDiv(c,dv);exDiv(c,dv);anaUpd(c);
 for(const k in c.own)if(k[0]==="c"&&c.own[k]>=20)S.co[+k.slice(1)].eqi+=c.ni*c.own[k]/100;
-c.er={op,it,ga,tax,eq:c.eqi,dr:c.dr,ni:c.ni,dv,d:S.day};(c.eh=c.eh||[]).push(Math.round(c.ni*1e5/c.sh)/10);if(c.eh.length>8)c.eh.shift();c.eqi=0;c.dr=0;if(!c.kd)c.q=Math.max(0,Math.min(.009,(c.q||0)+(c.ps||0)*.0006-(c.ps?0:.0002)));if(c.ap&&mine(c))autop(c);
+c.er={op,it,ga,tax,eq:c.eqi,dr:c.dr,ni:c.ni,dv,d:S.day};(c.eh=c.eh||[]).push(Math.round(c.ni*1e5/c.sh)/10);if(c.eh.length>8)c.eh.shift();woBook(c);c.eqi=0;c.dr=0;if(!c.kd)c.q=Math.max(0,Math.min(.009,(c.q||0)+(c.ps||0)*.0006-(c.ps?0:.0002)));if(c.ap&&mine(c))autop(c);
 const gr=c.A*c.g/4;c.A+=gr;if(c.kd)c.D+=gr;else c.cs-=gr>0?gr:gr*.9;
 if(c.cs<0){c.D-=c.cs;c.cs=0}if(c.bond>0&&S.day>=c.bmat){if(c.bh){S.cash+=c.bh;c.bh=0;L(c.tk+" 회사채 만기 상환",1)}c.bond=0;c.cpn=0}if(!c.kd&&c.bond===0&&!mine(c)&&rnd()<.05&&rating(c)<=4){const x=Math.min(loanOf(c)*.5,Math.max(0,eq(c)));if(x>5){c.bond=x;c.cpn=S.prime+SPR[rating(c)]+1;c.bmat=S.day+1800+(rnd()*1800|0)}}
 if(c.sweep&&!mine(c)||c.sweep===2){const tc=c.A*(c.kd===2?.25:c.kd===1?.08:.06);if(c.cs>tc*1.5&&c.D>0){const x=Math.min(c.kd?c.D:loanOf(c),c.cs-tc);if(x>0){c.cs-=x;c.D-=x}}}
@@ -23,7 +28,7 @@ if(c.ni<0&&c.D/Math.max(eq(c),1)>(c.kd?12:1.2))c.ds++;else c.ds=0;
 if(c.ds>=4){c.ds=0;const e=eq(c);if(e>-.3*c.A){const a0=c.A;c.A=Math.max(c.A*.2,c.A-(e+.3*c.A));const wd=a0-c.A;if(wd>0)impair(c,wd)}}
 if(eq(c)<(c.kd?0:-.25*c.A)){ch11(c,"자본잠식");if(c.dead)return}
 c.tg=tgCalc(c);if(c.surp){c.tg*=1+c.surp;c.jx=(c.jx||0)+Math.log(1+c.surp*.5);c.surp=0}
-qPush(c,[S.day,rev,op,rdx,it,iinc,ga,c.er.eq,c.er.dr,tax,c.ni,dv,gr,c.cs,c.A,c.gw,pfv(c),c.D,c.bond,c.pa||0,c.sh,c.p,c.er.imp||0]);if(c.own.P||mine(c))L(c.tk+" 실적: 순이익 "+F(c.ni)+(smsg?" · "+smsg:"")+(c.own.P&&dv>0?" · 배당 "+F(dv*c.own.P/100*.6):""))}
+qPush(c,[S.day,rev,op,rdx,it,iinc,ga,c.er.eq,c.er.dr,tax,c.ni,dv,gr,c.cs,c.A,c.gw,pfv(c),c.D,c.bond,c.pa||0,c.sh,c.p,c.er.imp||0,c.er.wo||0]);if(c.own.P||mine(c))L(c.tk+" 실적: 순이익 "+F(c.ni)+(smsg?" · "+smsg:"")+(c.own.P&&dv>0?" · 배당 "+F(dv*c.own.P/100*.6):""))}
 // remove a company. m = multiple of market cap paid to holders; paid=true when caller already paid holders
 function kill(c,m,paid){const v=mc(c)*m;settleNew(c,m);
 if(c.sp>0){const x=c.sb-v*c.sp/100,t=Math.max(0,x)*.22;S.cash+=x-t;if(x>0)S.fl.sh=1;c.sp=0;c.sb=0}
@@ -143,7 +148,7 @@ const bkE=c=>c.A+c.cs+c.gw-c.D+(c.fmg||0);
 function ch11(c,why){const b0=bkE(c);ch11x(c,why);if(!c.dead&&c.er&&c.er.d===S.day)c.er.cap=(c.er.cap||0)+(bkE(c)-b0)}
 function ch11x(c,why){const had=c.own.P>0||mine(c);c.bk++;
 if(c.bk>=2){S.st.del++;eco("🪦 "+c.tk+" "+c.n+" 상장폐지 ("+why+")"+(had?" — 내 지분 휴지조각!":""));if(had)toast(c.tk+" 상장폐지! 지분 소멸");kill(c,.02);return}
-const b=S.co[c.ln];if(b&&!b.dead){const ls=loanOf(c)*.3;b.A-=ls;if(mine(b))L(b.tk+" 은행: "+c.tk+" 부실로 대손 "+F(ls),1)}
+const b=S.co[c.ln];if(b&&!b.dead){const ls=loanOf(c)*.3;b.A-=ls;b.woq=(b.woq||0)+ls;if(mine(b))L(b.tk+" 은행: "+c.tk+" 부실로 대손 "+F(ls)+" (다음 결산 순이익에 반영)",1)}
 if(!c.kd&&c.A>20)fsAdd(c,.15,"법정관리");eco("💥 "+c.tk+" 법정관리 ("+why+")"+(had?" — 내 지분 소멸!":""));if(had)toast(c.tk+" 법정관리! 지분 소멸");
 if(c.pa)c.pa*=.3;for(const k of Object.keys(c.own))setOwn(c,k,0);c.priv=0;{const b=S.co[c.ln];if(b&&!b.dead&&b.kd===1&&loanOf(c)>c.A*.1){const st=Math.min(80,30+loanOf(c)/Math.max(1,c.A)*60);setOwn(c,"c"+b.id,st);c.bs["c"+b.id]=0;eco("🏦 "+b.tk+" 대출 출자전환 — 법정관리 "+c.tk+" 지분 "+st.toFixed(0)+"% 확보");if(mine(b))L("🏦 loan-to-own: "+b.tk+" 은행이 "+c.tk+" 지분 "+st.toFixed(0)+"%를 받았습니다",1);ctlAll()}}c.bh*=.4;c.bond*=.4;c.D=Math.max(0,c.A+c.cs+c.gw+pfv(c)-.15*c.A);if(c.bond>c.D)c.bond=c.D;if(c.pa>c.D-c.bond)c.pa=Math.max(0,c.D-c.bond);c.nol=0;c.mg=-1;c.p=Math.max(60,eq(c)*1e4/c.sh*.5);c.tg=c.p}
 // bank b calls fraction f of borrower x's bank loan; shortfall forces asset sales, then chapter 11
@@ -256,8 +261,8 @@ S.ixh=ringGet(S.IX.ALL.lv,S.IX.ALL.hn,DH).filter((_,t)=>t%10===(DH-1)%10).map(x=
 // ---------- revenue model and quarterly statements ----------
 function revQ(c){const x=SX[c.i]||SX[0];if(c.kd===1)return c.A*(S.prime+1.5)/400+c.A*.0015;if(c.kd===2)return c.A*.075/4+c.cs*Math.max(0,S.prime-2)/400;if(c.i===HOLD)return Math.max(0,c.cs*Math.max(0,S.prime-2)/400);
 return Math.max(0,c.A*x.to/4*(1+2*(S.dg[c.i]-S.cg[c.i]))*(1+.03*hgn(c.id,13)))}
-// record: [day,rev,op,rd,int exp,int inc,goodwill amort,equity-method,div income,tax,ni,div paid,capex growth,cash,A,gw,investments,D,bond,adv,shares,price]
-const FQ=["d","rev","op","rd","it","ii","ga","eq","dr","tax","ni","dv","gr","cs","A","gw","pv","D","bond","pa","sh","p","imp"],fqo=r=>{const o={};FQ.forEach((k,j)=>o[k]=r[j]);return o};
+// record: [day,rev,op,rd,int exp,int inc,goodwill amort,equity-method,div income,tax,ni,div paid,capex growth,cash,A,gw,investments,D,bond,adv,shares,price,impairment,bank loan write-off]
+const FQ=["d","rev","op","rd","it","ii","ga","eq","dr","tax","ni","dv","gr","cs","A","gw","pv","D","bond","pa","sh","p","imp","wo"],fqo=r=>{const o={};FQ.forEach((k,j)=>o[k]=r[j]);return o};
 const r1=x=>Math.abs(x)>=10?Math.round(x):Math.round(x*10)/10;
 function qPush(c,a){(c.fq=c.fq||[]).push(a.map((x,j)=>j===0||j===21?Math.round(x):r1(x)));if(c.fq.length>8)c.fq.shift()}
 function qBack(c){if(c.priv&&c.fo)return;const x=SX[c.i]||SX[0],g=x.dg||.03,rev0=revQ(c),pf=pfv(c);c.fq=[];
