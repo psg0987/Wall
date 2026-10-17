@@ -1,14 +1,15 @@
-"""RT-BANK-001-R1: is the cash flow fix display-only? Runs the same situations with the game before the fix (src/ of
-commit 41d77d2 = 1ec5891, rebuilt from git) and after it (dist/game.js), and compares.
+"""RT-BANK-001-R1: are the cash flow changes display-only? Runs the same situations with the game at a base commit
+(default 41d77d2 = 1ec5891, before the fqDerive fix; 23b7912 = before the add-back row; rebuilt from git) and with the
+current build (dist/game.js), and compares.
 - the TC-BANK-07 bank (write-off 60 reported on day 150) and JYNR (impairment 1823.05 on day 431, seed 12345):
   game values (exact cash change, financing cash flow of the statement, net income, EPS, tax, dividends, woq, llr,
   write-off/impairment records) must be identical; operating cash flow, other and free cash flow may change
 - what the 현금흐름 tab shows in the operating section (net income, depreciation, adjustment, operating cash flow)
 - 720-day whole-game state for seeds 12345, 777, 20261016 must be identical
-usage: python3 build/build.py && python3 verify/rt-bank-001/r1_before_after.py      (exit 1 if a game value differs)"""
+usage: python3 build/build.py && python3 verify/rt-bank-001/r1_before_after.py [base commit]      (exit 1 if a game value differs)"""
 import json, os, subprocess, sys, tempfile
 V = os.path.dirname(os.path.abspath(__file__)); R = os.path.dirname(os.path.dirname(V))
-REV = '41d77d2'
+REV = sys.argv[1] if len(sys.argv) > 1 else '41d77d2'
 show = lambda p: subprocess.run(['git', '-C', R, 'show', REV + ':' + p], capture_output=True, text=True, check=True).stdout
 PARTS = ['data.js', 'core.js', 'sim.js', 'act1.js', 'act2.js', 'ui1.js', 'ui2.js']
 old = show('src/base_v5.js') + '\n' + '\n'.join(show('src/' + f) for f in PARTS)
@@ -22,7 +23,7 @@ const out = {};
 function tabRows(c) {
   sel = -1; pg = ''; tab = 'h'; S.spd = 0; G.pick(c.id); G.stab('f'); G.fseg(3); render();
   const h = document.getElementById('sh').innerHTML, cell = lab => ([...((h.split('<td>' + lab + '</td>')[1] || '').split('</tr>')[0]).matchAll(/<td[^>]*>([^<]*)<\/td>/g)].map(m => m[1])[0]);
-  return ['순이익', '감가상각(비현금)', '지분법·상각 조정', '영업활동 현금흐름', '설비투자', '잉여현금흐름 FCF', '재무활동 현금흐름', '기타·투자 매매', '현금 증감'].map(k => k + ' ' + cell(k)).join(' | ');
+  return ['순이익', '감가상각(비현금)', '지분법·상각 조정', '손상·대손상각(비현금 조정)', '영업활동 현금흐름', '설비투자', '잉여현금흐름 FCF', '재무활동 현금흐름', '기타·투자 매매', '현금 증감'].map(k => k + ' ' + (cell(k) == null ? '(no row)' : cell(k))).join(' | ');
 }
 function stmt(c) { const L = fqL(c), q = L[L.length - 1], d = fqDerive(c, q, L[L.length - 2]); return { cfo: d.cfo, oth: d.oth, fcf: d.fcf, cff: d.cff, dc: d.dc } }
 { // the TC-BANK-07 bank
@@ -74,6 +75,7 @@ for case in ['bank', 'impair']:
     for k in b['statement']:
         print('  %-16s before %-22s after %-22s (statement line, may change)' % ('statement ' + k, round(b['statement'][k], 4), round(a['statement'][k], 4)))
     print('  tab before: ' + b['tab']); print('  tab after:  ' + a['tab'])
+print('base commit ' + REV + ' vs current build')
 print('== 720-day whole-game state')
 for s in res['before']['seeds']:
     same = res['before']['seeds'][s] == res['after']['seeds'][s]; bad += not same

@@ -1,0 +1,66 @@
+# RT-BANK-001 incl. R1 and the add-back row: do the tests catch wrong implementations? (broken builds, changed in memory only)
+# when: 2026-10-17 18:28:56 KST; game = working tree with the add-back row (src/ui1.js sFi); same files as fix_row_run_2026-10-17.log
+$ python3 verify/rt-bank-001/mutation_check.py
+ok   none (the fixed game) -> all pass
+ok   M1 the close never reports the write-off (woBook not called) -> caught by t_bank_writeoff.js, t_clean_surplus.js, t_bank_writeoff_cases.js, t_bank_writeoff_cashflow.js
+       t_bank_writeoff.js: FAIL bank book-equity change over write-off + next close is explained by its results (unexplained -60.0000)
+       t_clean_surplus.js: FAIL BOAX day 494 close reported write-off 0.000 but 286.970 was waiting
+       t_bank_writeoff_cases.js: FAIL another day: that close reports -, what was waiting (60.1478), and leaves nothing waiting (60.147805533658484)
+       t_bank_writeoff_cashflow.js: FAIL net income differs by exactly the write-off: 5.0328 = 5.0328 - 0.0000
+ok   M2 reported but not cleared (would be reported again next close) -> caught by t_clean_surplus.js, t_bank_writeoff_cases.js
+       t_clean_surplus.js: FAIL BOAX day 494 close left 286.970 of write-off waiting
+       t_bank_writeoff_cases.js: FAIL another day: that close reports 60.1478, what was waiting (60.1478), and leaves nothing waiting (60.147805533658484)
+ok   M3 queued but not cut from assets on the default day -> caught by t_bank_writeoff.js, t_clean_surplus.js, t_bank_writeoff_cases.js
+       t_bank_writeoff.js: FAIL write-off = 30% of the 200 loan = 60 (got 0)
+       t_clean_surplus.js: FAIL BOAX day 431 write-off: assets cut 0.000 but queued 286.970
+       t_bank_writeoff_cases.js: FAIL another day: assets cut by 30% of the loan 200.4927 = 0.0000, same amount queued 60.1478
+ok   M4 cut from assets but not queued (the old behaviour) -> caught by t_bank_writeoff.js, t_clean_surplus.js, t_bank_writeoff_cases.js, t_bank_writeoff_cashflow.js
+       t_bank_writeoff.js: FAIL bank book-equity change over write-off + next close is explained by its results (unexplained -60.0000)
+       t_clean_surplus.js: FAIL BOAX day 431 write-off: assets cut 286.970 but queued 0.000
+       t_bank_writeoff_cases.js: FAIL another day: assets cut by 30% of the loan 200.4927 = 60.1478, same amount queued 0.0000
+       t_bank_writeoff_cashflow.js: FAIL net income differs by exactly the write-off: 5.0328 = 5.0328 - 0.0000
+ok   M5 reported before tax (tax and loss carryforward change) -> caught by t_bank_writeoff_cases.js, t_bank_writeoff_cashflow.js
+       t_bank_writeoff_cases.js: FAIL TC-BANK-05 net income = twin - write-off: -53.8916 = 4.3793 - 60.1478, and er.ni is the bank's ni
+       t_bank_writeoff_cashflow.js: FAIL net income differs by exactly the write-off: -52.8102 = 5.0328 - 60.0000
+ok   M6 reported through operating profit (cash hit a second time) -> caught by t_bank_writeoff.js, t_clean_surplus.js, t_bank_writeoff_cases.js, t_bank_writeoff_cashflow.js
+       t_bank_writeoff.js: FAIL bank book-equity change over write-off + next close is explained by its results (unexplained -60.0000)
+       t_clean_surplus.js: FAIL BOAX day 494 residual -286.970 (equity 85.5, NI -267.63)
+       t_bank_writeoff_cases.js: FAIL another day: equity from just before the write-off to just after that close is explained by its results (unexplained -60.1478)
+       t_bank_writeoff_cashflow.js: FAIL net income differs by exactly the write-off: -52.8102 = 5.0328 - 60.0000
+ok   M7 reported twice as large -> caught by t_bank_writeoff.js, t_clean_surplus.js, t_bank_writeoff_cases.js
+       t_bank_writeoff.js: FAIL bank book-equity change over write-off + next close is explained by its results (unexplained 60.0000)
+       t_clean_surplus.js: FAIL BOAX day 494 close reported write-off 573.940 but 286.970 was waiting
+       t_bank_writeoff_cases.js: FAIL another day: that close reports 120.2956, what was waiting (60.1478), and leaves nothing waiting (0)
+ok   M8 stake value offset against the write-off -> caught by t_bank_writeoff.js, t_clean_surplus.js, t_bank_writeoff_cases.js
+       t_bank_writeoff.js: FAIL bank book-equity change over write-off + next close is explained by its results (unexplained -19.8000)
+       t_clean_surplus.js: FAIL BOAX day 431 write-off: assets cut 286.970 but queued 192.270
+       t_bank_writeoff_cases.js: FAIL another day: assets cut by 30% of the loan 200.4927 = 60.1478, same amount queued 40.2990
+ok   M9 quarter record misses the write-off (fq) -> caught by t_bank_writeoff_cases.js, t_bank_writeoff_cashflow.js
+       t_bank_writeoff_cases.js: FAIL TC-BANK-05 fq row of that close: day 60, ni -56, wo 0, imp 0 (24 fields)
+       t_bank_writeoff_cashflow.js: FAIL R1 operating cash flow does not move with the non-cash write-off: -55.0 vs twin 5.0 (difference -60.0, allowed 1.1)
+ok   M10 old saves not given woq = 0 -> caught by t_bank_writeoff_cases.js
+       t_bank_writeoff_cases.js: FAIL TC-BANK-04 old save: after loading every company has woq = 0
+ok   M11 parent equity-method income not corrected -> caught by t_bank_writeoff_cases.js
+       t_bank_writeoff_cases.js: FAIL TC-BANK-05 25% holder's equity-method income from this close 1.0948 = 25% of net income (twin 1.0948)
+ok   M12 cash flow: no add-back at all (the statement before R1) -> caught by t_bank_writeoff_cashflow.js
+       t_bank_writeoff_cashflow.js: FAIL R1 operating cash flow does not move with the non-cash write-off: -55.0 vs twin 5.0 (difference -60.0, allowed 1.1)
+ok   M13 cash flow: write-off not added back (impairment only) -> caught by t_bank_writeoff_cashflow.js
+       t_bank_writeoff_cashflow.js: FAIL R1 operating cash flow does not move with the non-cash write-off: -55.0 vs twin 5.0 (difference -60.0, allowed 1.1)
+ok   M14 cash flow: impairment not added back (write-off only) -> caught by t_bank_writeoff_cashflow.js
+       t_bank_writeoff_cashflow.js: FAIL R1 operating cash flow does not move with the non-cash write-down: -1829.0 vs replay -6.0 (difference -1823.0, allowed 1.5)
+ok   M15 cash flow: add-back counted twice -> caught by t_bank_writeoff_cashflow.js
+       t_bank_writeoff_cashflow.js: FAIL R1 operating cash flow does not move with the non-cash write-off: 65.0 vs twin 5.0 (difference 60.0, allowed 1.1)
+ok   M16 cash flow: records without imp/wo not read as 0 -> caught by t_bank_writeoff_cashflow.js
+       t_bank_writeoff_cashflow.js: FAIL records without the imp/wo fields (5 of 8 rows, 22 fields) read them as 0, and the tab renders clean
+ok   M17 cash flow tab: no add-back row (the tab before this change) -> caught by t_bank_writeoff_cashflow.js
+       t_bank_writeoff_cashflow.js: FAIL write-off only (bank, write-off 60.0 reported on day 150): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 1 of 8 quarters; record fields 24/24/22/22/22/22/22/22)
+ok   M18 cash flow tab: add-back row shown even when no quarter has imp or wo -> caught by t_bank_writeoff_cashflow.js
+       t_bank_writeoff_cashflow.js: FAIL neither (the twin that reports nothing): row 손상·대손상각(비현금 조정) shown (imp + wo non-zero in 0 of 8 quarters; record fields 24/24/22/22/22/22/22/22)
+ok   M19 cash flow tab: add-back row shows imp only -> caught by t_bank_writeoff_cashflow.js
+       t_bank_writeoff_cashflow.js: FAIL write-off only (bank, write-off 60.0 reported on day 150): the row shows imp + wo as a positive add-back: 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0
+ok   M20 cash flow tab: add-back row with the wrong sign -> caught by t_bank_writeoff_cashflow.js
+       t_bank_writeoff_cashflow.js: FAIL write-off only (bank, write-off 60.0 reported on day 150): the row shows imp + wo as a positive add-back: -60.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0
+ok   M21 cash flow tab: add-back row hidden when only wo exists -> caught by t_bank_writeoff_cashflow.js
+       t_bank_writeoff_cashflow.js: FAIL write-off only (bank, write-off 60.0 reported on day 150): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 1 of 8 quarters; record fields 24/24/22/22/22/22/22/22)
+ALL MUTANTS CAUGHT, fixed game passes
+exit code: 0

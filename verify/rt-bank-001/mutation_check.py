@@ -30,6 +30,11 @@ MUTANTS = [
     ('M14 cash flow: impairment not added back (write-off only)', [('cfo=q.ni-q.eq+q.ga+dep+(q.imp||0)+(q.wo||0),', 'cfo=q.ni-q.eq+q.ga+dep+(q.wo||0),')]),
     ('M15 cash flow: add-back counted twice', [('cfo=q.ni-q.eq+q.ga+dep+(q.imp||0)+(q.wo||0),', 'cfo=q.ni-q.eq+q.ga+dep+2*((q.imp||0)+(q.wo||0)),')]),
     ('M16 cash flow: records without imp/wo not read as 0', [('cfo=q.ni-q.eq+q.ga+dep+(q.imp||0)+(q.wo||0),', 'cfo=q.ni-q.eq+q.ga+dep+q.imp+q.wo,')]),
+    ('M17 cash flow tab: no add-back row (the tab before this change)', [('...(fqL(c).some(q=>q.imp||q.wo)?[["손상·대손상각(비현금 조정)",q=>(q.imp||0)+(q.wo||0)]]:[]),', '')]),
+    ('M18 cash flow tab: add-back row shown even when no quarter has imp or wo', [('.some(q=>q.imp||q.wo)?[', '.some(q=>true)?[')]),
+    ('M19 cash flow tab: add-back row shows imp only', [('q=>(q.imp||0)+(q.wo||0)]]', 'q=>(q.imp||0)]]')]),
+    ('M20 cash flow tab: add-back row with the wrong sign', [('q=>(q.imp||0)+(q.wo||0)]]', 'q=>-((q.imp||0)+(q.wo||0))]]')]),
+    ('M21 cash flow tab: add-back row hidden when only wo exists', [('.some(q=>q.imp||q.wo)?[', '.some(q=>q.imp)?[')]),
 ]
 def run(game, name):
     code = SEED + stub + '\n' + game + '\n' + rd(os.path.join(T, name))

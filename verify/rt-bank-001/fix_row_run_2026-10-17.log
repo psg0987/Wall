@@ -1,0 +1,295 @@
+# Add-back row on the 현금흐름 tab (sFi): full suite and verbose outputs, saved verbatim
+# when: 2026-10-17 18:29:18 KST; base commit a47cfda5af9046893f5bbfb459b74189faa5dfb7 (rt-bank-001) + the changes committed together with this log
+# environment: Node v22.22.0, Python 3.13.16
+# sha256 of the files that ran (compare with the commit that adds this log):
+#   cf9fa92ffaf5470db51f55cce650090751c2b78a4819dcb479c8d1b7cd58869e  src/act1.js
+#   8383cdf73b1afd69e91338b639f491926bc0aedae8f37a42f004a12ee6c93369  src/act2.js
+#   2afa0d72bd0f5f8dffec55815bd5bda0477b030333a291275fadf772cdf10700  src/base_v5.js
+#   22ed8832c921cbf8c235c8bbf86c3f69017feda79ca7af0674eb80bbb951ae04  src/core.js
+#   edcc9c24b9344218c3d839d8a2c426b05eb6ff520bc7a8bea1084f62b901512a  src/data.js
+#   fc00285d8248f27b62c1e906c6c79d62617aa90c809eea0e72a8116c2d78d439  src/sim.js
+#   9fa3a2e8d7ae3205868ae4edf50f01f837dec28395f39db1e0e56f9902b3ff21  src/ui1.js
+#   70e416ddca6bc2d47b1a3ccdd8a283b868858c221fb66d3c9f009d409867902e  src/ui2.js
+#   5125ff3a2f2ce03827a11212c7d9a9319e7b30b7d3622cb48e91f2e8ac37ad17  src/head.html
+#   89203abc2789115fbaf388562b074d5eb3c7606a7b3f29ce04d64acba6dd5fb5  tests/ai_native_fake.js
+#   b225d730b5f46d40118e3a443adef2e609c5591d74afb7cc7c3a0e17e5c4ae16  tests/stub.js
+#   b83fea744bf59b9d0b9fb46d0ed7118bf06b93d257e5ec2b514d5e6e2e557719  tests/t12_sim.js
+#   9d98d23052819a5a2a5f1a830041607c24c5663b093a2b8723fa573a7abbdc81  tests/t13_ui.js
+#   58dbca9d2c47e8ef21238148b304d89afa3244acc5cd43457bcdf36c9852afdc  tests/t14_advisor.js
+#   05094fd835d5d5999817203a188113195d15a4ddae00bdf6e8b95048a2716ea1  tests/t18_ai_native.js
+#   67cfb09112b3f0b6d08b78484569fddaef929dcb4435ebfbb2d474d30877def4  tests/t18_ai_web.js
+#   cb518078b538bb44e085fb5212f7507da5719919e87d0307c4e1e059bacc7c75  tests/t_bank_writeoff.js
+#   ebd6649ddcea6e057218982f47e004fd321d4870d4dbea6b5bfe655a7d31349f  tests/t_bank_writeoff_cases.js
+#   10c29a3a2fd6f8eef3a88e57736495e8515833721320e10d85abba5baefee9f2  tests/t_bank_writeoff_cashflow.js
+#   e7b9fd9ebd4a9dca6f9978b9d9c14977050d6e0908a4035c028e55c760f2140c  tests/t_clean_surplus.js
+#   332bc414adc6ce8ce927d7525dabe90d9fd9d73b5dc86a62c998f7be7952283e  tests/t_close_spec.js
+#   b080a6651bcd1e1424e728a48405cb3d8910631f024fb168d84f512302f02a7c  tests/t_golden.js
+#   41dcbc7fd1d992da15d5112cbf7a22093ca41e37a091e4a0b634743fb5690193  tests/t_impair_ui.js
+#   5945a70f00aaadca7581aa0ec65660379acf7d19b2d029742c24425bc426a577  tests/run.py
+#   77c1708ba43fb94812daea4e3fa8b9c539d0b351ee4f1603189b6f57143fab4b  tests/fixtures/old_save_1ecdc53_seed12345_day440.wsr
+
+$ VERBOSE=1 python3 tests/run.py cashflow
+---- t_bank_writeoff_cashflow.js
+-- TC-BANK-07 cash flow statement of the quarter that reports a bank write-off (RT-BANK-001-R1)
+ok   both twins: write-off on day 60 after the bank's close that day, next close day 150 (statement quarter 60 -> 150)
+     reports the write-off: write-off 60.0000 | NI -54.9672 | cash change: exact 3.0197, statement 3.0 | CFO 5.0 | financing 9.0 | other -11.0   (tab shows: NI -55.0, CFO 5.0, other -11.0, cash change 3.0)
+     twin, nothing reported: write-off 0.0000 | NI 5.0328 | cash change: exact 3.0197, statement 3.0 | CFO 5.0 | financing 9.0 | other -11.0   (tab shows: NI 5.0, CFO 5.0, other -11.0, cash change 3.0)
+ok   net income differs by exactly the write-off: -54.9672 = 5.0328 - 60.0000
+ok   the write-off moved no cash: cash change 3.0197 vs 3.0197 (statement 3.0 vs 3.0)
+ok   R1 operating cash flow does not move with the non-cash write-off: 5.0 vs twin 5.0 (difference 0.0, allowed 1.1)
+ok   R1 the other cash flow line does not absorb the write-off: -11.0 vs twin -11.0 (difference 0.0, allowed 1.1)
+ok   the twins differ only in net income: exact cash change 3.0197, exact debt change 11.9063, statement: cash change 3.0, financing 9.0, capital spending 0.0, depreciation 0.0, share issue 0.0, dividends 2.0, equity-method/amortization adjustment 0.0 (same in the twin)
+ok   a bank has no capital spending (0.0) and the tab shows no free cash flow line (–)
+ok   the 현금흐름 tab shows the computed lines: CFO 5.0 / 5.0, financing 9.0 / 9.0, other -11.0 / -11.0
+ok   records without the imp/wo fields (5 of 8 rows, 22 fields) read them as 0, and the tab renders clean
+-- TC-BANK-07 second case: cash flow statement of the quarter with an asset impairment (impair)
+ok   an impairment happened within 720 days on the test seeds
+ok   seed 12345 day 431 JYNR (alive true, write-down 1823.0521): the replay without the charge reaches the same quarter (341 -> 431)
+     reports the impairment: write-down 1823.0521 | NI -1840.4701 | cash change: exact 32.0693, statement 32.0 | CFO -6.0 | capital spending 34.0 | FCF -40.0 | financing -848.0 | other 920.0   (tab: CFO -6.0, FCF -40.0, other 920)
+     replay, no charge:      write-down 0.0000 | NI -17.4180 | cash change: exact 32.0693, statement 32.0 | CFO -6.0 | capital spending 34.0 | FCF -40.0 | financing -848.0 | other 920.0   (tab: CFO -6.0, FCF -40.0, other 920)
+ok   net income differs by exactly the write-down: -1840.4701 = -17.4180 - 1823.0521 (record imp 1823.0 / 0.0)
+ok   tax 0.0000 and dividends 0.0000 are the same in both
+ok   the twins differ only in net income: exact cash change 32.0693, exact debt change -848.4240, statement: cash change 32.0, financing -848.0, capital spending 34.0, depreciation 11.0, share issue 0.0, dividends 0.0, equity-method/amortization adjustment 0.0 (same in the replay)
+ok   R1 operating cash flow does not move with the non-cash write-down: -6.0 vs replay -6.0 (difference -0.0, allowed 1.5)
+ok   R1 the other cash flow line does not absorb the write-down: 920.0 vs replay 920.0 (difference 0.0, allowed 1.5)
+ok   R1 free cash flow does not move with the non-cash write-down: -40.0 vs replay -40.0 (difference -0.0, allowed 1.5)
+ok   the 현금흐름 tab shows the computed lines: CFO -6.0 / -6.0, FCF -40.0 / -40.0, other 920 / 920
+-- TC-BANK-07 third part: the 현금흐름 tab shows the non-cash add-back on its own row
+ok   write-off only (bank, write-off 60.0 reported on day 150): row 손상·대손상각(비현금 조정) shown (imp + wo non-zero in 1 of 8 quarters; record fields 24/24/22/22/22/22/22/22)
+ok   write-off only (bank, write-off 60.0 reported on day 150): the row shows imp + wo as a positive add-back: 60.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0
+ok   write-off only (bank, write-off 60.0 reported on day 150): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 0.25; latest quarter -55.0 + 0.0 + 0.0 + 60.0 = 5.0)
+ok   write-off only: the latest quarter carries wo 60.0, no quarter carries imp
+ok   neither (the twin that reports nothing): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 0 of 8 quarters; record fields 24/24/22/22/22/22/22/22)
+ok   neither (the twin that reports nothing): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 0.20; latest quarter 5.0 + 0.0 + 0.0 = 5.0)
+ok   impairment only (JYNR, write-down 1823.1 on day 431): row 손상·대손상각(비현금 조정) shown (imp + wo non-zero in 1 of 8 quarters; record fields 24/24/24/24/24/22/22/22)
+ok   impairment only (JYNR, write-down 1823.1 on day 431): the row shows imp + wo as a positive add-back: 1,823 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0
+ok   impairment only (JYNR, write-down 1823.1 on day 431): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 1.60; latest quarter -1,840 + 11.0 + 0.0 + 1,823 = -6.0)
+ok   impairment only: the latest quarter carries imp 1823.0, no quarter carries wo
+ok   neither (the replay without the charge): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 0 of 8 quarters; record fields 24/24/24/24/24/22/22/22)
+ok   neither (the replay without the charge): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 1.10; latest quarter -17.0 + 11.0 + 0.0 = -6.0)
+ok   old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): row 손상·대손상각(비현금 조정) shown (imp + wo non-zero in 1 of 8 quarters; record fields 23/23/23/23/23/22/22/22)
+ok   old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): the row shows imp + wo as a positive add-back: 1,823 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0
+ok   old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 1.60; latest quarter -1,840 + 11.0 + 0.0 + 1,823 = -6.0)
+ok   old records: every row has 22 or 23 fields, wo reads as 0, imp 1823.0 still shown
+ok   old save from before the fix (commit 1ecdc53), BOAX after its day-494 close: row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 0 of 8 quarters; record fields 24/22/22/22/22/22/22/22)
+ok   old save from before the fix (commit 1ecdc53), BOAX after its day-494 close: in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 0.20; latest quarter 14.0 + 0.0 + 0.0 = 14.0)
+ok   old save: BOAX mixes rows without the new fields (7) and new rows (1)
+errs 0 fails 0
+PASS t_bank_writeoff_cashflow.js
+ALL PASS
+exit code: 0
+
+$ python3 tests/run.py
+PASS t12_sim.js
+PASS t13_ui.js
+PASS t14_advisor.js
+PASS t18_ai_native.js
+PASS t18_ai_web.js
+PASS t_clean_surplus.js
+PASS t_close_spec.js
+PASS t_impair_ui.js
+PASS t_bank_writeoff.js
+PASS t_bank_writeoff_cases.js
+PASS t_bank_writeoff_cashflow.js
+PASS t_golden.js
+ALL PASS
+exit code: 0
+
+$ VERBOSE=1 python3 tests/run.py bank
+---- t_bank_writeoff.js
+before   bank A 1000, cash 100, deposits 1000, book equity 100, reserve llr 50.5700 | borrower loan 200, chapter 11 count 0
+after ch11   bank A 940, book equity 40, NI field unchanged, quarter record unchanged, reserve llr 50.5700, bank stake in borrower 80.0%
+ok   write-off = 30% of the 200 loan = 60 (got 60)
+bank close   NI -56.5247 (op 3.5897, tax 1.4894, dividends 1.3901), provision in close 0.7050, reserve llr 50.5700
+window   book equity moved -57.9148, explained by results -57.9148, unexplained 0.0000
+counterfactual   bank NI without the loss 4.3247 -> NI difference caused by the 60 loss -60.8494
+ok   bank book-equity change over write-off + next close is explained by its results (unexplained 0.0000)
+errs 0 fails 0
+PASS t_bank_writeoff.js
+---- t_bank_writeoff_cases.js
+-- TC-BANK-02 event order (real days) and TC-BANK-03 reported once
+ok   another day: the borrower went into its first chapter 11 at its own close (PNPL, bank JPMX closes on day % 90 = 60)
+     write-off day 25 (borrower PNPL @25), loan 200.4927, cut 60.1478 | bank closes after it: day 60 reported 60.1478, day 150 reported 0.0000, day 240 reported 0.0000
+ok   another day: write-off day 25 is not a bank close day
+ok   another day: assets cut by 30% of the loan 200.4927 = 60.1478, same amount queued 60.1478
+ok   another day: reported by the bank close on day 60 (first close after the write-off: day 60)
+ok   another day: that close reports 60.1478, what was waiting (60.1478), and leaves nothing waiting (0)
+ok   another day: no close before the write-off reports anything ()
+ok   another day: equity from just before the write-off to just after that close is explained by its results (unexplained 0.0000)
+ok   TC-BANK-03 another day: the next 2 closes report nothing (day 150 er.wo 0, fq 0; day 240 er.wo 0, fq 0)
+ok   TC-BANK-03 another day: reported in all closes together 60.1478 = booked 60.1478
+ok   same day, borrower closes first: the borrower went into its first chapter 11 at its own close (PNPL, bank JPMX closes on day % 90 = 60)
+     write-off day 60 (borrower PNPL @60 > bank @60), loan 195.0030, cut 58.5009 | bank closes after it: day 60 reported 58.5009, day 150 reported 0.0000, day 240 reported 0.0000
+ok   same day, borrower closes first: on day 60 the borrower closed (and defaulted) before the bank closed
+ok   same day, borrower closes first: assets cut by 30% of the loan 195.0030 = 58.5009, same amount queued 58.5009
+ok   same day, borrower closes first: reported by the bank close on day 60 (first close after the write-off: day 60)
+ok   same day, borrower closes first: that close reports 58.5009, what was waiting (58.5009), and leaves nothing waiting (0)
+ok   same day, borrower closes first: no close before the write-off reports anything ()
+ok   same day, borrower closes first: equity from just before the write-off to just after that close is explained by its results (unexplained 0.0000)
+ok   TC-BANK-03 same day, borrower closes first: the next 2 closes report nothing (day 150 er.wo 0, fq 0; day 240 er.wo 0, fq 0)
+ok   TC-BANK-03 same day, borrower closes first: reported in all closes together 58.5009 = booked 58.5009
+ok   same day, bank closes first: the borrower went into its first chapter 11 at its own close (DOWC, bank JPMX closes on day % 90 = 60)
+     write-off day 60 (bank @60 > borrower DOWC @60), loan 200.0000, cut 60.0000 | bank closes after it: day 150 reported 60.0000, day 240 reported 0.0000, day 330 reported 0.0000
+ok   same day, bank closes first: on day 60 the bank closed before the borrower closed (and defaulted)
+ok   same day, bank closes first: assets cut by 30% of the loan 200.0000 = 60.0000, same amount queued 60.0000
+ok   same day, bank closes first: reported by the bank close on day 150 (first close after the write-off: day 150)
+ok   same day, bank closes first: that close reports 60.0000, what was waiting (60.0000), and leaves nothing waiting (0)
+ok   same day, bank closes first: no close before the write-off reports anything (day 60)
+ok   same day, bank closes first: equity from just before the write-off to just after that close is explained by its results (unexplained -0.0000)
+ok   TC-BANK-03 same day, bank closes first: the next 2 closes report nothing (day 240 er.wo 0, fq 0; day 330 er.wo 0, fq 0)
+ok   TC-BANK-03 same day, bank closes first: reported in all closes together 60.0000 = booked 60.0000
+ok   TC-BANK-03 two write-offs (day 25 60.1478, day 40 60.0625) before one bank close (day 60)
+ok   TC-BANK-03 that close reports both together once: 120.2103 = 120.2103
+ok   TC-BANK-03 the closes after it report nothing (day 150)
+ok   TC-BANK-03 equity from before the first write-off to that close is explained by its results (unexplained -0.0000)
+-- TC-BANK-04 saves
+ok   TC-BANK-04 autosave (full): saved on day 26 with 60.1478 waiting, loaded: woq 60.1478
+ok   TC-BANK-04 autosave (full): the close after loading (day 60) reports 60.1478 once, nothing left waiting
+ok   TC-BANK-04 autosave (full): equity from before the write-off (before saving) to that close is explained by its results (unexplained 0.0000)
+ok   TC-BANK-04 autosave (full): same close as the run without saving (NI -55.7685 vs -55.7685, equity 192.4798 vs 192.4798)
+ok   TC-BANK-04 export (packS(1), histories left out): saved on day 26 with 60.1478 waiting, loaded: woq 60.1478
+ok   TC-BANK-04 export (packS(1), histories left out): the close after loading (day 60) reports 60.1478 once, nothing left waiting
+ok   TC-BANK-04 export (packS(1), histories left out): equity from before the write-off (before saving) to that close is explained by its results (unexplained 0.0000)
+ok   TC-BANK-04 old save: day 440, 530 companies, none has a woq field
+ok   TC-BANK-04 old save: after loading every company has woq = 0
+ok   TC-BANK-04 old save: played days 441-500 without errors
+ok   TC-BANK-04 old save: 325 closes balance and none reports or keeps a write-off
+ok   TC-BANK-04 old save: BOAX (wrote off 286.97 on day 431, before the save, in the old version) closes on day 494 reporting 0 (no catch-up for write-offs made before the fix), new record row has 24 fields
+ok   TC-BANK-04 old save: BOAX income statement renders clean (old 22-field and new 24-field quarter rows mixed), no write-off row
+ok   TC-BANK-04 new save with the new fields removed: after loading every company has woq = 0
+ok   TC-BANK-04 new save with the new fields removed: the bank closes day 60, day 150 with nothing reported
+-- TC-BANK-05 records and TC-BANK-06 policy (twin runs: same world, the twin drops the queued amount)
+ok   twins reached the same bank close (day 60)
+     write-off 60.1478 | NI -55.7685 vs twin 4.3793 | tax 1.8769/1.8769 | dividends 1.7517/1.7517 | EPS -220.6/17.3
+ok   TC-BANK-05 er.wo = 60.1478 (twin: none)
+ok   TC-BANK-05 net income = twin - write-off: -55.7685 = 4.3793 - 60.1478, and er.ni is the bank's ni
+ok   TC-BANK-05 statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   TC-BANK-05 fq row of that close: day 60, ni -56, wo 60, imp 0 (24 fields)
+ok   TC-BANK-05 EPS history -220.6 won matches net income (twin 17.3)
+ok   TC-BANK-05 yearly net income lower by the write-off: -55.7685 vs 4.3793
+ok   TC-BANK-05 25% holder's equity-method income from this close -13.9421 = 25% of net income (twin 1.0948)
+ok   TC-BANK-05 income statement shows a 대손상각비 row only with a write-off: -60.0 | -60.0 | 0.0
+ok   TC-BANK-05 statement EPS -221 and net income -56.0 match the quarter record
+ok   TC-BANK-06 tax 1.8769, loss carryforward 0.0000, dividends 1.7517, operating profit 4.8812 same as the twin
+ok   TC-BANK-06 balance sheet after the close same as the twin (the loss already left the assets on the write-off day)
+ok   TC-BANK-06 statistical loss 0.7049 and provision 1.6964 unchanged, both still charged (overlap kept, docs/MODEL.md)
+ok   TC-BANK-06 llr untouched by the write-off (10.0000 before and after) and by reporting it
+ok   TC-BANK-06 stake received 80% at cost 0 (worth 20.0976), not offset: write-off stays 30% of the loan = 60.1478
+ok   TC-BANK-06 TC-BANK-01 with starting llr 50.5700 (inherited, as in TC-BANK-01): write-off 60.0000, reported 60.0000, unexplained 0.0000, NI -56.5247 = 3.4753 - 60
+ok   TC-BANK-06 TC-BANK-01 with starting llr 0.0000: write-off 60.0000, reported 60.0000, unexplained -0.0000, NI -61.0948 = -1.0948 - 60
+ok   TC-BANK-06 TC-BANK-01 with starting llr 10.0000: write-off 60.0000, reported 60.0000, unexplained 0.0000, NI -57.2272 = 2.7728 - 60
+errs 0 fails 0
+PASS t_bank_writeoff_cases.js
+---- t_bank_writeoff_cashflow.js
+-- TC-BANK-07 cash flow statement of the quarter that reports a bank write-off (RT-BANK-001-R1)
+ok   both twins: write-off on day 60 after the bank's close that day, next close day 150 (statement quarter 60 -> 150)
+     reports the write-off: write-off 60.0000 | NI -54.9672 | cash change: exact 3.0197, statement 3.0 | CFO 5.0 | financing 9.0 | other -11.0   (tab shows: NI -55.0, CFO 5.0, other -11.0, cash change 3.0)
+     twin, nothing reported: write-off 0.0000 | NI 5.0328 | cash change: exact 3.0197, statement 3.0 | CFO 5.0 | financing 9.0 | other -11.0   (tab shows: NI 5.0, CFO 5.0, other -11.0, cash change 3.0)
+ok   net income differs by exactly the write-off: -54.9672 = 5.0328 - 60.0000
+ok   the write-off moved no cash: cash change 3.0197 vs 3.0197 (statement 3.0 vs 3.0)
+ok   R1 operating cash flow does not move with the non-cash write-off: 5.0 vs twin 5.0 (difference 0.0, allowed 1.1)
+ok   R1 the other cash flow line does not absorb the write-off: -11.0 vs twin -11.0 (difference 0.0, allowed 1.1)
+ok   the twins differ only in net income: exact cash change 3.0197, exact debt change 11.9063, statement: cash change 3.0, financing 9.0, capital spending 0.0, depreciation 0.0, share issue 0.0, dividends 2.0, equity-method/amortization adjustment 0.0 (same in the twin)
+ok   a bank has no capital spending (0.0) and the tab shows no free cash flow line (–)
+ok   the 현금흐름 tab shows the computed lines: CFO 5.0 / 5.0, financing 9.0 / 9.0, other -11.0 / -11.0
+ok   records without the imp/wo fields (5 of 8 rows, 22 fields) read them as 0, and the tab renders clean
+-- TC-BANK-07 second case: cash flow statement of the quarter with an asset impairment (impair)
+ok   an impairment happened within 720 days on the test seeds
+ok   seed 12345 day 431 JYNR (alive true, write-down 1823.0521): the replay without the charge reaches the same quarter (341 -> 431)
+     reports the impairment: write-down 1823.0521 | NI -1840.4701 | cash change: exact 32.0693, statement 32.0 | CFO -6.0 | capital spending 34.0 | FCF -40.0 | financing -848.0 | other 920.0   (tab: CFO -6.0, FCF -40.0, other 920)
+     replay, no charge:      write-down 0.0000 | NI -17.4180 | cash change: exact 32.0693, statement 32.0 | CFO -6.0 | capital spending 34.0 | FCF -40.0 | financing -848.0 | other 920.0   (tab: CFO -6.0, FCF -40.0, other 920)
+ok   net income differs by exactly the write-down: -1840.4701 = -17.4180 - 1823.0521 (record imp 1823.0 / 0.0)
+ok   tax 0.0000 and dividends 0.0000 are the same in both
+ok   the twins differ only in net income: exact cash change 32.0693, exact debt change -848.4240, statement: cash change 32.0, financing -848.0, capital spending 34.0, depreciation 11.0, share issue 0.0, dividends 0.0, equity-method/amortization adjustment 0.0 (same in the replay)
+ok   R1 operating cash flow does not move with the non-cash write-down: -6.0 vs replay -6.0 (difference -0.0, allowed 1.5)
+ok   R1 the other cash flow line does not absorb the write-down: 920.0 vs replay 920.0 (difference 0.0, allowed 1.5)
+ok   R1 free cash flow does not move with the non-cash write-down: -40.0 vs replay -40.0 (difference -0.0, allowed 1.5)
+ok   the 현금흐름 tab shows the computed lines: CFO -6.0 / -6.0, FCF -40.0 / -40.0, other 920 / 920
+-- TC-BANK-07 third part: the 현금흐름 tab shows the non-cash add-back on its own row
+ok   write-off only (bank, write-off 60.0 reported on day 150): row 손상·대손상각(비현금 조정) shown (imp + wo non-zero in 1 of 8 quarters; record fields 24/24/22/22/22/22/22/22)
+ok   write-off only (bank, write-off 60.0 reported on day 150): the row shows imp + wo as a positive add-back: 60.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0
+ok   write-off only (bank, write-off 60.0 reported on day 150): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 0.25; latest quarter -55.0 + 0.0 + 0.0 + 60.0 = 5.0)
+ok   write-off only: the latest quarter carries wo 60.0, no quarter carries imp
+ok   neither (the twin that reports nothing): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 0 of 8 quarters; record fields 24/24/22/22/22/22/22/22)
+ok   neither (the twin that reports nothing): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 0.20; latest quarter 5.0 + 0.0 + 0.0 = 5.0)
+ok   impairment only (JYNR, write-down 1823.1 on day 431): row 손상·대손상각(비현금 조정) shown (imp + wo non-zero in 1 of 8 quarters; record fields 24/24/24/24/24/22/22/22)
+ok   impairment only (JYNR, write-down 1823.1 on day 431): the row shows imp + wo as a positive add-back: 1,823 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0
+ok   impairment only (JYNR, write-down 1823.1 on day 431): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 1.60; latest quarter -1,840 + 11.0 + 0.0 + 1,823 = -6.0)
+ok   impairment only: the latest quarter carries imp 1823.0, no quarter carries wo
+ok   neither (the replay without the charge): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 0 of 8 quarters; record fields 24/24/24/24/24/22/22/22)
+ok   neither (the replay without the charge): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 1.10; latest quarter -17.0 + 11.0 + 0.0 = -6.0)
+ok   old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): row 손상·대손상각(비현금 조정) shown (imp + wo non-zero in 1 of 8 quarters; record fields 23/23/23/23/23/22/22/22)
+ok   old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): the row shows imp + wo as a positive add-back: 1,823 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0
+ok   old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 1.60; latest quarter -1,840 + 11.0 + 0.0 + 1,823 = -6.0)
+ok   old records: every row has 22 or 23 fields, wo reads as 0, imp 1823.0 still shown
+ok   old save from before the fix (commit 1ecdc53), BOAX after its day-494 close: row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 0 of 8 quarters; record fields 24/22/22/22/22/22/22/22)
+ok   old save from before the fix (commit 1ecdc53), BOAX after its day-494 close: in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 0.20; latest quarter 14.0 + 0.0 + 0.0 = 14.0)
+ok   old save: BOAX mixes rows without the new fields (7) and new rows (1)
+errs 0 fails 0
+PASS t_bank_writeoff_cashflow.js
+ALL PASS
+exit code: 0
+
+$ VERBOSE=1 python3 tests/run.py clean_surplus
+---- t_clean_surplus.js
+seed 12345 quarterly closes 4169 mismatches 0 skipped (cooked books) 0 | bank write-offs booked 1 (286.97), reported in closes 1 (286.97), still waiting 0.00
+seed 777 quarterly closes 4171 mismatches 0 skipped (cooked books) 0 | bank write-offs booked 0 (0.00), reported in closes 0 (0.00), still waiting 0.00
+errs 0 fails 0
+PASS t_clean_surplus.js
+ALL PASS
+exit code: 0
+
+$ VERBOSE=1 python3 tests/run.py close_spec
+---- t_close_spec.js
+{"closes":8340,"checked":7381,"skipped":959,"goodwill":68,"nolUsed":68,"lossToNol":82,"eqi":166,"dr":295,"payout0":157,"sweep":594,"sweepCapped":0,"shrink":0,"borrow":57,"playerLoan":0}
+errs 0 fails 0
+PASS t_close_spec.js
+ALL PASS
+exit code: 0
+
+$ VERBOSE=1 python3 tests/run.py golden
+---- t_golden.js
+errs 0 fails 0
+PASS t_golden.js
+ALL PASS
+exit code: 0
+
+$ python3 verify/rt-bank-001/r1_before_after.py 23b7912
+== bank
+  day              before 150                    after 150                    same
+  cashChangeExact  before 3.019703190593205      after 3.019703190593205      same
+  financing        before 9                      after 9                      same
+  ni               before -54.967161349011334    after -54.967161349011334    same
+  eps              before -217.4                 after -217.4                 same
+  tax              before 2.156930850423713      after 2.156930850423713      same
+  dividends        before 2.0131354603954654     after 2.0131354603954654     same
+  woq              before 0                      after 0                      same
+  llr              before 11.7596875             after 11.7596875             same
+  wo               before 60                     after 60                     same
+  statement cfo    before 5                      after 5                      (statement line, may change)
+  statement other  before -11                    after -11                    (statement line, may change)
+  statement fcf    before 5                      after 5                      (statement line, may change)
+  tab before: 순이익 -55.0 | 감가상각(비현금) 0.0 | 지분법·상각 조정 0.0 | 손상·대손상각(비현금 조정) (no row) | 영업활동 현금흐름 5.0 | 설비투자 – | 잉여현금흐름 FCF – | 재무활동 현금흐름 9.0 | 기타·투자 매매 -11.0 | 현금 증감 3.0
+  tab after:  순이익 -55.0 | 감가상각(비현금) 0.0 | 지분법·상각 조정 0.0 | 손상·대손상각(비현금 조정) 60.0 | 영업활동 현금흐름 5.0 | 설비투자 – | 잉여현금흐름 FCF – | 재무활동 현금흐름 9.0 | 기타·투자 매매 -11.0 | 현금 증감 3.0
+== impair
+  company          before JYNR                   after JYNR                   same
+  day              before 431                    after 431                    same
+  cashChangeExact  before 32.06930475106654      after 32.06930475106654      same
+  financing        before -848                   after -848                   same
+  ni               before -1840.4701239630188    after -1840.4701239630188    same
+  eps              before -15637                 after -15637                 same
+  tax              before 0                      after 0                      same
+  dividends        before 0                      after 0                      same
+  imp              before 1823.0521464813269     after 1823.0521464813269     same
+  statement cfo    before -5.98                  after -5.98                  (statement line, may change)
+  statement other  before 920                    after 920                    (statement line, may change)
+  statement fcf    before -40.0                  after -40.0                  (statement line, may change)
+  tab before: 순이익 -1,840 | 감가상각(비현금) 11.0 | 지분법·상각 조정 0.0 | 손상·대손상각(비현금 조정) (no row) | 영업활동 현금흐름 -6.0 | 설비투자 -34.0 | 잉여현금흐름 FCF -40.0 | 재무활동 현금흐름 -848 | 기타·투자 매매 920 | 현금 증감 32.0
+  tab after:  순이익 -1,840 | 감가상각(비현금) 11.0 | 지분법·상각 조정 0.0 | 손상·대손상각(비현금 조정) 1,823 | 영업활동 현금흐름 -6.0 | 설비투자 -34.0 | 잉여현금흐름 FCF -40.0 | 재무활동 현금흐름 -848 | 기타·투자 매매 920 | 현금 증감 32.0
+base commit 23b7912 vs current build
+== 720-day whole-game state
+  seed 777       before ef3d2edf599814f8 after ef3d2edf599814f8 same
+  seed 12345     before e1bf5948256fc235 after e1bf5948256fc235 same
+  seed 20261016  before a4760bc7382c7915 after a4760bc7382c7915 same
+ALL GAME VALUES IDENTICAL
+exit code: 0
