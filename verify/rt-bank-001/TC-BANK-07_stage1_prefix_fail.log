@@ -1,0 +1,44 @@
+# TC-BANK-07 strengthened (stage 1): run BEFORE the fix, saved verbatim
+# when: 2026-10-17 17:48:31 KST; game code = commit 1ec5891 (src/ unchanged since; branch head 597bcb7 + this test change)
+# environment: Node v22.22.0, Python 3.13.16
+# sha256 of the test and game files that ran:
+#   ea7dc86583a2a354ab613c84e081baa1b0267d76e185588ab4dcc8a343643d4d  tests/t_bank_writeoff_cashflow.js
+#   e7e900af4b2fd201972836f61205222d30a7e7339626afdf2baec858ddbf753e  src/ui1.js
+#   fc00285d8248f27b62c1e906c6c79d62617aa90c809eea0e72a8116c2d78d439  src/sim.js
+# expected: FAIL on the five R1 checks (write-off: CFO, other; impairment: CFO, other, FCF); every comparison-condition
+# and display check passes
+
+$ VERBOSE=1 python3 tests/run.py cashflow
+---- t_bank_writeoff_cashflow.js
+-- TC-BANK-07 cash flow statement of the quarter that reports a bank write-off (RT-BANK-001-R1)
+ok   both twins: write-off on day 60 after the bank's close that day, next close day 150 (statement quarter 60 -> 150)
+     reports the write-off: write-off 60.0000 | NI -54.9672 | cash change: exact 3.0197, statement 3.0 | CFO -55.0 | financing 9.0 | other 49.0   (tab shows: NI -55.0, CFO -55.0, other 49.0, cash change 3.0)
+     twin, nothing reported: write-off 0.0000 | NI 5.0328 | cash change: exact 3.0197, statement 3.0 | CFO 5.0 | financing 9.0 | other -11.0   (tab shows: NI 5.0, CFO 5.0, other -11.0, cash change 3.0)
+ok   net income differs by exactly the write-off: -54.9672 = 5.0328 - 60.0000
+ok   the write-off moved no cash: cash change 3.0197 vs 3.0197 (statement 3.0 vs 3.0)
+FAIL R1 operating cash flow does not move with the non-cash write-off: -55.0 vs twin 5.0 (difference -60.0, allowed 1.1)
+FAIL R1 the other cash flow line does not absorb the write-off: 49.0 vs twin -11.0 (difference 60.0, allowed 1.1)
+ok   the twins differ only in net income: exact cash change 3.0197, exact debt change 11.9063, statement: cash change 3.0, financing 9.0, capital spending 0.0, depreciation 0.0, share issue 0.0, dividends 2.0, equity-method/amortization adjustment 0.0 (same in the twin)
+ok   a bank has no capital spending (0.0) and the tab shows no free cash flow line (–)
+ok   the 현금흐름 tab shows the computed lines: CFO -55.0 / 5.0, financing 9.0 / 9.0, other 49.0 / -11.0
+-- TC-BANK-07 second case: cash flow statement of the quarter with an asset impairment (impair)
+ok   an impairment happened within 720 days on the test seeds
+ok   seed 12345 day 431 JYNR (alive true, write-down 1823.0521): the replay without the charge reaches the same quarter (341 -> 431)
+     reports the impairment: write-down 1823.0521 | NI -1840.4701 | cash change: exact 32.0693, statement 32.0 | CFO -1829.0 | capital spending 34.0 | FCF -1863.0 | financing -848.0 | other 2743.0   (tab: CFO -1,829, FCF -1,863, other 2,743)
+     replay, no charge:      write-down 0.0000 | NI -17.4180 | cash change: exact 32.0693, statement 32.0 | CFO -6.0 | capital spending 34.0 | FCF -40.0 | financing -848.0 | other 920.0   (tab: CFO -6.0, FCF -40.0, other 920)
+ok   net income differs by exactly the write-down: -1840.4701 = -17.4180 - 1823.0521 (record imp 1823.0 / 0.0)
+ok   tax 0.0000 and dividends 0.0000 are the same in both
+ok   the twins differ only in net income: exact cash change 32.0693, exact debt change -848.4240, statement: cash change 32.0, financing -848.0, capital spending 34.0, depreciation 11.0, share issue 0.0, dividends 0.0, equity-method/amortization adjustment 0.0 (same in the replay)
+FAIL R1 operating cash flow does not move with the non-cash write-down: -1829.0 vs replay -6.0 (difference -1823.0, allowed 1.5)
+FAIL R1 the other cash flow line does not absorb the write-down: 2743.0 vs replay 920.0 (difference 1823.0, allowed 1.5)
+FAIL R1 free cash flow does not move with the non-cash write-down: -1863.0 vs replay -40.0 (difference -1823.0, allowed 1.5)
+ok   the 현금흐름 tab shows the computed lines: CFO -1,829 / -6.0, FCF -1,863 / -40.0, other 2,743 / 920
+errs 0 fails 5
+FAIL t_bank_writeoff_cashflow.js
+FAIL R1 operating cash flow does not move with the non-cash write-off: -55.0 vs twin 5.0 (difference -60.0, allowed 1.1)
+FAIL R1 the other cash flow line does not absorb the write-off: 49.0 vs twin -11.0 (difference 60.0, allowed 1.1)
+FAIL R1 operating cash flow does not move with the non-cash write-down: -1829.0 vs replay -6.0 (difference -1823.0, allowed 1.5)
+FAIL R1 the other cash flow line does not absorb the write-down: 2743.0 vs replay 920.0 (difference 1823.0, allowed 1.5)
+FAIL R1 free cash flow does not move with the non-cash write-down: -1863.0 vs replay -40.0 (difference -1823.0, allowed 1.5)
+1 test file(s) failed
+exit code: 1
