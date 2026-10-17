@@ -1,0 +1,62 @@
+# TC-BANK-07 third part (the add-back row on the 현금흐름 tab): run BEFORE the row is added, saved verbatim
+# when: 2026-10-17 18:27:38 KST; game code = commit 23b7912 (src/ unchanged), test change on top
+# environment: Node v22.22.0, Python 3.13.16
+# sha256 of the test and game files that ran:
+#   10c29a3a2fd6f8eef3a88e57736495e8515833721320e10d85abba5baefee9f2  tests/t_bank_writeoff_cashflow.js
+#   d6efd50b4ee51adcf4ed9a9d83726b028665edcb3b74ec50b9c5f4eaa9c6d8e1  src/ui1.js
+# expected: FAIL where a quarter carries imp or wo (row missing, rows above CFO off by the add-back): write-off only,
+# impairment only, v23 records; pass for neither (twice) and the old save; every earlier TC-BANK-07 check passes
+
+$ VERBOSE=1 python3 tests/run.py cashflow
+---- t_bank_writeoff_cashflow.js
+-- TC-BANK-07 cash flow statement of the quarter that reports a bank write-off (RT-BANK-001-R1)
+ok   both twins: write-off on day 60 after the bank's close that day, next close day 150 (statement quarter 60 -> 150)
+     reports the write-off: write-off 60.0000 | NI -54.9672 | cash change: exact 3.0197, statement 3.0 | CFO 5.0 | financing 9.0 | other -11.0   (tab shows: NI -55.0, CFO 5.0, other -11.0, cash change 3.0)
+     twin, nothing reported: write-off 0.0000 | NI 5.0328 | cash change: exact 3.0197, statement 3.0 | CFO 5.0 | financing 9.0 | other -11.0   (tab shows: NI 5.0, CFO 5.0, other -11.0, cash change 3.0)
+ok   net income differs by exactly the write-off: -54.9672 = 5.0328 - 60.0000
+ok   the write-off moved no cash: cash change 3.0197 vs 3.0197 (statement 3.0 vs 3.0)
+ok   R1 operating cash flow does not move with the non-cash write-off: 5.0 vs twin 5.0 (difference 0.0, allowed 1.1)
+ok   R1 the other cash flow line does not absorb the write-off: -11.0 vs twin -11.0 (difference 0.0, allowed 1.1)
+ok   the twins differ only in net income: exact cash change 3.0197, exact debt change 11.9063, statement: cash change 3.0, financing 9.0, capital spending 0.0, depreciation 0.0, share issue 0.0, dividends 2.0, equity-method/amortization adjustment 0.0 (same in the twin)
+ok   a bank has no capital spending (0.0) and the tab shows no free cash flow line (–)
+ok   the 현금흐름 tab shows the computed lines: CFO 5.0 / 5.0, financing 9.0 / 9.0, other -11.0 / -11.0
+ok   records without the imp/wo fields (5 of 8 rows, 22 fields) read them as 0, and the tab renders clean
+-- TC-BANK-07 second case: cash flow statement of the quarter with an asset impairment (impair)
+ok   an impairment happened within 720 days on the test seeds
+ok   seed 12345 day 431 JYNR (alive true, write-down 1823.0521): the replay without the charge reaches the same quarter (341 -> 431)
+     reports the impairment: write-down 1823.0521 | NI -1840.4701 | cash change: exact 32.0693, statement 32.0 | CFO -6.0 | capital spending 34.0 | FCF -40.0 | financing -848.0 | other 920.0   (tab: CFO -6.0, FCF -40.0, other 920)
+     replay, no charge:      write-down 0.0000 | NI -17.4180 | cash change: exact 32.0693, statement 32.0 | CFO -6.0 | capital spending 34.0 | FCF -40.0 | financing -848.0 | other 920.0   (tab: CFO -6.0, FCF -40.0, other 920)
+ok   net income differs by exactly the write-down: -1840.4701 = -17.4180 - 1823.0521 (record imp 1823.0 / 0.0)
+ok   tax 0.0000 and dividends 0.0000 are the same in both
+ok   the twins differ only in net income: exact cash change 32.0693, exact debt change -848.4240, statement: cash change 32.0, financing -848.0, capital spending 34.0, depreciation 11.0, share issue 0.0, dividends 0.0, equity-method/amortization adjustment 0.0 (same in the replay)
+ok   R1 operating cash flow does not move with the non-cash write-down: -6.0 vs replay -6.0 (difference -0.0, allowed 1.5)
+ok   R1 the other cash flow line does not absorb the write-down: 920.0 vs replay 920.0 (difference 0.0, allowed 1.5)
+ok   R1 free cash flow does not move with the non-cash write-down: -40.0 vs replay -40.0 (difference -0.0, allowed 1.5)
+ok   the 현금흐름 tab shows the computed lines: CFO -6.0 / -6.0, FCF -40.0 / -40.0, other 920 / 920
+-- TC-BANK-07 third part: the 현금흐름 tab shows the non-cash add-back on its own row
+FAIL write-off only (bank, write-off 60.0 reported on day 150): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 1 of 8 quarters; record fields 24/24/22/22/22/22/22/22)
+FAIL write-off only (bank, write-off 60.0 reported on day 150): in every quarter the rows above add up to operating cash flow (on screen, worst gap -60.0 vs allowed 0.65; latest quarter -55.0 + 0.0 + 0.0 = 5.0)
+ok   write-off only: the latest quarter carries wo 60.0, no quarter carries imp
+ok   neither (the twin that reports nothing): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 0 of 8 quarters; record fields 24/24/22/22/22/22/22/22)
+ok   neither (the twin that reports nothing): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 0.20; latest quarter 5.0 + 0.0 + 0.0 = 5.0)
+FAIL impairment only (JYNR, write-down 1823.1 on day 431): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 1 of 8 quarters; record fields 24/24/24/24/24/22/22/22)
+FAIL impairment only (JYNR, write-down 1823.1 on day 431): in every quarter the rows above add up to operating cash flow (on screen, worst gap -1823.0 vs allowed 1.10; latest quarter -1,840 + 11.0 + 0.0 = -6.0)
+ok   impairment only: the latest quarter carries imp 1823.0, no quarter carries wo
+ok   neither (the replay without the charge): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 0 of 8 quarters; record fields 24/24/24/24/24/22/22/22)
+ok   neither (the replay without the charge): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 1.10; latest quarter -17.0 + 11.0 + 0.0 = -6.0)
+FAIL old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 1 of 8 quarters; record fields 23/23/23/23/23/22/22/22)
+FAIL old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): in every quarter the rows above add up to operating cash flow (on screen, worst gap -1823.0 vs allowed 1.10; latest quarter -1,840 + 11.0 + 0.0 = -6.0)
+ok   old records: every row has 22 or 23 fields, wo reads as 0, imp 1823.0 still shown
+ok   old save from before the fix (commit 1ecdc53), BOAX after its day-494 close: row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 0 of 8 quarters; record fields 24/22/22/22/22/22/22/22)
+ok   old save from before the fix (commit 1ecdc53), BOAX after its day-494 close: in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 0.20; latest quarter 14.0 + 0.0 + 0.0 = 14.0)
+ok   old save: BOAX mixes rows without the new fields (7) and new rows (1)
+errs 0 fails 6
+FAIL t_bank_writeoff_cashflow.js
+FAIL write-off only (bank, write-off 60.0 reported on day 150): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 1 of 8 quarters; record fields 24/24/22/22/22/22/22/22)
+FAIL write-off only (bank, write-off 60.0 reported on day 150): in every quarter the rows above add up to operating cash flow (on screen, worst gap -60.0 vs allowed 0.65; latest quarter -55.0 + 0.0 + 0.0 = 5.0)
+FAIL impairment only (JYNR, write-down 1823.1 on day 431): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 1 of 8 quarters; record fields 24/24/24/24/24/22/22/22)
+FAIL impairment only (JYNR, write-down 1823.1 on day 431): in every quarter the rows above add up to operating cash flow (on screen, worst gap -1823.0 vs allowed 1.10; latest quarter -1,840 + 11.0 + 0.0 = -6.0)
+FAIL old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 1 of 8 quarters; record fields 23/23/23/23/23/22/22/22)
+FAIL old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): in every quarter the rows above add up to operating cash flow (on screen, worst gap -1823.0 vs allowed 1.10; latest quarter -1,840 + 11.0 + 0.0 = -6.0)
+1 test file(s) failed
+exit code: 1

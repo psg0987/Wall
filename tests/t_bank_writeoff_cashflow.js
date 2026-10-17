@@ -16,8 +16,14 @@
 // Both cases also check that the twins really are alike apart from net income (cash change, financing, capital
 // spending, depreciation, share issues, dividends, the equity-method/amortization adjustment) and that the 현금흐름 tab
 // shows what fqDerive computes.
+// Third part (display, approved after the R1 fix): the tab must show the add-back on its own row, '손상·대손상각(비현금
+// 조정)' = imp + wo as a positive amount, hidden when no quarter on the tab has either; and the rows above operating cash
+// flow must add up to it in every quarter: exactly for the values behind them, and on screen within rounding (each shown
+// number up to 0.5 off from 10 up and 0.05 below, as r1 rounds the records; 50 for amounts shown in 조). Cases: write-off
+// only, impairment only, neither (twice), old records (rows of the v23 format without wo, and a save written before the
+// fix).
 let errs = 0, fails = 0;
-(() => {   // own scope: the game already has globals such as A and B
+(async () => {   // own scope: the game already has globals such as A and B
 const ok = (c, m) => { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) fails++ };
 const f4 = x => x == null ? '-' : (+x).toFixed(4), f1 = x => x == null ? '-' : (+x).toFixed(1);
 const TOL = 1.1;
@@ -43,6 +49,30 @@ const alikeMsg = (a, exactA) => 'exact cash change ' + f4(exactA.cash) + ', exac
 // flow line: fqDerive still computes a number, the tab shows '–' (row: fin?null:d.fcf)
 const shownOk = (x, fin) => x.shown.cfo === fN(x.cfo) && x.shown.oth === fN(x.oth) && x.shown.dc === fN(x.dc) && x.shown.cff === fN(x.cff) && x.shown.fcf === (fin ? '–' : fN(x.fcf));
 const ePart = v => Math.abs(v) >= 10 ? 0.5 : 0.05;          // largest r1 rounding error of a recorded value
+// the operating section of the 현금흐름 tab in every quarter column (newest first): what is shown, and the values behind it
+const ROW_NC = '손상·대손상각(비현금 조정)';
+const num = s => s == null || s === '–' ? null : s.endsWith('조') ? parseFloat(s) * 1e4 : parseFloat(s.replace(/,/g, ''));
+const shownErr = s => s.endsWith('조') ? 50 : Math.abs(num(s)) >= 10 ? 0.5 : 0.05;
+function opSection(c) {
+  sel = -1; pg = ''; tab = 'h'; S.spd = 0; G.pick(c.id); G.stab('f'); G.fseg(3); render();
+  const h = document.getElementById('sh').innerHTML;
+  const row = lab => { const part = h.split('<td>' + lab + '</td>')[1]; return part == null ? null : [...part.split('</tr>')[0].matchAll(/<td[^>]*>([^<]*)<\/td>/g)].map(m => m[1]) };
+  const cols = fqL(c).slice().reverse(), rec = c.fq.slice().reverse();
+  return { clean: !/NaN|undefined|Infinity|\[object/.test(h), ni: row('순이익'), dep: row('감가상각(비현금)'), adj: row('지분법·상각 조정'), nc: row(ROW_NC), cfo: row('영업활동 현금흐름'),
+    want: cols.map((q, j) => { const d = fqDerive(c, q, cols[j + 1]); return { ni: q.ni, dep: d.dep, adj: q.ga - q.eq, imp: q.imp || 0, wo: q.wo || 0, nc: (q.imp || 0) + (q.wo || 0), cfo: d.cfo, fields: rec[j].length } }) };
+}
+function opCheck(s, label, expect) {
+  const hasNc = s.want.some(w => w.nc !== 0), shown = s.nc != null;
+  ok(s.clean && hasNc === (expect === 'shown') && shown === hasNc, label + ': row ' + ROW_NC + ' ' + (shown ? 'shown' : 'hidden') + ' (imp + wo non-zero in ' + s.want.filter(w => w.nc !== 0).length +
+    ' of ' + s.want.length + ' quarters; record fields ' + s.want.map(w => w.fields).join('/') + ')');
+  if (shown) ok(s.nc.length === s.want.length && s.want.every((w, j) => w.nc >= 0 && s.nc[j] === fN(w.nc)), label + ': the row shows imp + wo as a positive add-back: ' + s.nc.join(' | '));
+  const exact = s.want.every(w => Math.abs(w.ni + w.dep + w.adj + w.nc - w.cfo) <= 1e-9 * Math.max(1, Math.abs(w.cfo)));
+  const parts = j => [s.ni[j], s.dep[j], s.adj[j]].concat(shown ? [s.nc[j]] : []);
+  const gaps = s.want.map((w, j) => { const ps = parts(j), sum = ps.reduce((a, x) => a + num(x), 0); return { gap: sum - num(s.cfo[j]), tol: ps.concat([s.cfo[j]]).reduce((a, x) => a + shownErr(x), 0) } });
+  const worst = gaps.reduce((m, g) => Math.abs(g.gap) - g.tol > Math.abs(m.gap) - m.tol ? g : m, gaps[0]);
+  ok(exact && gaps.every(g => Math.abs(g.gap) <= g.tol), label + ': in every quarter the rows above add up to operating cash flow (on screen, worst gap ' + f1(worst.gap) + ' vs allowed ' + worst.tol.toFixed(2) +
+    '; latest quarter ' + parts(0).join(' + ') + ' = ' + s.cfo[0] + ')');
+}
 
 // The world of TC-BANK-02 'same day, bank closes first' (tests/t_bank_writeoff_cases.js): seed 12345, the first bank
 // with assets 1,000, cash 100, deposits 850, llr 10; an insolvent borrower owing it 200 closes right after the bank on
@@ -62,7 +92,7 @@ function twin(drop) {
   ch11x = x0; earn = e0;
   const rep = cut && closes[cut.after], last = cut && closes[cut.after - 1];
   return { b, cut, rep, wo: rep ? rep.er.wo || 0 : 0, ni: rep ? rep.er.ni : null, cashExact: rep && last ? rep.cs - last.cs : null,
-    exact: { cash: rep && last ? rep.cs - last.cs : null, debt: rep && last ? rep.D - last.D : null }, cf: cashflow(b) };
+    exact: { cash: rep && last ? rep.cs - last.cs : null, debt: rep && last ? rep.D - last.D : null }, cf: cashflow(b), op: opSection(b) };
 }
 console.log('-- TC-BANK-07 cash flow statement of the quarter that reports a bank write-off (RT-BANK-001-R1)');
 const A = twin(false), B = twin(true);
@@ -104,13 +134,19 @@ function firstImpairment(seed, quiet) {
   play(720, () => hit);
   impair = imp0; earn = earn0;
   if (hit) { hit.cf = cashflow(hit.c); hit.exact = hit.after && hit.after.before ? { cash: hit.after.cs - hit.after.before.cs, debt: hit.after.D - hit.after.before.D } : { cash: null, debt: null } }
+  if (hit) {
+    hit.op = opSection(hit.c);
+    // the same company's records in the format of the game before the bank write-off existed (v23: 23 fields, imp but
+    // no wo; the history rows made at the start keep their 22 fields)
+    if (!quiet) { hit.c.fq = hit.c.fq.map(r => r.slice(0, 23)); hit.op23 = opSection(hit.c) }
+  }
   return hit;
 }
 let found = null;
 for (const seed of [12345, 777, 4242]) { const h = firstImpairment(seed, false); if (h) { found = { seed, a: h }; break } }
 ok(!!found, 'an impairment happened within 720 days on the test seeds');
 if (found) {
-  const a = found.a, b = firstImpairment(found.seed, true);
+  const a = found.a, b = firstImpairment(found.seed, true); found.b = b;
   ok(!!(b && b.c.id === a.c.id && b.day === a.day && a.after && b.after && a.after.before && b.after.before) && a.cf.day === a.day && b.cf.day === a.day,
     'seed ' + found.seed + ' day ' + a.day + ' ' + a.c.tk + ' (alive ' + !a.c.dead + ', write-down ' + f4(a.wd) + '): the replay without the charge reaches the same quarter (' + a.cf.prevDay + ' -> ' + a.cf.day + ')');
   if (b && b.after && a.after) {
@@ -126,5 +162,27 @@ if (found) {
     ok(!a.c.kd && shownOk(ca, 0) && shownOk(cb, 0), 'the 현금흐름 tab shows the computed lines: CFO ' + ca.shown.cfo + ' / ' + cb.shown.cfo + ', FCF ' + ca.shown.fcf + ' / ' + cb.shown.fcf + ', other ' + ca.shown.oth + ' / ' + cb.shown.oth);
   }
 }
-})();
-console.log('errs', errs, 'fails', fails);
+
+// ---- third part: the add-back on its own row of the 현금흐름 tab
+console.log('-- TC-BANK-07 third part: the 현금흐름 tab shows the non-cash add-back on its own row');
+opCheck(A.op, 'write-off only (bank, write-off ' + f1(A.wo) + ' reported on day ' + (A.rep && A.rep.day) + ')', 'shown');
+ok(A.op.want[0].wo > 0 && A.op.want.every(w => w.imp === 0), 'write-off only: the latest quarter carries wo ' + f1(A.op.want[0].wo) + ', no quarter carries imp');
+opCheck(B.op, 'neither (the twin that reports nothing)', 'hidden');
+if (found && found.b) {
+  opCheck(found.a.op, 'impairment only (' + found.a.c.tk + ', write-down ' + f1(found.a.wd) + ' on day ' + found.a.day + ')', 'shown');
+  ok(found.a.op.want[0].imp > 0 && found.a.op.want.every(w => w.wo === 0), 'impairment only: the latest quarter carries imp ' + f1(found.a.op.want[0].imp) + ', no quarter carries wo');
+  opCheck(found.b.op, 'neither (the replay without the charge)', 'hidden');
+  opCheck(found.a.op23, 'old records in the v23 format (' + found.a.c.tk + ', rows cut to 23 fields: imp kept, no wo)', 'shown');
+  ok(found.a.op23.want.every(w => w.fields <= 23 && w.wo === 0) && found.a.op23.want[0].imp > 0, 'old records: every row has 22 or 23 fields, wo reads as 0, imp ' + f1(found.a.op23.want[0].imp) + ' still shown');
+}
+{
+  // a real save written by the game before the fix (tests/fixtures/README.md), played on to day 500
+  const fs = require('fs'), path = require('path'), txt = fs.readFileSync(path.join(process.env.TESTS_DIR, 'fixtures', 'old_save_1ecdc53_seed12345_day440.wsr'), 'utf8').trim();
+  Math.random = mulberry(20261016); init(Object.assign(defCfg(), { tut: 0, seed: 1 })); mdl = null;
+  S = migrate(await unpackS(txt)); v8fix(); S.bgs = 0; col(); secUpd(); sel = -1; pg = ''; mdl = null;
+  play(60);
+  const boax = S.co.find(x => x.tk === 'BOAX'), s = opSection(boax);
+  opCheck(s, 'old save from before the fix (commit 1ecdc53), BOAX after its day-494 close', 'hidden');
+  ok(s.want.some(w => w.fields < 24) && s.want.some(w => w.fields === 24), 'old save: BOAX mixes rows without the new fields (' + s.want.filter(w => w.fields < 24).length + ') and new rows (' + s.want.filter(w => w.fields === 24).length + ')');
+}
+})().catch(e => { errs++; console.log('ERR ' + (e && e.stack || e)) }).finally(() => console.log('errs', errs, 'fails', fails));
