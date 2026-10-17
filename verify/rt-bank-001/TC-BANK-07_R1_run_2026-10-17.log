@@ -1,0 +1,44 @@
+# TC-BANK-07 (RT-BANK-001-R1, cash flow statement) first run, saved verbatim
+# when: 2026-10-17 17:20:21 KST; game code = commit 1ec5891a85294e5edc66f74f71fc600fb6eb818e (src/ unchanged), test added on top
+# environment: Node v22.22.0, Python 3.13.16
+# expected result: the test FAILS on purpose (reproduces R1); every other test passes
+
+$ VERBOSE=1 python3 tests/run.py cashflow
+---- t_bank_writeoff_cashflow.js
+-- TC-BANK-07 cash flow statement of the quarter that reports a bank write-off (RT-BANK-001-R1)
+ok   both twins: write-off on day 60 after the bank's close that day, next close day 150 (statement quarter 60 -> 150)
+     reports the write-off: write-off 60.0000 | NI -54.9672 | cash change: exact 3.0197, statement 3.0 | CFO -55.0 | financing 9.0 | other 49.0   (tab shows: NI -55.0, CFO -55.0, other 49.0, cash change 3.0)
+     twin, nothing reported: write-off 0.0000 | NI 5.0328 | cash change: exact 3.0197, statement 3.0 | CFO 5.0 | financing 9.0 | other -11.0   (tab shows: NI 5.0, CFO 5.0, other -11.0, cash change 3.0)
+ok   net income differs by exactly the write-off: -54.9672 = 5.0328 - 60.0000
+ok   the write-off moved no cash: cash change 3.0197 vs 3.0197 (statement 3.0 vs 3.0)
+FAIL R1 operating cash flow does not move with the non-cash write-off: -55.0 vs twin 5.0 (difference -60.0, allowed 1.1)
+FAIL R1 the other cash flow line does not absorb the write-off: 49.0 vs twin -11.0 (difference 60.0, allowed 1.1)
+-- diagnostic (no assertion): the same for an asset impairment (impair)
+     seed 12345 day 431 JYNR (alive true), write-down 1823.0521
+     reports the impairment: NI -1840.0, imp 1823.0 | cash change 32.0 | CFO -1829.0 | other 2743.0
+     twin, impair does nothing: NI -17.0, imp 0.0 | cash change 32.0 | CFO -6.0 | other 920.0
+     -> same cash change: true; CFO difference -1823.0, other difference 1823.0 (same problem if these are about -/+ the write-down)
+errs 0 fails 2
+FAIL t_bank_writeoff_cashflow.js
+FAIL R1 operating cash flow does not move with the non-cash write-off: -55.0 vs twin 5.0 (difference -60.0, allowed 1.1)
+FAIL R1 the other cash flow line does not absorb the write-off: 49.0 vs twin -11.0 (difference 60.0, allowed 1.1)
+1 test file(s) failed
+exit code: 1
+
+$ python3 tests/run.py
+PASS t12_sim.js
+PASS t13_ui.js
+PASS t14_advisor.js
+PASS t18_ai_native.js
+PASS t18_ai_web.js
+PASS t_clean_surplus.js
+PASS t_close_spec.js
+PASS t_impair_ui.js
+PASS t_bank_writeoff.js
+PASS t_bank_writeoff_cases.js
+FAIL t_bank_writeoff_cashflow.js
+FAIL R1 operating cash flow does not move with the non-cash write-off: -55.0 vs twin 5.0 (difference -60.0, allowed 1.1)
+FAIL R1 the other cash flow line does not absorb the write-off: 49.0 vs twin -11.0 (difference 60.0, allowed 1.1)
+PASS t_golden.js
+1 test file(s) failed
+exit code: 1
