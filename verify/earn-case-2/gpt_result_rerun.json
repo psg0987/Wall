@@ -1,0 +1,21 @@
+{
+ "source": "GPT, card A2 re-run in a separate 'independent check room' (2026-10-17 13:08). Python float, no game code, no GitHub, no sealed values, no earlier results. Values are the exact repr GPT printed.",
+ "spread_mult": 1.3675020937849025,
+ "bank_loans": 2767.5799037102606,
+ "interest_expense": 55.2963966305048,
+ "int_income": 8.169833293180934,
+ "cash_profit": 300.97230640349375,
+ "goodwill_amortization": 0.0,
+ "pretax": 300.97230640349375,
+ "nol_used": 7.2735585396018365,
+ "tax": 88.10962435916757,
+ "net_income": 218.20540314105537,
+ "dividends": 63.85880461329785,
+ "sweep_x": 292.30867552946904,
+ "cash_end": 486.0532951708883,
+ "total_debt_end": 2475.2712281807917,
+ "assets_end": 8100.888252848139,
+ "goodwill_end": 0.0,
+ "nol_end": 0.0,
+ "sweep": true
+}
