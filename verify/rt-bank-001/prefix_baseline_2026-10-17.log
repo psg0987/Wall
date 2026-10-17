@@ -1,0 +1,58 @@
+# Pre-fix baseline, saved verbatim before any change to src/ (RT-BANK-001 fix work)
+# when: 2026-10-17 16:13:41 KST
+# commit: 91bca8ce70f6d42e2bf4a8a8cbf939c85a191f36 (branch rt-bank-001, src/ identical to main 1ecdc53)
+# environment: Node v22.22.0, Python 3.13.16
+# expected: t_bank_writeoff.js FAILS (defect reproduced), every other test PASSES
+
+$ VERBOSE=1 python3 tests/run.py bank
+---- t_bank_writeoff.js
+before   bank A 1000, cash 100, deposits 1000, book equity 100, reserve llr 50.5700 | borrower loan 200, chapter 11 count 0
+after ch11   bank A 940, book equity 40, NI field unchanged, quarter record unchanged, reserve llr 50.5700, bank stake in borrower 80.0%
+ok   write-off = 30% of the 200 loan = 60 (got 60)
+bank close   NI 3.4753 (op 3.5897, tax 1.4894, dividends 1.3901), provision in close 0.7050, reserve llr 50.5700
+window   book equity moved -57.9148, explained by results 2.0852, unexplained -60.0000
+counterfactual   bank NI without the loss 4.3247 -> NI difference caused by the 60 loss -0.8494
+FAIL bank book-equity change over write-off + next close is explained by its results (unexplained -60.0000)
+errs 0 fails 1
+FAIL t_bank_writeoff.js
+FAIL bank book-equity change over write-off + next close is explained by its results (unexplained -60.0000)
+1 test file(s) failed
+exit code: 1
+
+$ python3 tests/run.py
+PASS t12_sim.js
+PASS t13_ui.js
+PASS t14_advisor.js
+PASS t18_ai_native.js
+PASS t18_ai_web.js
+PASS t_clean_surplus.js
+PASS t_close_spec.js
+PASS t_impair_ui.js
+FAIL t_bank_writeoff.js
+FAIL bank book-equity change over write-off + next close is explained by its results (unexplained -60.0000)
+PASS t_golden.js
+1 test file(s) failed
+exit code: 1
+
+# full outputs of the three suite-level checks, for comparison after the fix
+$ VERBOSE=1 python3 tests/run.py clean_surplus
+---- t_clean_surplus.js
+seed 12345 quarterly closes 4169 mismatches 0 skipped (cooked books) 0
+seed 777 quarterly closes 4171 mismatches 0 skipped (cooked books) 0
+errs 0 fails 0
+PASS t_clean_surplus.js
+ALL PASS
+exit code: 0
+$ VERBOSE=1 python3 tests/run.py close_spec
+---- t_close_spec.js
+{"closes":8340,"checked":7381,"skipped":959,"goodwill":68,"nolUsed":68,"lossToNol":82,"eqi":166,"dr":295,"payout0":157,"sweep":594,"sweepCapped":0,"shrink":0,"borrow":57,"playerLoan":0}
+errs 0 fails 0
+PASS t_close_spec.js
+ALL PASS
+exit code: 0
+$ VERBOSE=1 python3 tests/run.py golden
+---- t_golden.js
+errs 0 fails 0
+PASS t_golden.js
+ALL PASS
+exit code: 0
