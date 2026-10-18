@@ -1,0 +1,100 @@
+# REG-01 mutation check, 2026-10-18T12:04:41Z, base 8a76765f3a6d8eea1bfcc7b4d33e43ff73e1dca0, node v22.22.0, test sha256 46589d388ddf38fc…
+ok   none (the unmodified game) -> passes
+ok   N1 woBook cuts the assets a second time -> CAUGHT by REG-01 (19 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: t_bank_writeoff.js, t_clean_surplus.js, t_bank_writeoff_cases.js, t_bank_writeoff_cashflow.js
+       FAIL case B [R] T3 assets 890.7007 = T2 939.8522 + growth 11.7482 - impairment 0.0000
+       FAIL case B [R] the close cut 60.8997 from the assets (expected 0.0000 = equity before test + 0.3 x assets) and the write-off cut none: record imp 0.0000 (expected 0.0000)
+       FAIL case B [R] no chapter 11, no debt relief, debt 818.4256, ds 0 -> 1
+ok   N2 ch11x cuts the assets twice -> CAUGHT by REG-01 (8 FAIL = calculation differs, 5 ERR = precondition/other) | older bank tests: t_bank_writeoff.js, t_clean_surplus.js, t_bank_writeoff_cases.js
+       FAIL case B [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 879.7044, llr untouched (10.0000)
+       FAIL case B [R] no chapter 11, no debt relief, debt 818.0933, ds 0 -> 1
+       FAIL case B [I] window T0 -> T3: the cut is inside net income, one deduction only: residual -60.1478
+ok   N3 ch11x does not cut the assets (only queues) -> CAUGHT by REG-01 (8 FAIL = calculation differs, 4 ERR = precondition/other) | older bank tests: t_bank_writeoff.js, t_clean_surplus.js, t_bank_writeoff_cases.js
+       FAIL case B [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 1000.0000, llr untouched (10.0000)
+       FAIL case B [I] window T0 -> T3: the cut is inside net income, one deduction only: residual 60.1478
+       FAIL case C [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 1000.0000, llr untouched (10.0000)
+ok   N4 ch11x queues nothing (cut only, as before RT-BANK-001) -> CAUGHT by REG-01 (22 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: t_bank_writeoff.js, t_clean_surplus.js, t_bank_writeoff_cases.js, t_bank_writeoff_cashflow.js
+       FAIL case B [R] T0->T1: loan 200.4927, cut and queued 0.0000 = 30% = 60.1478, assets 1000.0000 -> 939.8522, llr untouched (10.0000)
+       FAIL case B [R] write-off reported 0.0000 (expected 60.1478), nothing waiting after (0)
+       FAIL case B [R] net income -97.5207 = before charges -97.5207 - write-off 60.1478 - impairment 0.0000
+ok   N5 woBook is skipped in a close that also impairs (decided before the impairment is known: ds>=3) -> CAUGHT by REG-01 (11 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: none catch it
+       FAIL case C [R] write-off reported 0.0000 (expected 60.1478), nothing waiting after (60.147805533658484)
+       FAIL case C [R] net income -424.1831 = before charges -97.5207 - write-off 60.1478 - impairment 326.6623
+       FAIL case C [I] window T0 -> T3: the cut is inside net income, one deduction only: residual -60.1478
+ok   N6 woBook runs after the impairment (same net income; only the ds streak could see it) -> SURVIVES (expected, documented) passes | older bank tests: none catch it
+ok   N7 impairment overwrites the write-off in the quarter record -> CAUGHT by REG-01 (7 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: none catch it
+       FAIL case C [R] write-off reported 0.0000 (expected 60.1478), nothing waiting after (0)
+       FAIL case C [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+       FAIL case C [I] book equity change of the close = net income - equity-method - dividends received - dividends paid + capital transactions + write-off already out of the assets: residual 60.1478
+ok   N8 impairment refreshes EPS from net income before the write-off -> CAUGHT by REG-01 (1 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: none catch it
+       FAIL case C [R] EPS record -1677.6 won (net income x 1e4 / shares = -1915.49), yearly net income +-484.3309, 25% holder's equity-method income -121.0827 = 25% of net income -121.0827
+ok   N9 write-off does not refresh EPS -> CAUGHT by REG-01 (2 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: t_bank_writeoff_cases.js
+       FAIL case B [R] EPS record -385.7 won (net income x 1e4 / shares = -623.57), yearly net income +-157.6685, 25% holder's equity-method income -39.4171 = 25% of net income -39.4171
+       FAIL twin Cwo [R] EPS record -385.7 won (net income x 1e4 / shares = -623.57), yearly net income +-157.6685, 25% holder's equity-method income -39.4171 = 25% of net income -39.4171
+ok   N10 write-off not added to yearly net income -> CAUGHT by REG-01 (3 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: t_bank_writeoff_cases.js
+       FAIL case B [R] EPS record -623.6 won (net income x 1e4 / shares = -623.57), yearly net income +-97.5207, 25% holder's equity-method income -39.4171 = 25% of net income -39.4171
+       FAIL case C [R] EPS record -1915.5 won (net income x 1e4 / shares = -1915.49), yearly net income +-424.1831, 25% holder's equity-method income -121.0827 = 25% of net income -121.0827
+       FAIL twin Cwo [R] EPS record -623.6 won (net income x 1e4 / shares = -623.57), yearly net income +-97.5207, 25% holder's equity-method income -39.4171 = 25% of net income -39.4171
+ok   N11 impairment counted twice in yearly net income -> CAUGHT by REG-01 (3 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: none catch it
+       FAIL case A [R] EPS record -1829.3 won (net income x 1e4 / shares = -1829.29), yearly net income +-828.1066, 25% holder's equity-method income -115.6342 = 25% of net income -115.6342
+       FAIL case C [R] EPS record -1915.5 won (net income x 1e4 / shares = -1915.49), yearly net income +-810.9932, 25% holder's equity-method income -121.0827 = 25% of net income -121.0827
+       FAIL twin Cimp [R] EPS record -1677.6 won (net income x 1e4 / shares = -1677.61), yearly net income +-750.8454, 25% holder's equity-method income -106.0458 = 25% of net income -106.0458
+ok   N12 impairment does not reach the 25% holder -> CAUGHT by REG-01 (3 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: none catch it
+       FAIL case A [R] EPS record -1829.3 won (net income x 1e4 / shares = -1829.29), yearly net income +-462.5368, 25% holder's equity-method income -24.2417 = 25% of net income -115.6342
+       FAIL case C [R] EPS record -1915.5 won (net income x 1e4 / shares = -1915.49), yearly net income +-484.3309, 25% holder's equity-method income -39.4171 = 25% of net income -121.0827
+       FAIL twin Cimp [R] EPS record -1677.6 won (net income x 1e4 / shares = -1677.61), yearly net income +-424.1831, 25% holder's equity-method income -24.3802 = 25% of net income -106.0458
+ok   N13 impairment books only half of the asset cut -> CAUGHT by REG-01 (17 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: t_clean_surplus.js, t_bank_writeoff_cashflow.js
+       FAIL case A [R] the close cut 365.5699 from the assets (expected 365.5699 = equity before test + 0.3 x assets) and the write-off cut none: record imp 182.7849 (expected 365.5699)
+       FAIL case A [R] net income -279.7518 = before charges -96.9669 - write-off 0.0000 - impairment 365.5699
+       FAIL case A [I] book equity change of the close = net income - equity-method - dividends received - dividends paid + capital transactions + write-off already out of the assets: residual -182.7849
+ok   N14 impairment cuts to equity -20% of assets instead of -30% -> CAUGHT by REG-01 (26 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: none catch it
+       FAIL case A [R] T3 assets 748.1801 = T2 1000.0000 + growth 12.5000 - impairment 365.5699
+       FAIL case A [R] the close cut 264.3199 from the assets (expected 365.5699 = equity before test + 0.3 x assets) and the write-off cut none: record imp 264.3199 (expected 365.5699)
+       FAIL case A [R] impairment leaves equity -202.5000 = -30% of assets -303.7500 -> the bank's chapter 11 (0->1), debt 972.5000 -> 657.7730, debt relief cap 314.7270 (expected 400.7895)
+ok   N15 impairment books the charge but does not cut the assets -> CAUGHT by REG-01 (2 FAIL = calculation differs, 2 ERR = precondition/other) | older bank tests: t_clean_surplus.js
+       FAIL case A [R] T3 assets 1012.5000 = T2 1000.0000 + growth 12.5000 - impairment 365.5699
+       FAIL case A [R] the close cut 0.0000 from the assets (expected 365.5699 = equity before test + 0.3 x assets) and the write-off cut none: record imp 365.5699 (expected 365.5699)
+       ERR  FIXTURE INVALID: case A: holdings value unchanged until the impairment and no cash sweep (cash 21.8199 <= 121.5000)
+ok   N16 debt relief not recorded as a capital transaction -> CAUGHT by REG-01 (8 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: t_clean_surplus.js
+       FAIL case A [R] impairment leaves equity -303.7500 = -30% of assets -303.7500 -> the bank's chapter 11 (0->1), debt 972.5000 -> 571.7105, debt relief cap 0.0000 (expected 400.7895)
+       FAIL case A [I] book equity change of the close = net income - equity-method - dividends received - dividends paid + capital transactions + write-off already out of the assets: residual 400.7895
+       FAIL case C [R] impairment leaves equity -285.4801 = -30% of assets -285.4801 -> the bank's chapter 11 (0->1), debt 971.7482 -> 592.5273, debt relief cap 0.0000 (expected 379.2208)
+ok   N17 dividends reduced by the waiting write-off -> CAUGHT by REG-01 (18 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: t_bank_writeoff_cases.js, t_bank_writeoff_cashflow.js
+       FAIL case B [R] tax 1.0625 = 30% of pre-tax 3.5418 and dividends 0.0000 are the same whatever was written off or impaired
+       FAIL case B [I] cash 20.0000 -> 22.4793 = + cash profit - tax - dividends = 21.4876 (no write-off or impairment moved cash)
+       FAIL case C [R] T3 assets 623.9463 = T2 939.8522 + growth 11.7482 - impairment 326.6623
+ok   N18 tax reduced by the waiting write-off -> CAUGHT by REG-01 (37 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: t_bank_writeoff.js, t_clean_surplus.js, t_bank_writeoff_cases.js, t_bank_writeoff_cashflow.js
+       FAIL case B [R] net income -216.7538 = before charges -97.5207 - write-off 60.1478 - impairment 0.0000
+       FAIL case B [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+       FAIL case B [R] tax 0.0000 = 30% of pre-tax 3.5418 and dividends 1.4167 are the same whatever was written off or impaired
+ok   N19 reserve llr reduced by the waiting write-off -> CAUGHT by REG-01 (31 FAIL = calculation differs, 3 ERR = precondition/other) | older bank tests: t_bank_writeoff_cases.js, t_bank_writeoff_cashflow.js
+       FAIL case B [R] no chapter 11, no debt relief, debt 978.2386, ds 0 -> 1
+       FAIL case B [R] net income -186.6383 = before charges -118.5433 - write-off 60.1478 - impairment 0.0000
+       FAIL case B [R] tax 0.0000 = 30% of pre-tax -26.4905 and dividends 0.0000 are the same whatever was written off or impaired
+ok   N20 write-off also taken from cash -> CAUGHT by REG-01 (20 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: t_bank_writeoff.js, t_clean_surplus.js, t_bank_writeoff_cases.js, t_bank_writeoff_cashflow.js
+       FAIL case B [R] no chapter 11, no debt relief, debt 848.7028, ds 0 -> 1
+       FAIL case B [I] cash 20.0000 -> 0.0000 = + cash profit - tax - dividends = 21.4876 (no write-off or impairment moved cash)
+       FAIL case B [I] book equity change of the close = net income - equity-method - dividends received - dividends paid + capital transactions + write-off already out of the assets: residual -60.1478
+ok   N21 cash flow: adds back only the larger of impairment and write-off -> CAUGHT by REG-01 (4 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: none catch it
+       FAIL case C [M] model rule cfo = cash profit - tax + dividends received: 2.4793; add-back form 2.4793; statement shows -57.0 (rounding allowed 2.05)
+       FAIL case C [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 387 (expected shown 387), record fields 24/22/22/22/22/22/22/22
+       FAIL case C [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 60.0 vs allowed 2.05; newest -484 + 0.0 + 100 + 387 = -57.0)
+ok   N22 cash flow: adds back impairment only -> CAUGHT by REG-01 (10 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: t_bank_writeoff_cashflow.js
+       FAIL case B [M] model rule cfo = cash profit - tax + dividends received: 2.4793; add-back form 2.4793; statement shows -58.0 (rounding allowed 1.60)
+       FAIL case B [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 60.0 (expected shown 60.0), record fields 24/22/22/22/22/22/22/22
+       FAIL case B [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 60.0 vs allowed 2.05; newest -158 + 0.0 + 100 + 60.0 = -58.0)
+ok   N23 cash flow: adds back write-off only -> CAUGHT by REG-01 (10 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: t_bank_writeoff_cashflow.js
+       FAIL case A [M] model rule cfo = cash profit - tax + dividends received: 3.0331; add-back form 3.0331; statement shows -363.0 (rounding allowed 1.60)
+       FAIL case A [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 366 (expected shown 366), record fields 24/22/22/22/22/22/22/22
+       FAIL case A [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 366.0 vs allowed 2.05; newest -463 + 0.0 + 100 + 366 = -363)
+ok   N24 cash flow tab row shows the larger of impairment and write-off -> CAUGHT by REG-01 (2 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: none catch it
+       FAIL case C [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 327 (expected shown 387), record fields 24/22/22/22/22/22/22/22
+       FAIL case C [R] in every quarter the rows above add up to operating cash flow (on screen worst gap -60.0 vs allowed 1.60; newest -484 + 0.0 + 100 + 327 = 3.0)
+ok   N25 income statement: impairment row shows the write-off -> CAUGHT by REG-01 (3 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: none catch it
+       FAIL case A [R] 손익 tab: 자산 손상차손 row 0.0, 대손상각비 row hidden, net income -463, EPS -1,831
+       FAIL case C [R] 손익 tab: 자산 손상차손 row -60.0, 대손상각비 row -60.0, net income -484, EPS -1,914
+       FAIL twin Cimp [R] 손익 tab: 자산 손상차손 row 0.0, 대손상각비 row hidden, net income -424, EPS -1,677
+ok   N26 quarter record misses the impairment (fq) -> CAUGHT by REG-01 (9 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests: t_bank_writeoff_cashflow.js
+       FAIL case A [R] quarter record: day 60, ni -463, imp 0, wo 0 (24 fields)
+       FAIL case A [M] model rule cfo = cash profit - tax + dividends received: 3.0331; add-back form 3.0331; statement shows -363.0 (rounding allowed 1.15)
+       FAIL case A [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) hidden (expected shown 0.0), record fields 24/22/22/22/22/22/22/22
+ALL MUTANTS CAUGHT (documented survivors aside), unmodified game passes

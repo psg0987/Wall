@@ -1,0 +1,5 @@
+# golden (t_golden.js), 2026-10-18T11:53:32Z, base 8a76765f3a6d8eea1bfcc7b4d33e43ff73e1dca0, node v22.22.0
+---- t_golden.js
+errs 0 fails 0
+PASS t_golden.js
+ALL PASS
