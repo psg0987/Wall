@@ -1,0 +1,23 @@
+item                  basis                game value       GPT value  abs error  verdict
+interest_expense      sealed          55.296396630505     55.29639663   5.05e-10  PASS
+goodwill_amortization sealed           0.000000000000      0.00000000   0.00e+00  PASS
+tax                   sealed          88.109624359168     88.10962436   8.32e-10  PASS
+net_income            sealed         218.205403141055    218.20540314   1.06e-09  PASS
+dividends             sealed          63.858804613298     63.85880461   3.30e-09  PASS
+cash_end              sealed         486.053295170888    486.05329517   8.88e-10  PASS
+total_debt_end        sealed        2475.271228180792   2475.27122818   7.92e-10  PASS
+assets_end            sealed        8100.888252848139   8100.88825285   1.86e-09  PASS
+goodwill_end          sealed           0.000000000000      0.00000000   0.00e+00  PASS
+nol_end               sealed           0.000000000000      0.00000000   0.00e+00  PASS
+spread_mult           post-hoc         1.367502093785      1.36750209   3.78e-09  match (reference only, not pre-sealed)
+bank_loans            post-hoc      2767.579903710261   2767.57990371   2.61e-10  match (reference only, not pre-sealed)
+int_income            post-hoc         8.169833293181      8.16983329   3.18e-09  match (reference only, not pre-sealed)
+cash_profit           post-hoc       300.972306403494    300.97230640   3.49e-09  match (reference only, not pre-sealed)
+pretax                post-hoc       300.972306403494    300.97230640   3.49e-09  match (reference only, not pre-sealed)
+nol_used              post-hoc         7.273558539602      7.27355854   3.98e-10  match (reference only, not pre-sealed)
+sweep_x               post-hoc       292.308675529469    292.30867553   5.31e-10  match (reference only, not pre-sealed)
+
+sealed items: 10, compared 10, fail 0, max abs error 3.30e-09 (tolerance 0.01)
+post-hoc items: 7, mismatches 0, max abs error 3.78e-09
+result items without a game value: none | game items missing in result: none
+VERDICT (10 pre-sealed items): PASS
