@@ -29,7 +29,7 @@ if(c.ni<0&&c.D/Math.max(eq(c),1)>(c.kd?12:1.2))c.ds++;else c.ds=0;
 if(c.ds>=4){c.ds=0;const e=eq(c);if(e>-.3*c.A){const a0=c.A;c.A=Math.max(c.A*.2,c.A-(e+.3*c.A));const wd=a0-c.A;if(wd>0)impair(c,wd)}}
 if(eq(c)<(c.kd?0:-.25*c.A)){ch11(c,"자본잠식");if(c.dead)return}
 c.tg=tgCalc(c);if(c.surp){c.tg*=1+c.surp;c.jx=(c.jx||0)+Math.log(1+c.surp*.5);c.surp=0}
-qPush(c,[S.day,rev,op,rdx,it,iinc,ga,c.er.eq,c.er.dr,tax,c.ni,dv,gr,c.cs,c.A,c.gw,pfv(c),c.D,c.bond,c.pa||0,c.sh,c.p,c.er.imp||0,c.er.wo||0]);if(c.own.P||mine(c))L(c.tk+" 실적: 순이익 "+F(c.ni)+(smsg?" · "+smsg:"")+(c.own.P&&dv>0?" · 배당 "+F(dv*c.own.P/100*.6):""))}
+if(c.ncq){c.rlf={d:Math.round(S.day),R:c.ncq};c.ncq=0}qPush(c,[S.day,rev,op,rdx,it,iinc,ga,c.er.eq,c.er.dr,tax,c.ni,dv,gr,c.cs,c.A,c.gw,pfv(c),c.D,c.bond,c.pa||0,c.sh,c.p,c.er.imp||0,c.er.wo||0]);if(c.own.P||mine(c))L(c.tk+" 실적: 순이익 "+F(c.ni)+(smsg?" · "+smsg:"")+(c.own.P&&dv>0?" · 배당 "+F(dv*c.own.P/100*.6):""))}
 // remove a company. m = multiple of market cap paid to holders; paid=true when caller already paid holders
 function kill(c,m,paid){const v=mc(c)*m;settleNew(c,m);
 if(c.sp>0){const x=c.sb-v*c.sp/100,t=Math.max(0,x)*.22;S.cash+=x-t;if(x>0)S.fl.sh=1;c.sp=0;c.sb=0}
@@ -37,7 +37,7 @@ if(c.bh>0){S.cash+=c.bh*(m>=1?1:m<.1?.1:.6);c.bh=0}if(c.pa){S.cash+=c.pa*(m>=1?1
 S.op=S.op.filter(o=>{if(o.i!==c.id)return true;S.cash+=o.nsh*Math.max(0,o.t==="C"?c.p*m-o.k:o.k-c.p*m)/1e4;return false});
 for(const k of Object.keys(c.own)){if(!paid)payK(c,k,c.own[k]/100*v);setOwn(c,k,0)}
 for(const t of Object.keys(c.pos))setOwn(S.co[t],"c"+c.id,0);
-S.wl=S.wl.filter(x=>x!==c.id);if(S.ceo===c.id)S.ceo=-1;if(S.te===c.id)S.te="P";if(sel===c.id)sel=-1;c.dead=1;S.cd=1;c.hr=null;c.fq=[];c.hm=[];c.eh=[];c.xvd=null;c.w10=null;c.wd=null}
+S.wl=S.wl.filter(x=>x!==c.id);if(S.ceo===c.id)S.ceo=-1;if(S.te===c.id)S.te="P";if(sel===c.id)sel=-1;c.dead=1;S.cd=1;c.hr=null;c.fq=[];c.hm=[];c.eh=[];c.xvd=null;c.w10=null;c.wd=null;c.ncq=0;delete c.rlf}
 // move target t's assets & holdings into acquirer a (after holders were settled)
 function absorb(a,t,paidVal){if(a.i===HOLD&&t.i!==HOLD&&t.A>0){a.i=t.i;if(t.kd){a.kd=t.kd;a.ln=-1}if(mine(a))L(a.tk+" 지주회사가 "+t.tk+"를 흡수해 "+SEC[t.i][0]+" 회사가 됐습니다",1)}const va=t.own["c"+a.id]?hv(t,t.own["c"+a.id]):0,et=eq(t);setOwn(t,"c"+a.id,0);
 a.A+=t.A;a.cs+=t.cs;a.D+=t.D;a.gw+=t.gw+Math.max(0,paidVal+va-et);a.nol+=t.nol*.5;
@@ -151,7 +151,7 @@ function ch11x(c,why){const had=c.own.P>0||mine(c);c.bk++;
 if(c.bk>=2){S.st.del++;eco("🪦 "+c.tk+" "+c.n+" 상장폐지 ("+why+")"+(had?" — 내 지분 휴지조각!":""));if(had)toast(c.tk+" 상장폐지! 지분 소멸");kill(c,.02);return}
 const b=S.co[c.ln];let wb=null;if(b&&!b.dead){const ls=loanOf(c)*.3;b.A-=ls;b.woq=(b.woq||0)+ls;if(ls>0)wb=b;if(mine(b))L(b.tk+" 은행: "+c.tk+" 부실로 대손 "+F(ls)+" (다음 결산 순이익에 반영)",1)}
 if(!c.kd&&c.A>20)fsAdd(c,.15,"법정관리");eco("💥 "+c.tk+" 법정관리 ("+why+")"+(had?" — 내 지분 소멸!":""));if(had)toast(c.tk+" 법정관리! 지분 소멸");
-if(c.pa)c.pa*=.3;for(const k of Object.keys(c.own))setOwn(c,k,0);c.priv=0;{const b=S.co[c.ln];if(b&&!b.dead&&b.kd===1&&loanOf(c)>c.A*.1){const st=Math.min(80,30+loanOf(c)/Math.max(1,c.A)*60);setOwn(c,"c"+b.id,st);c.bs["c"+b.id]=0;eco("🏦 "+b.tk+" 대출 출자전환 — 법정관리 "+c.tk+" 지분 "+st.toFixed(0)+"% 확보");if(mine(b))L("🏦 loan-to-own: "+b.tk+" 은행이 "+c.tk+" 지분 "+st.toFixed(0)+"%를 받았습니다",1);ctlAll()}}c.bh*=.4;c.bond*=.4;c.D=Math.max(0,c.A+c.cs+c.gw+pfv(c)-.15*c.A);if(c.bond>c.D)c.bond=c.D;if(c.pa>c.D-c.bond)c.pa=Math.max(0,c.D-c.bond);c.nol=0;c.mg=-1;c.p=Math.max(60,eq(c)*1e4/c.sh*.5);c.tg=c.p;if(wb&&!wb.dead)wb.tg=tgCalc(wb)}
+if(c.pa)c.pa*=.3;for(const k of Object.keys(c.own))setOwn(c,k,0);c.priv=0;{const b=S.co[c.ln];if(b&&!b.dead&&b.kd===1&&loanOf(c)>c.A*.1){const st=Math.min(80,30+loanOf(c)/Math.max(1,c.A)*60);setOwn(c,"c"+b.id,st);c.bs["c"+b.id]=0;eco("🏦 "+b.tk+" 대출 출자전환 — 법정관리 "+c.tk+" 지분 "+st.toFixed(0)+"% 확보");if(mine(b))L("🏦 loan-to-own: "+b.tk+" 은행이 "+c.tk+" 지분 "+st.toFixed(0)+"%를 받았습니다",1);ctlAll()}}c.bh*=.4;c.bond*=.4;const D0=c.D;c.D=Math.max(0,c.A+c.cs+c.gw+pfv(c)-.15*c.A);c.ncq=(c.ncq||0)+(D0-c.D);if(c.bond>c.D)c.bond=c.D;if(c.pa>c.D-c.bond)c.pa=Math.max(0,c.D-c.bond);c.nol=0;c.mg=-1;c.p=Math.max(60,eq(c)*1e4/c.sh*.5);c.tg=c.p;if(wb&&!wb.dead)wb.tg=tgCalc(wb)}
 // bank b calls fraction f of borrower x's bank loan; shortfall forces asset sales, then chapter 11
 function callLoan(b,x,f){const amt=loanOf(x)*f;if(amt<1)return 0;let paid=Math.min(x.cs,amt);x.cs-=paid;let need=amt-paid;
 if(need>0&&!x.kd){fsAdd(x,Math.min(.6,need/.75/Math.max(1,x.A)),"대출 회수");const p2=Math.min(x.cs,need);x.cs-=p2;paid+=p2;need-=p2}
@@ -274,7 +274,7 @@ return Math.max(0,c.A*x.to/4*(1+2*(S.dg[c.i]-S.cg[c.i]))*(1+.03*hgn(c.id,13)))}
 const FQ=["d","rev","op","rd","it","ii","ga","eq","dr","tax","ni","dv","gr","cs","A","gw","pv","D","bond","pa","sh","p","imp","wo"],fqo=r=>{const o={};FQ.forEach((k,j)=>o[k]=r[j]);return o};
 const r1=x=>Math.abs(x)>=10?Math.round(x):Math.round(x*10)/10;
 function qPush(c,a){(c.fq=c.fq||[]).push(a.map((x,j)=>j===0||j===21?Math.round(x):r1(x)));if(c.fq.length>8)c.fq.shift()}
-function qBack(c){if(c.priv&&c.fo)return;const x=SX[c.i]||SX[0],g=x.dg||.03,rev0=revQ(c),pf=pfv(c);c.fq=[];
+function qBack(c){if(c.priv&&c.fo)return;const x=SX[c.i]||SX[0],g=x.dg||.03,rev0=revQ(c),pf=pfv(c);c.fq=[];delete c.rlf;c.cfd=S.day-720;
 for(let k=8;k>=1;k--){const sc=Math.exp(-g*k/4+.03*gz()),rev=rev0*sc,A=c.A*sc,opm=c.kd?.0035*c.A*sc:A*(SEC[c.i][1]+(S.dg[c.i]-S.cg[c.i])*.5)*(1+.22*gz()),
 it=c.kd?0:loanOf(c)*sc*(S.prime+2)/400,ii=c.cs*sc*Math.max(0,S.prime-2)/400,pre=opm-it+ii,tax=Math.max(0,pre)*ctax(c),ni=pre-tax,dv=Math.max(0,ni)*c.pay,
 p=closeAgo(c,k*90);qPush(c,[S.day-k*90,rev,opm,c.kd?0:A*(c.ps||0)*.0025,it,ii,0,0,0,tax,ni,dv,A*c.g/4,c.cs*sc,A,c.gw,pf*sc,c.D*sc,c.bond*sc,(c.pa||0),c.sh,p])}

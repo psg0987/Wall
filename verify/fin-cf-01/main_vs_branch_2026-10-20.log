@@ -1,0 +1,8 @@
+seed 20261016 (720 days): the whole game state (without ncq/rlf/cfd) and the RNG position are identical on every day (main == branch)
+seed 777 (720 days): the whole game state (without ncq/rlf/cfd) and the RNG position are identical on every day (main == branch)
+seed 12345 (560 days): the whole game state (without ncq/rlf/cfd) and the RNG position are identical on every day (main == branch)
+seed 20261016 (400 days + scripted callLoan on day 150): the whole game state (without ncq/rlf/cfd) and the RNG position are identical on every day (main == branch)
+seed 777 (400 days + scripted ch11 on day 120): the whole game state (without ncq/rlf/cfd) and the RNG position are identical on every day (main == branch)
+   scripted action: 20261016 150 ACT PNPL bk 1
+   scripted action: 777 120 ACT PNPL bk 1
+ALL IDENTICAL

@@ -63,10 +63,16 @@ const fqL=c=>(c.fq||[]).map(fqo);
 // operating cash flow adds back the non-cash charges inside net income: goodwill amortization, depreciation, asset
 // impairment (imp) and bank loan write-off (wo, RT-BANK-001-R1); records from before those fields read them as 0.
 // '기타·투자 매매' (oth) is what is left of the cash change, so it follows automatically.
+// Chapter-11 debt relief moves the debt without any cash (FIN-CF-01): ch11x queues the signed amount R = debt before - debt after
+// in c.ncq, earn() confirms it as c.rlf={d,R} just before the quarter record is pushed, and the quarter whose date is exactly
+// rlf.d takes it out of the borrowing line (cff = dD + R - dv + iss), so oth no longer absorbs it. A record from before the ledger
+// existed (quarter that began before c.cfd, the day the company's ledger started) of a company with a chapter-11 history whose quarter-end equity is about 15% of assets
+// (what the reset leaves behind) may hold an unrecorded relief: it is never given an estimated R, the display says 'unconfirmed' (d.unk).
 function fqDerive(c,q,prev){const x=SX[c.i]||SX[0],fin=c.kd,gp=fin?q.rev:Math.max(q.op+q.rd+q.rev*.04,q.rev*x.gm),sga=fin?Math.max(0,q.rev-q.op):gp-q.op-q.rd,cogs=fin?0:q.rev-gp,
 pre=q.op-q.it+q.ii-q.ga,dep=fin?0:q.A*.02,cfo=q.ni-q.eq+q.ga+dep+(q.imp||0)+(q.wo||0),capex=fin?0:q.gr+dep,dD=prev?q.D-prev.D:null,iss=prev&&q.sh!==prev.sh?(q.sh-prev.sh)*q.p/1e4:0,
-cff=prev?dD-q.dv+iss:null,dc=prev?q.cs-prev.cs:null,oth=prev?dc-cfo+capex-cff:null,bank=fin?0:Math.max(0,q.D-q.bond-q.pa),eq0=q.A+q.cs+q.gw+q.pv-q.D;
-return{gp,sga,cogs,pre,dep,cfo,capex,cff,dc,oth,bank,eqv:eq0,wc:fin?0:q.A*.18,ppe:fin?0:q.A*.82,fcf:cfo-capex,iss}}
+nc=prev&&c&&c.rlf&&c.rlf.d===q.d&&isFinite(c.rlf.R)?c.rlf.R:0,unk=prev&&!(c&&c.rlf&&c.rlf.d===q.d)&&c&&c.bk>0&&c.cfd!=null&&prev.d<c.cfd&&q.A>0&&Math.abs(q.A+q.cs+q.gw+q.pv-q.D-.15*q.A)<=3,
+cff=prev?dD+nc-q.dv+iss:null,dc=prev?q.cs-prev.cs:null,oth=prev?dc-cfo+capex-cff:null,bank=fin?0:Math.max(0,q.D-q.bond-q.pa),eq0=q.A+q.cs+q.gw+q.pv-q.D;
+return{gp,sga,cogs,pre,dep,cfo,capex,cff,dc,oth,nc,unk:!!unk,bank,eqv:eq0,wc:fin?0:q.A*.18,ppe:fin?0:q.A*.82,fcf:cfo-capex,iss}}
 function ttm(L,k){if(L.length<4)return null;return L.slice(-4).reduce((a,q)=>a+q[k],0)}
 function fRatios(c){const L=fqL(c);if(L.length<1)return null;const q=L[L.length-1],d=fqDerive(c,q,L[L.length-2]),ni=ttm(L,"ni"),op=ttm(L,"op"),rev=ttm(L,"rev"),dv=ttm(L,"dv"),it=ttm(L,"it"),m=mc(c),eqv=Math.max(1e-9,eq(c)),
 eps=ni!=null?ni*1e4/c.sh:null,bps=eqv*1e4/c.sh,ya=L.length>=8?L.slice(-8,-4):null,g=(k)=>ya&&ttm(L,k)!=null?(ttm(L,k)/Math.max(1e-9,Math.abs(ya.reduce((a,z)=>a+z[k],0)))-(ya.reduce((a,z)=>a+z[k],0)<0?-1:1))*100:null;
@@ -76,12 +82,19 @@ function secAvg(i){const a=S.co.filter(c=>!c.dead&&!c.priv&&c.i===i&&c.fq&&c.fq.
 return{per:av("per"),pbr:av("pbr"),roe:av("roe"),opm:av("opm"),de:av("de"),dy:av("dy")}}
 const fN=x=>x==null||!isFinite(x)?"–":Math.abs(x)>=1e4?(x/1e4).toFixed(2)+"조":Math.abs(x)>=100?Math.round(x).toLocaleString():x.toFixed(1),fK=x=>x==null||!isFinite(x)?"–":Math.abs(x)>=100?Math.round(x).toLocaleString():x.toFixed(1),fP=x=>x==null||!isFinite(x)?"–":x.toFixed(1)+"%",fX=x=>x==null||!isFinite(x)?"–":x.toFixed(1)+"배";
 function qLab(d){const k=d-1,y=(S.y0||2027)+Math.floor(k/360),q=Math.floor((((k%360)+360)%360)/90)+1;return((y%100)+100)%100+"."+q+"Q"}
+// FIN-CF-01 cash-flow tab helpers. cfRl: a recorded chapter-11 relief sits in a visible quarter that has a previous quarter to compare with.
+const cfRl=c=>!!(c.rlf&&c.rlf.R&&fqL(c).slice(1).some(q=>q.d===c.rlf.d));
+// cfNote: says which quarters are 'unconfirmed', why, and what that cannot tell; or that older quarters of a company with a chapter-11 history may hide one
+function cfNote(c){const L=fqL(c),Ds=L.map((q,j)=>j?fqDerive(c,q,L[j-1]):null),u=L.filter((q,j)=>Ds[j]&&Ds[j].unk).map(q=>qLab(q.d)),st="margin-top:4px;line-height:1.6";
+if(u.length)return `<div class="mu" style="${st}">※ 미확인 분기(${u.join(", ")}): 법정관리의 비현금 부채 감면이 섞여 있을 수 있는데 감면액 기록이 없어 차입 증감·재무활동·기타·투자 매매를 계산하지 않았어요. 판단 근거는 이 회사의 법정관리 이력과 분기 말 자본이 자산의 약 15%라는 점(법정관리 직후의 모습)뿐이라 법정관리 분기라고 확정한 것은 아니에요. 감면액을 기록하기 전에 저장된 데이터라서, 같은 이유로 놓친 분기가 있을 수 있어요.</div>`;
+if(c.bk>0&&c.cfd!=null&&L.some((q,j)=>j&&!(c.rlf&&c.rlf.d===q.d)&&L[j-1].d<c.cfd))return `<div class="mu" style="${st}">※ 이 회사는 법정관리 이력이 있어요. 감면액을 기록하기 전 분기는 비현금 부채 감면이 어느 분기의 차입·재무활동·기타에 섞여 있는지 확인되지 않아요.</div>`;
+return ""}
 function fTable(c,rows,opt){const L=fqL(c),cols=L.slice().reverse(),Ds=cols.map((q,j)=>fqDerive(c,q,cols[j+1]));opt=opt||{};
 let h=`<div class="ftw"><table class="ft"><thead><tr><th>${opt.h||"(억)"}</th>${opt.ttm?"<th>최근 4분기</th>":""}${cols.map(q=>`<th>${qLab(q.d)}</th>`).join("")}</tr></thead><tbody>`;
 const T={};if(opt.ttm&&cols.length>=4)for(const q of cols.slice(0,4))for(const k in q)if(typeof q[k]==="number")T[k]=(T[k]||0)+q[k];
 for(const [lab,f,st,tf] of rows){if(lab==="-"){h+=`<tr class="sep"><td colspan="${cols.length+1+(opt.ttm?1:0)}">${f}</td></tr>`;continue}
 const vals=cols.map((q,j)=>f(q,Ds[j],j));let t="";if(opt.ttm&&cols.length>=4){const tv=cols.slice(0,4).map((q,j)=>f(q,Ds[j],j));t=st==="pct"?(tf?tf(T):null):tv.every(v=>v!=null&&isFinite(v))&&st!=="pt"?tv.reduce((a,b)=>a+b,0):null}
-h+=`<tr class="${st||""}"><td>${lab}</td>${opt.ttm?`<td>${st==="pt"?"":st==="pct"?(t==null?"–":fP(t)):st==="krw"?fK(t):fN(t)}</td>`:""}${vals.map(v=>`<td class="${v<0?"neg":""}">${st==="pct"?fP(v):st==="krw"?fK(v):fN(v)}</td>`).join("")}</tr>`}
+h+=`<tr class="${st||""}"><td>${lab}</td>${opt.ttm?`<td>${st==="pt"?"":st==="pct"?(t==null?"–":fP(t)):st==="krw"?fK(t):fN(t)}</td>`:""}${vals.map(v=>`<td class="${v<0?"neg":""}">${typeof v==="string"?v:st==="pct"?fP(v):st==="krw"?fK(v):fN(v)}</td>`).join("")}</tr>`}
 return h+`</tbody></table></div>`}
 function sFi(c,i){const L=fqL(c),seg=["요약","손익","재무상태","현금흐름","투자지표"].map((t,k)=>B(t,`G.fseg(${k})`,fseg===k?"on":"")).join(""),fin=c.kd;
 let h=`<div class="seg" style="margin-top:4px">${seg}</div>`+fiNote(c);if(!L.length)return h+`<div class="card mu" style="line-height:1.6">아직 공시된 분기 실적이 없습니다. 첫 실적 발표는 D-${nxe(c)}에요.</div>`;
@@ -94,7 +107,7 @@ if(fseg===1)return h+fTable(c,[["매출액",q=>q.rev],["매출원가",(q,d)=>fin
 ["-","주당·비율"],["EPS (원)",q=>q.ni*1e4/q.sh,"krw"],["영업이익률",q=>q.rev?q.op/q.rev*100:null,"pct",T=>T.rev?T.op/T.rev*100:null],["순이익률",q=>q.rev?q.ni/q.rev*100:null,"pct",T=>T.rev?T.ni/T.rev*100:null],["배당 지급",q=>q.dv]],{ttm:1})+`<div class="mu" style="margin-top:6px;line-height:1.6">매출에서 원가와 판관비를 빼면 영업이익, 여기서 이자·세금 등을 빼면 순이익이에요. 지분법 이익은 20% 이상 가진 회사의 이익 중 내 몫입니다.</div>`;
 if(fseg===2)return h+fTable(c,[["현금",q=>q.cs],[fin?"대출·운용 자산":"매출채권·재고",(q,d)=>fin?q.A:d.wc],["유형자산(설비)",(q,d)=>fin?null:d.ppe],["영업권",q=>q.gw],["투자 지분",q=>q.pv],["자산총계",q=>q.A+q.cs+q.gw+q.pv,"b"],["-","부채"],
 ...(fin?[[c.kd===1?"예금":"보험 부채",q=>q.D]]:[["은행 차입",(q,d)=>d.bank],["회사채",q=>q.bond],["대여금(내가 빌려줌)",q=>q.pa]]),["부채총계",q=>q.D,"b"],["자본총계",(q,d)=>d.eqv,"b"],["부채비율",(q,d)=>d.eqv>0?q.D/d.eqv*100:null,"pct"],["주당순자산 BPS",(q,d)=>d.eqv*1e4/q.sh],["발행주식(만주)",q=>q.sh]])+`<div class="mu" style="margin-top:6px;line-height:1.6">자산 = 부채 + 자본. 부채비율이 높을수록 이자 부담과 파산 위험이 커져요.</div>`;
-if(fseg===3)return h+fTable(c,[["순이익",q=>q.ni],["감가상각(비현금)",(q,d)=>d.dep],["지분법·상각 조정",q=>q.ga-q.eq],...(fqL(c).some(q=>q.imp||q.wo)?[["손상·대손상각(비현금 조정)",q=>(q.imp||0)+(q.wo||0)]]:[]),["영업활동 현금흐름",(q,d)=>d.cfo,"b"],["설비투자",(q,d)=>fin?null:-d.capex],["잉여현금흐름 FCF",(q,d)=>fin?null:d.fcf,"b"],["차입 증감",(q,d)=>d.cff==null?null:d.cff+q.dv-d.iss],["배당 지급",q=>-q.dv],["증자(자사주)",(q,d)=>d.iss||null],["재무활동 현금흐름",(q,d)=>d.cff,"b"],["기타·투자 매매",(q,d)=>d.oth],["현금 증감",(q,d)=>d.dc,"b"]])+`<div class="mu" style="margin-top:6px;line-height:1.6">이익이 나도 현금이 들어오지 않으면 위험해요. 잉여현금흐름(영업현금 − 설비투자)이 배당과 빚 상환의 원천입니다.</div>`;
+if(fseg===3)return h+fTable(c,[["순이익",q=>q.ni],["감가상각(비현금)",(q,d)=>d.dep],["지분법·상각 조정",q=>q.ga-q.eq],...(fqL(c).some(q=>q.imp||q.wo)?[["손상·대손상각(비현금 조정)",q=>(q.imp||0)+(q.wo||0)]]:[]),["영업활동 현금흐름",(q,d)=>d.cfo,"b"],["설비투자",(q,d)=>fin?null:-d.capex],["잉여현금흐름 FCF",(q,d)=>fin?null:d.fcf,"b"],["차입 증감",(q,d)=>d.cff==null?null:d.unk?"미확인":d.cff+q.dv-d.iss],["배당 지급",q=>-q.dv],["증자(자사주)",(q,d)=>d.iss||null],["재무활동 현금흐름",(q,d)=>d.unk?"미확인":d.cff,"b"],["기타·투자 매매",(q,d)=>d.unk?"미확인":d.oth],["현금 증감",(q,d)=>d.dc,"b"],...(cfRl(c)?[["└ 법정관리 부채 감면(비현금, 위 차입·재무활동에서 뺌)",(q,d)=>d.nc||null]]:[])])+`<div class="mu" style="margin-top:6px;line-height:1.6">이익이 나도 현금이 들어오지 않으면 위험해요. 잉여현금흐름(영업현금 − 설비투자)이 배당과 빚 상환의 원천입니다.</div>`+cfNote(c);
 const r=fRatios(c)||{},sa=secAvg(c.i);return h+`<div class="pn"><div class="ph"><b>투자지표</b><span class="mu">회사 · 업종 중간값</span></div>`+[["PER (주가/주당순이익)",fX(r.per),fX(sa.per)],["PBR (주가/주당순자산)",fX(r.pbr),fX(sa.pbr)],["PSR (시총/매출)",fX(r.psr),"–"],["EV/EBITDA",fX(r.ev),"–"],["ROE (자기자본이익률)",fP(r.roe),fP(sa.roe)],["ROA (총자산이익률)",fP(r.roa),"–"],["영업이익률",fP(r.opm),fP(sa.opm)],["순이익률",fP(r.npm),"–"],["부채비율",fP(r.de),fP(sa.de)],["이자보상배율",fX(r.icr),"–"],["배당수익률",fP(r.dy),fP(sa.dy)],["배당성향",fP(r.po),"–"],["EPS (연간)",r.eps!=null?W(r.eps):"–","–"],["BPS",W(r.bps||0),"–"],["매출 성장 (1년)",fP(r.gRev),"–"],["순이익 성장 (1년)",fP(r.gNi),"–"]].map(([a,b,s])=>brow(a,`<b>${b}</b> <span class="mu">${s}</span>`)).join("")+`<div class="br mu" style="line-height:1.6;white-space:normal">같은 업종끼리 비교해야 의미가 있어요. 성장이 빠른 업종은 PER이 높아도 비싸지 않을 수 있습니다. ${B("개념서: 가치평가","G.book('val')")}</div></div>`}
 
 function scrList(){const f=scf;return S.co.filter(c=>{if(c.dead||c.priv)return false;if(f.sec>=0&&c.i!==f.sec)return false;if(f.tier>=0&&tn(c)!==f.tier)return false;if(f.tech&&!techOk(c,f.tech))return false;const r=rating(c);

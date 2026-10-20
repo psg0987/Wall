@@ -1,0 +1,59 @@
+-- harness ready
+
+-- TC-CF01-F1 ordinary borrowing then repayment: nothing changes (no relief, no ledger entry)
+pre  F1: target PNPL (kd 0) lender KNYA A 6549.0 D 3160.5 cs 457.7 bk 0
+  --- F1a borrow 300 in the quarter (close day 207, no relief)
+  ledger : relief R 0.00 | asset-market cash 0.00 | injected borrow 300.00 | injected issue cash 0.00 | injected spending 0.00 | loan-call repayment 0.00 | dividend 38.52
+  true   : dD -160.30 | dc -136.54 | cfo-capex(indep.) 62.28 | cff(real cash) -198.82 | oth(clean) 0.00
+  game   : cff -199.00 | oth 1.00 | 차입 증감 -160.00 | nc n/a | rlf undefined | ncq undefined
+FAIL F1a: no relief, nothing pending (nc undefined, ncq undefined)
+ok   F1a: cff -199.0 vs expected -198.8 (err -0.18); other 1.0 vs expected -0.0 (err 1.00)
+ok   F1a no rlf record exists (undefined)
+ok   F1a cff = dD - dividend + issue (dD -160.30): the old formula is kept when there is no relief
+ok   F1a borrow 300 in the quarter: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged)
+  --- F1b repay 120 in the next quarter (close day 297, no relief)
+  ledger : relief R 0.00 | asset-market cash 0.00 | injected borrow -120.00 | injected issue cash 0.00 | injected spending 0.00 | loan-call repayment 0.00 | dividend 48.72
+  true   : dD -120.00 | dc -72.74 | cfo-capex(indep.) 95.98 | cff(real cash) -168.72 | oth(clean) 0.00
+  game   : cff -169.00 | oth 0.00 | 차입 증감 -120.00 | nc n/a | rlf undefined | ncq undefined
+FAIL F1b: no relief, nothing pending (nc undefined, ncq undefined)
+ok   F1b: cff -169.0 vs expected -168.7 (err -0.28); other 0.0 vs expected 0.0 (err 0.00)
+ok   F1b repay 120 in the next quarter: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged)
+
+-- TC-CF01-F2 chapter-11 relief only, inside earn() (SYNTHETIC: a non-cash asset write-down makes earn()'s own equity test trip)
+pre  F2: target PNPL (kd 0) lender KNYA A 6549.0 D 3160.5 cs 457.7 bk 0
+  --- F2 relief quarter (close day 207, relief inside earn())
+  ledger : relief R 1432.88 | asset-market cash 165.01 | injected borrow 0.00 | injected issue cash 0.00 | injected spending 0.00 | loan-call repayment 0.00 | dividend 0.00
+  true   : dD -1847.76 | dc -288.31 | cfo-capex(indep.) -38.44 | cff(real cash) -414.87 | oth(clean) 165.01
+  game   : cff -1847.00 | oth 1597.00 | 차입 증감 -1847.00 | nc n/a | rlf undefined | ncq undefined
+ok   F2 exactly one relief, inside earn() (1)
+ok   F2 relief R = 1432.88 (non-cash; the forced asset sale cash 165.01 is a separate investing inflow)
+FAIL F2 rlf = {d: undefined, R: n/a} = the close day 207 and the ledger R 1432.88 exactly; ncq back to undefined
+FAIL F2: cff -1847.0 vs expected -414.9 (err -1432.13); other 1597.0 vs expected 165.0 (err 1431.99)
+FAIL F2 the row takes R out of the borrowing line: cff = dD + R - dv + iss; 차입 증감 = dD + R = -1847.00 (dD -1847.76 + R 1432.88)
+ok   F2 independent cash closure: oth_clean 165.01 = asset-market cash 165.01 (residual 0.00)
+ok   F2 er.cap is UNCHANGED (FIN-EQ-01 not touched): 1377.88 = R 1432.88 - 0.25 x forced sale 220.01
+ok   F2 dD -1847.76 and the real cash financing -414.87 differ by R 1432.88 (the old statement showed dD)
+FAIL F2 relief quarter: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged) | 27.3Q cff game -1847.00 spec -414.12; 27.3Q oth game 1597.00 spec 164.12; 27.3Q 차입 증감 game -1847.00 spec -414.12
+
+-- TC-CF01-F3 relief and cash borrowing in the same quarter (SYNTHETIC)
+pre  F3: target PNPL (kd 0) lender KNYA A 6549.0 D 3160.5 cs 457.7 bk 0
+  --- F3 (close day 207, relief inside earn())
+  ledger : relief R 1435.89 | asset-market cash 165.01 | injected borrow 250.00 | injected issue cash 0.00 | injected spending 0.00 | loan-call repayment 0.00 | dividend 0.00
+  true   : dD -1847.76 | dc -288.31 | cfo-capex(indep.) -41.45 | cff(real cash) -411.87 | oth(clean) 165.01
+  game   : cff -1847.00 | oth 1600.00 | 차입 증감 -1847.00 | nc n/a | rlf undefined | ncq undefined
+ok   F3 one relief
+FAIL F3: cff -1847.0 vs expected -411.9 (err -1435.13); other 1600.0 vs expected 165.0 (err 1434.99)
+ok   F3 independent closure residual 0.00
+ERR  TypeError: Cannot read properties of undefined (reading 'R')
+    at Object.check (/tmp/claude-0/-home-claude/4c4f3d49-6d45-5f50-93f9-783fbad41798/scratchpad/fincf01/tmpp_xcgynw.js:3226:21)
+    at runSeq (/tmp/claude-0/-home-claude/4c4f3d49-6d45-5f50-93f9-783fbad41798/scratchpad/fincf01/tmpp_xcgynw.js:3191:20)
+    at /tmp/claude-0/-home-claude/4c4f3d49-6d45-5f50-93f9-783fbad41798/scratchpad/fincf01/tmpp_xcgynw.js:3224:1
+    at Object.<anonymous> (/tmp/claude-0/-home-claude/4c4f3d49-6d45-5f50-93f9-783fbad41798/scratchpad/fincf01/tmpp_xcgynw.js:3526:3)
+    at Module._compile (node:internal/modules/cjs/loader:1706:14)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+errs 1 fails 7
+
