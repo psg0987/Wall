@@ -1,0 +1,8 @@
+seed 20261016: 720 days, the whole game state is identical on every day (main == branch)
+seed 777: 720 days, the whole game state is identical on every day (main == branch)
+seed 12345: 560 days, first difference on day 431
+-- seed 12345, whole-state difference on the first day it differs (day 431), main -> branch:
+    /co[123]/tg (BOAX) | 2519.2553148091497 -> 319.50104134477715
+    1 differing leaf values listed
+   only a bank target price (tg) differs on the first day: True
+RESULT: as expected

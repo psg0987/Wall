@@ -1,0 +1,421 @@
+---- t_r4c_bank_tg.js
+-- TC-R4C-A no write-off: identical to the existing valuation
+ok   TC-R4C-A1 natural seed 12345 x 720 days: 4170 target-price calculations (1 of them with a write-off waiting) all equal to the spec
+ok   TC-R4C-A1 natural seed 777 x 720 days: 4171 target-price calculations (0 of them with a write-off waiting) all equal to the spec
+ok   TC-R4C-A1 natural seed 20261016 x 720 days: 4159 target-price calculations (0 of them with a write-off waiting) all equal to the spec
+pre  TC-R4C-A2 world: the borrower is in chapter 11 (bk 1), loan to the bank at the default 0.0000
+pre  TC-R4C-A2 the stored target price is stale (mood moved by .4 since the last close): the formula on today's inputs gives 850.1934 vs stored 727.0136, so a refresh would show
+ok   TC-R4C-A2 nothing written off (0.0000): the bank record changed in [], target price 727.0136 -> 727.0136
+pre  TC-R4C-A3 the stored target price is stale (mood moved by .4): the formula on today's inputs gives 850.1934 vs stored 727.0136
+ok   TC-R4C-A3 default without a lender: borrower bk 1, no write-off, the bank target price stays 727.0136
+-- TC-R4C-B one write-off (strong = valuation EPS < 0, mild = valuation EPS > 0)
+pre  TC-R4C-B1 (strong) world: one default on day 100, bank close on day 150 (1 write-offs)
+pre  TC-R4C-B1 (strong): regime strong: the spec valuation EPS is -170.2948 (< 0, tg follows the book-value branch)
+ok   TC-R4C-B1 (strong): write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-B1 (strong): assets 1012.5000 -> 952.5000, book equity without the stake 162.4363 -> 102.4363 (both down by the write-off)
+ok   TC-R4C-B1 (strong): equity used for valuation 102.4363 = book 102.4363 + stake value 0.0000
+ok   TC-R4C-B1 (strong): target price on the default day 200.5377 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+ok   TC-R4C-B1 (strong): target price fell 727.0 -> 200.5 (the book-equity part alone would give 602.9)
+ok   TC-R4C-B1 (strong): the borrower's own chapter 11 reset is untouched: its target price 369.0709 = its new price 369.0709
+ok   TC-R4C-B1 (strong): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-B1 (strong): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-B1 (strong): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-B1 (strong): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-B1 (strong): the close on day 150 books 60.0000 of 60.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-B1 (strong): the loss sits once in the published quarter: EPS -220.9 = core 16.4 - loss 237.3
+ok   TC-R4C-B1 (strong): after the close the valuation EPS is the confirmed trailing EPS -169.8000 (the temporary term is released)
+ok   TC-R4C-B1 (strong): target price after the close 205.4021 = existing formula on the confirmed EPS (expected 205.4021)
+ok   TC-R4C-B1 (strong): no double counting: valuation EPS before the close, had the quarter met its own core EPS, -169.8164 = trailing EPS after it -169.8000
+info TC-R4C-B1 (strong) price/target: before 795.1/727.0 | default instant 795.1/200.5 | default day end 786.6/200.5 | d+10 731.5/200.5 | close-1 613.5/200.5 | close 611.2/205.4 | c+1 623.1/205.4 | c+10 626.4/205.4 | c+30 -
+ok   TC-R4C-B1 (strong) from the default day to the day before the close the target price stays 200.5377 and the loss stays queued (50 days)
+pre  TC-R4C-B4 (strong) world: the old-code run has the same default and close (100, 150)
+ok   TC-R4C-B4 (strong) the close on day 150 is the same as with the old code (assets, cash, deposits, shares, net income, yearly income, EPS history, estimate, results): differing none
+ok   TC-R4C-B4 (strong) the old code leaves the target price at 727.0 on the default day; R4C puts it at 200.5
+info TC-R4C-B4 (strong) bank price, old code / R4C: day 100 792.7 / 786.6 | day 110 794.4 / 731.5 | day 149 857.3 / 613.5 | day 150 855.1 / 611.2 | day 151 870.0 / 623.1 | day 160 859.3 / 626.4
+pre  TC-R4C-B2 (strong, loan-to-own) world: loan-to-own stake 80.0%, close on day 150
+pre  TC-R4C-B2 (strong, loan-to-own): regime strong: the spec valuation EPS is -170.2948 (< 0, tg follows the book-value branch)
+ok   TC-R4C-B2 (strong, loan-to-own): write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-B2 (strong, loan-to-own): assets 1012.5000 -> 952.5000, book equity without the stake 162.4363 -> 102.4363 (both down by the write-off)
+ok   TC-R4C-B2 (strong, loan-to-own): equity used for valuation 122.5339 = book 102.4363 + stake value 20.0976 (loan-to-own stake 80.0%)
+ok   TC-R4C-B2 (strong, loan-to-own): target price on the default day 239.8824 = the existing formula on the spec EPS -170.2948 (expected 239.8824)
+ok   TC-R4C-B2 (strong, loan-to-own): target price fell 727.0 -> 239.9 (the book-equity part alone would give 629.1)
+ok   TC-R4C-B2 (strong, loan-to-own): the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-B2 (strong, loan-to-own): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-B2 (strong, loan-to-own): the bank record changed in A, pos, tg, woq only (allowed: A, woq, tg, pos for the stake)
+ok   TC-R4C-B2 (strong, loan-to-own): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-B2 (strong, loan-to-own) the stake is registered on the bank (pos) and valued 20.0976
+pre  TC-R4C-B2 (strong, loan-to-own): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-B2 (strong, loan-to-own): the close on day 150 books 60.0000 of 60.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-B2 (strong, loan-to-own): the loss sits once in the published quarter: EPS -220.9 = core 16.4 - loss 237.3
+ok   TC-R4C-B2 (strong, loan-to-own): after the close the valuation EPS is the confirmed trailing EPS -169.8000 (the temporary term is released)
+ok   TC-R4C-B2 (strong, loan-to-own): target price after the close 244.7468 = existing formula on the confirmed EPS (expected 244.7468)
+ok   TC-R4C-B2 (strong, loan-to-own): no double counting: valuation EPS before the close, had the quarter met its own core EPS, -169.8164 = trailing EPS after it -169.8000
+info TC-R4C-B2 (strong, loan-to-own) price/target: before 795.1/727.0 | default instant 795.1/239.9 | default day end 787.4/239.9 | d+10 739.9/239.9 | close-1 642.7/239.9 | close 641.1/244.7 | c+1 654.2/244.7 | c+10 662.0/244.7 | c+30 -
+pre  TC-R4C-B1 (mild) world: one default on day 100, bank close on day 150 (1 write-offs)
+pre  TC-R4C-B1 (mild): regime mild: the spec valuation EPS is 31.4058 (> 0, the EPS term decides tg)
+ok   TC-R4C-B1 (mild): write-off 9.0000 = 30% of the loan 30.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-B1 (mild): assets 1012.5000 -> 1003.5000, book equity without the stake 162.4363 -> 153.4363 (both down by the write-off)
+ok   TC-R4C-B1 (mild): equity used for valuation 153.4363 = book 153.4363 + stake value 0.0000
+ok   TC-R4C-B1 (mild): target price on the default day 415.0410 = the existing formula on the spec EPS 31.4058 (expected 415.0410)
+ok   TC-R4C-B1 (mild): target price fell 727.0 -> 415.0 (the book-equity part alone would give 669.4)
+ok   TC-R4C-B1 (mild): the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-B1 (mild): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-B1 (mild): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-B1 (mild): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-B1 (mild): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-B1 (mild): the close on day 150 books 9.0000 of 9.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-B1 (mild): the loss sits once in the published quarter: EPS -17.3 = core 18.3 - loss 35.6
+ok   TC-R4C-B1 (mild): after the close the valuation EPS is the confirmed trailing EPS 33.8000 (the temporary term is released)
+ok   TC-R4C-B1 (mild): target price after the close 435.0381 = existing formula on the confirmed EPS (expected 435.0381)
+ok   TC-R4C-B1 (mild): no double counting: valuation EPS before the close, had the quarter met its own core EPS, 33.8024 = trailing EPS after it 33.8000
+info TC-R4C-B1 (mild) price/target: before 795.1/727.0 | default instant 795.1/415.0 | default day end 790.0/415.0 | d+10 766.4/415.0 | close-1 741.1/415.0 | close 750.0/435.0 | c+1 767.5/435.0 | c+10 796.7/435.0 | c+30 -
+ok   TC-R4C-B1 (mild) from the default day to the day before the close the target price stays 415.0410 and the loss stays queued (50 days)
+pre  TC-R4C-B4 (mild) world: the old-code run has the same default and close (100, 150)
+ok   TC-R4C-B4 (mild) the close on day 150 is the same as with the old code (assets, cash, deposits, shares, net income, yearly income, EPS history, estimate, results): differing none
+ok   TC-R4C-B4 (mild) the old code leaves the target price at 727.0 on the default day; R4C puts it at 415.0
+info TC-R4C-B4 (mild) bank price, old code / R4C: day 100 792.7 / 790.0 | day 110 794.4 / 766.4 | day 149 857.3 / 741.1 | day 150 868.0 / 750.0 | day 151 887.5 / 767.5 | day 160 914.2 / 796.7
+pre  TC-R4C-B2 (mild, loan-to-own) world: loan-to-own stake 44.1%, close on day 150
+pre  TC-R4C-B2 (mild, loan-to-own): regime mild: the spec valuation EPS is 31.4058 (> 0, the EPS term decides tg)
+ok   TC-R4C-B2 (mild, loan-to-own): write-off 9.0000 = 30% of the loan 30.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-B2 (mild, loan-to-own): assets 1012.5000 -> 1003.5000, book equity without the stake 162.4363 -> 153.4363 (both down by the write-off)
+ok   TC-R4C-B2 (mild, loan-to-own): equity used for valuation 164.5195 = book 153.4363 + stake value 11.0832 (loan-to-own stake 44.1%)
+ok   TC-R4C-B2 (mild, loan-to-own): target price on the default day 429.5059 = the existing formula on the spec EPS 31.4058 (expected 429.5059)
+ok   TC-R4C-B2 (mild, loan-to-own): target price fell 727.0 -> 429.5 (the book-equity part alone would give 683.9)
+ok   TC-R4C-B2 (mild, loan-to-own): the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-B2 (mild, loan-to-own): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-B2 (mild, loan-to-own): the bank record changed in A, pos, tg, woq only (allowed: A, woq, tg, pos for the stake)
+ok   TC-R4C-B2 (mild, loan-to-own): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-B2 (mild, loan-to-own) the stake is registered on the bank (pos) and valued 11.0832
+pre  TC-R4C-B2 (mild, loan-to-own): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-B2 (mild, loan-to-own): the close on day 150 books 9.0000 of 9.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-B2 (mild, loan-to-own): the loss sits once in the published quarter: EPS -17.3 = core 18.3 - loss 35.6
+ok   TC-R4C-B2 (mild, loan-to-own): after the close the valuation EPS is the confirmed trailing EPS 33.8000 (the temporary term is released)
+ok   TC-R4C-B2 (mild, loan-to-own): target price after the close 449.5031 = existing formula on the confirmed EPS (expected 449.5031)
+ok   TC-R4C-B2 (mild, loan-to-own): no double counting: valuation EPS before the close, had the quarter met its own core EPS, 33.8024 = trailing EPS after it 33.8000
+info TC-R4C-B2 (mild, loan-to-own) price/target: before 795.1/727.0 | default instant 795.1/429.5 | default day end 790.2/429.5 | d+10 768.1/429.5 | close-1 747.7/429.5 | close 756.9/449.5 | c+1 774.6/449.5 | c+10 805.1/449.5 | c+30 -
+pre  TC-R4C-B3 (no published quarter) world: default day 40, close day 60, published quarters at the default 0
+pre  TC-R4C-B3 (no published quarter): regime mild: the spec valuation EPS is 13.0492 (> 0, the EPS term decides tg)
+ok   TC-R4C-B3 (no published quarter): write-off 3.6000 = 30% of the loan 12.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-B3 (no published quarter): assets 1000.0000 -> 996.4000, book equity without the stake 160.0000 -> 156.4000 (both down by the write-off)
+ok   TC-R4C-B3 (no published quarter): equity used for valuation 156.4000 = book 156.4000 + stake value 0.0000
+ok   TC-R4C-B3 (no published quarter): target price on the default day 302.0882 = the existing formula on the spec EPS 13.0492 (expected 302.0882)
+ok   TC-R4C-B3 (no published quarter): target price fell 2310.9 -> 302.1 (the book-equity part alone would give 2306.2)
+ok   TC-R4C-B3 (no published quarter): the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-B3 (no published quarter): no price shock on the default day: price 2676.0975 -> 2676.0975, jump term 0.0000 -> 0.0000
+ok   TC-R4C-B3 (no published quarter): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-B3 (no published quarter): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-B3 (no published quarter): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-B3 (no published quarter): the close on day 60 books 3.6000 of 3.6000 waiting, nothing left waiting (0)
+ok   TC-R4C-B3 (no published quarter): the loss sits once in the published quarter: EPS 1.7 = core 15.9 - loss 14.2
+ok   TC-R4C-B3 (no published quarter): after the close the valuation EPS is the confirmed trailing EPS 6.8000 (the temporary term is released)
+ok   TC-R4C-B3 (no published quarter): target price after the close 258.3257 = existing formula on the confirmed EPS (expected 258.3257)
+ok   TC-R4C-B3 (no published quarter): no double counting: valuation EPS before the close, had the quarter met its own core EPS, 6.7598 = trailing EPS after it 6.8000
+pre  TC-R4C-B3 (two published quarters) world: default day 40, close day 60, published quarters at the default 2
+pre  TC-R4C-B3 (two published quarters): regime mild: the spec valuation EPS is 22.5410 (> 0, the EPS term decides tg)
+ok   TC-R4C-B3 (two published quarters): write-off 9.0000 = 30% of the loan 30.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-B3 (two published quarters): assets 1000.0000 -> 991.0000, book equity without the stake 160.0000 -> 151.0000 (both down by the write-off)
+ok   TC-R4C-B3 (two published quarters): equity used for valuation 151.0000 = book 151.0000 + stake value 0.0000
+ok   TC-R4C-B3 (two published quarters): target price on the default day 366.3002 = the existing formula on the spec EPS 22.5410 (expected 366.3002)
+ok   TC-R4C-B3 (two published quarters): target price fell 734.3 -> 366.3 (the book-equity part alone would give 722.6)
+ok   TC-R4C-B3 (two published quarters): the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-B3 (two published quarters): no price shock on the default day: price 859.8729 -> 859.8729, jump term 0.0000 -> 0.0000
+ok   TC-R4C-B3 (two published quarters): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-B3 (two published quarters): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-B3 (two published quarters): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-B3 (two published quarters): the close on day 60 books 9.0000 of 9.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-B3 (two published quarters): the loss sits once in the published quarter: EPS -19.9 = core 15.7 - loss 35.6
+ok   TC-R4C-B3 (two published quarters): after the close the valuation EPS is the confirmed trailing EPS 20.1333 (the temporary term is released)
+ok   TC-R4C-B3 (two published quarters): target price after the close 351.3391 = existing formula on the confirmed EPS (expected 351.3391)
+ok   TC-R4C-B3 (two published quarters): no double counting: valuation EPS before the close, had the quarter met its own core EPS, 20.1823 = trailing EPS after it 20.1333
+-- TC-R4C-C several write-offs
+pre  TC-R4C-C1 (strong) world: two write-offs on days 95 and 100, one close on day 150
+ok   TC-R4C-C1 (strong) first: write-off 45.0000 = 30% of the loan 150.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-C1 (strong) first: assets 1012.5000 -> 967.5000, book equity without the stake 162.4363 -> 117.4363 (both down by the write-off)
+ok   TC-R4C-C1 (strong) first: equity used for valuation 117.4363 = book 117.4363 + stake value 0.0000
+ok   TC-R4C-C1 (strong) first: target price on the default day 229.9029 = the existing formula on the spec EPS -110.9711 (expected 229.9029)
+ok   TC-R4C-C1 (strong) first: target price fell 727.0 -> 229.9 (the book-equity part alone would give 622.4)
+ok   TC-R4C-C1 (strong) first: the borrower's own chapter 11 reset is untouched: its target price 276.8032 = its new price 276.8032
+ok   TC-R4C-C1 (strong) first: no price shock on the default day: price 747.5657 -> 747.5657, jump term 0.0000 -> 0.0000
+ok   TC-R4C-C1 (strong) first: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-C1 (strong) first: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-C1 (strong) second default: waiting 45.0000 + 75.0000 = 120.0000 (each loss once)
+pre  TC-R4C-C1 (strong) regime: valuation EPS with both losses -407.5897
+ok   TC-R4C-C1 (strong) second default: target price 83.0767 = formula on the spec EPS with BOTH losses once, built from the history before the first default (EPS -407.5897)
+ok   TC-R4C-C1 (strong) second default: target price 229.9 -> 83.1, bank record changed in A, tg, woq only
+pre  TC-R4C-C1 (strong): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-C1 (strong): the close on day 150 books 120.0000 of 120.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-C1 (strong): the loss sits once in the published quarter: EPS -460.5 = core 14.1 - loss 474.6
+ok   TC-R4C-C1 (strong): after the close the valuation EPS is the confirmed trailing EPS -409.4000 (the temporary term is released)
+ok   TC-R4C-C1 (strong): target price after the close 87.2709 = existing formula on the confirmed EPS (expected 87.2709)
+ok   TC-R4C-C1 (strong): no double counting: valuation EPS before the close, had the quarter met its own core EPS, -409.3681 = trailing EPS after it -409.4000
+ok   TC-R4C-C1 (strong) the close books both losses in one line: 120.0000 = 45.0000 + 75.0000
+pre  TC-R4C-C1 (strong) single-borrower world: loan 400.0000 vs the two loans 400.0000
+ok   TC-R4C-C1 (strong) after the second default the bank is the same as after one combined write-off (assets, cash, deposits, waiting loss, equity, target price 83.0767 vs 83.0767): differing none
+ok   TC-R4C-C1 (strong) and the close is the same: net income -116.4294 vs -116.4294, target price 87.2709 vs 87.2709
+pre  TC-R4C-C1 (mild) world: two write-offs on days 95 and 100, one close on day 150
+ok   TC-R4C-C1 (mild) first: write-off 6.0000 = 30% of the loan 20.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-C1 (mild) first: assets 1012.5000 -> 1006.5000, book equity without the stake 162.4363 -> 156.4363 (both down by the write-off)
+ok   TC-R4C-C1 (mild) first: equity used for valuation 156.4363 = book 156.4363 + stake value 0.0000
+ok   TC-R4C-C1 (mild) first: target price on the default day 500.1008 = the existing formula on the spec EPS 43.2705 (expected 500.1008)
+ok   TC-R4C-C1 (mild) first: target price fell 727.0 -> 500.1 (the book-equity part alone would give 673.3)
+ok   TC-R4C-C1 (mild) first: the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-C1 (mild) first: no price shock on the default day: price 747.5657 -> 747.5657, jump term 0.0000 -> 0.0000
+ok   TC-R4C-C1 (mild) first: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-C1 (mild) first: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-C1 (mild) second default: waiting 6.0000 + 9.0000 = 15.0000 (each loss once)
+pre  TC-R4C-C1 (mild) regime: valuation EPS with both losses 7.6763
+ok   TC-R4C-C1 (mild) second default: target price 244.9214 = formula on the spec EPS with BOTH losses once, built from the history before the first default (EPS 7.6763)
+ok   TC-R4C-C1 (mild) second default: target price 500.1 -> 244.9, bank record changed in A, tg, woq only
+pre  TC-R4C-C1 (mild): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-C1 (mild): the close on day 150 books 15.0000 of 15.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-C1 (mild): the loss sits once in the published quarter: EPS -41.3 = core 18.1 - loss 59.3
+ok   TC-R4C-C1 (mild): after the close the valuation EPS is the confirmed trailing EPS 9.8000 (the temporary term is released)
+ok   TC-R4C-C1 (mild): target price after the close 263.0237 = existing formula on the confirmed EPS (expected 263.0237)
+ok   TC-R4C-C1 (mild): no double counting: valuation EPS before the close, had the quarter met its own core EPS, 9.8473 = trailing EPS after it 9.8000
+ok   TC-R4C-C1 (mild) the close books both losses in one line: 15.0000 = 6.0000 + 9.0000
+pre  TC-R4C-C1 (mild) single-borrower world: loan 50.0000 vs the two loans 50.0000
+ok   TC-R4C-C1 (mild) after the second default the bank is the same as after one combined write-off (assets, cash, deposits, waiting loss, equity, target price 244.9214 vs 244.9214): differing none
+ok   TC-R4C-C1 (mild) and the close is the same: net income -10.4308 vs -10.4308, target price 263.0237 vs 263.0237
+pre  TC-R4C-C2 world: defaults on days 100, 200; closes on days 150, 240
+pre  TC-R4C-C2 first: regime mild: the spec valuation EPS is 31.4058 (> 0, the EPS term decides tg)
+ok   TC-R4C-C2 first: write-off 9.0000 = 30% of the loan 30.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-C2 first: assets 1012.5000 -> 1003.5000, book equity without the stake 162.4363 -> 153.4363 (both down by the write-off)
+ok   TC-R4C-C2 first: equity used for valuation 153.4363 = book 153.4363 + stake value 0.0000
+ok   TC-R4C-C2 first: target price on the default day 415.0410 = the existing formula on the spec EPS 31.4058 (expected 415.0410)
+ok   TC-R4C-C2 first: target price fell 727.0 -> 415.0 (the book-equity part alone would give 669.4)
+ok   TC-R4C-C2 first: the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-C2 first: no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-C2 first: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-C2 first: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-C2 first: no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-C2 first: the close on day 150 books 9.0000 of 9.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-C2 first: the loss sits once in the published quarter: EPS -17.3 = core 18.3 - loss 35.6
+ok   TC-R4C-C2 first: after the close the valuation EPS is the confirmed trailing EPS 33.8000 (the temporary term is released)
+ok   TC-R4C-C2 first: target price after the close 435.0381 = existing formula on the confirmed EPS (expected 435.0381)
+ok   TC-R4C-C2 first: no double counting: valuation EPS before the close, had the quarter met its own core EPS, 33.8024 = trailing EPS after it 33.8000
+pre  TC-R4C-C2 second: regime mild: the spec valuation EPS is 15.9029 (> 0, the EPS term decides tg)
+ok   TC-R4C-C2 second: write-off 4.5000 = 30% of the loan 15.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-C2 second: assets 1016.0438 -> 1011.5438, book equity without the stake 156.2121 -> 151.7121 (both down by the write-off)
+ok   TC-R4C-C2 second: equity used for valuation 151.7121 = book 151.7121 + stake value 0.0000
+ok   TC-R4C-C2 second: target price on the default day 307.4431 = the existing formula on the spec EPS 15.9029 (expected 307.4431)
+ok   TC-R4C-C2 second: target price fell 435.0 -> 307.4 (the book-equity part alone would give 430.6)
+ok   TC-R4C-C2 second: the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-C2 second: no price shock on the default day: price 853.8477 -> 853.8477, jump term 0.0000 -> 0.0000
+ok   TC-R4C-C2 second: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-C2 second: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-C2 second: no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-C2 second: the close on day 240 books 4.5000 of 4.5000 waiting, nothing left waiting (0)
+ok   TC-R4C-C2 second: the loss sits once in the published quarter: EPS 1.0 = core 18.8 - loss 17.8
+ok   TC-R4C-C2 second: after the close the valuation EPS is the confirmed trailing EPS 17.3000 (the temporary term is released)
+ok   TC-R4C-C2 second: target price after the close 320.7758 = existing formula on the confirmed EPS (expected 320.7758)
+ok   TC-R4C-C2 second: no double counting: valuation EPS before the close, had the quarter met its own core EPS, 17.2813 = trailing EPS after it 17.3000
+ok   TC-R4C-C2 the second quarter waits only for its own loss (4.5000) and books only that (4.5000), not 13.5000
+ok   TC-R4C-C2 the first loss is in the published EPS history once (last quarter -17.3) and the second default is valued on top of it: target 307.4
+-- TC-R4C-D two banks default on the same day (bank 1 mild, bank 2 strong)
+pre  TC-R4C-D world: write-offs 2 (both banks), 1 (bank 1 only), 1 (bank 2 only)
+pre  TC-R4C-D bank 1: regime mild: the spec valuation EPS is 31.4058 (> 0, the EPS term decides tg)
+ok   TC-R4C-D bank 1: write-off 9.0000 = 30% of the loan 30.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-D bank 1: assets 1012.5000 -> 1003.5000, book equity without the stake 162.4363 -> 153.4363 (both down by the write-off)
+ok   TC-R4C-D bank 1: equity used for valuation 153.4363 = book 153.4363 + stake value 0.0000
+ok   TC-R4C-D bank 1: target price on the default day 415.0410 = the existing formula on the spec EPS 31.4058 (expected 415.0410)
+ok   TC-R4C-D bank 1: target price fell 727.0 -> 415.0 (the book-equity part alone would give 669.4)
+ok   TC-R4C-D bank 1: the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-D bank 1: no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-D bank 1: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-D bank 1: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-D bank 2: regime strong: the spec valuation EPS is -304.8091 (< 0, tg follows the book-value branch)
+ok   TC-R4C-D bank 2: write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-D bank 2: assets 1012.5000 -> 952.5000, book equity without the stake 162.4216 -> 102.4216 (both down by the write-off)
+ok   TC-R4C-D bank 2: equity used for valuation 102.4216 = book 102.4216 + stake value 0.0000
+ok   TC-R4C-D bank 2: target price on the default day 325.4087 = the existing formula on the spec EPS -304.8091 (expected 325.4087)
+ok   TC-R4C-D bank 2: target price fell 932.6 -> 325.4 (the book-equity part alone would give 753.1)
+ok   TC-R4C-D bank 2: the borrower's own chapter 11 reset is untouched: its target price 527.4061 = its new price 527.4061
+ok   TC-R4C-D bank 2: no price shock on the default day: price 817.7772 -> 817.7772, jump term 0.0000 -> 0.0000
+ok   TC-R4C-D bank 2: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-D bank 2: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-D bank 1 on the day both default: target 415.0410 = when only it defaults 415.0410 (write-offs differ: 9.00 / 60.00)
+ok   TC-R4C-D bank 2 on the day both default: target 325.4087 = when only it defaults 325.4087
+ok   TC-R4C-D the bank whose borrower does not default keeps its target price and queues nothing
+pre  TC-R4C-D every bank has its close
+pre  TC-R4C-D bank 1: no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-D bank 1: the close on day 150 books 9.0000 of 9.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-D bank 1: the loss sits once in the published quarter: EPS -17.3 = core 18.3 - loss 35.6
+ok   TC-R4C-D bank 1: after the close the valuation EPS is the confirmed trailing EPS 33.8000 (the temporary term is released)
+ok   TC-R4C-D bank 1: target price after the close 435.0381 = existing formula on the confirmed EPS (expected 435.0381)
+ok   TC-R4C-D bank 1: no double counting: valuation EPS before the close, had the quarter met its own core EPS, 33.8024 = trailing EPS after it 33.8000
+pre  TC-R4C-D bank 2: no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-D bank 2: the close on day 150 books 60.0000 of 60.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-D bank 2: the loss sits once in the published quarter: EPS -358.5 = core 26.6 - loss 385.1
+ok   TC-R4C-D bank 2: after the close the valuation EPS is the confirmed trailing EPS -297.6000 (the temporary term is released)
+ok   TC-R4C-D bank 2: target price after the close 333.3080 = existing formula on the confirmed EPS (expected 333.3080)
+ok   TC-R4C-D bank 2: no double counting: valuation EPS before the close, had the quarter met its own core EPS, -297.6121 = trailing EPS after it -297.6000
+ok   TC-R4C-D each close is the same as in the world where only that bank is hit (targets 435.0381 / 333.3080, write-offs 9.0000 / 60.0000)
+-- TC-R4C-E the bank is settled before its close (kill: bankruptcy m=.02, nationalisation m=.6, takeover m=1.3)
+pre  TC-R4C-E (m=0.02) world: default on day 100, the bank is settled on day 105
+ok   TC-R4C-E (m=0.02): write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-E (m=0.02): assets 1012.5000 -> 952.5000, book equity without the stake 162.4363 -> 102.4363 (both down by the write-off)
+ok   TC-R4C-E (m=0.02): equity used for valuation 102.4363 = book 102.4363 + stake value 0.0000
+ok   TC-R4C-E (m=0.02): target price on the default day 200.5377 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+ok   TC-R4C-E (m=0.02): target price fell 727.0 -> 200.5 (the book-equity part alone would give 602.9)
+ok   TC-R4C-E (m=0.02): the borrower's own chapter 11 reset is untouched: its target price 369.0709 = its new price 369.0709
+ok   TC-R4C-E (m=0.02): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0368 -> 0.0368
+ok   TC-R4C-E (m=0.02): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-E (m=0.02): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-E (m=0.02) the player's 20% is paid at market cap 199.5658 x 0.02 less 22% tax: 0.6226 (the existing rule, core.js payK / sim.js kill; the lower target price changes no payout formula)
+ok   TC-R4C-E (m=0.02) the waiting loss stays on the dead bank, as before R4C (R2): woq 60.0000 (nothing books it)
+ok   TC-R4C-E (m=0.02) twenty days after the settlement every price and target is finite and positive, no error
+pre  TC-R4C-E (m=0.6) world: default on day 100, the bank is settled on day 105
+ok   TC-R4C-E (m=0.6): write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-E (m=0.6): assets 1012.5000 -> 952.5000, book equity without the stake 162.4363 -> 102.4363 (both down by the write-off)
+ok   TC-R4C-E (m=0.6): equity used for valuation 102.4363 = book 102.4363 + stake value 0.0000
+ok   TC-R4C-E (m=0.6): target price on the default day 200.5377 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+ok   TC-R4C-E (m=0.6): target price fell 727.0 -> 200.5 (the book-equity part alone would give 602.9)
+ok   TC-R4C-E (m=0.6): the borrower's own chapter 11 reset is untouched: its target price 369.0709 = its new price 369.0709
+ok   TC-R4C-E (m=0.6): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0368 -> 0.0368
+ok   TC-R4C-E (m=0.6): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-E (m=0.6): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-E (m=0.6) the player's 20% is paid at market cap 199.5658 x 0.6 less 22% tax: 18.6794 (the existing rule, core.js payK / sim.js kill; the lower target price changes no payout formula)
+ok   TC-R4C-E (m=0.6) the waiting loss stays on the dead bank, as before R4C (R2): woq 60.0000 (nothing books it)
+ok   TC-R4C-E (m=0.6) twenty days after the settlement every price and target is finite and positive, no error
+pre  TC-R4C-E (m=1.3) world: default on day 100, the bank is settled on day 105
+ok   TC-R4C-E (m=1.3): write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-E (m=1.3): assets 1012.5000 -> 952.5000, book equity without the stake 162.4363 -> 102.4363 (both down by the write-off)
+ok   TC-R4C-E (m=1.3): equity used for valuation 102.4363 = book 102.4363 + stake value 0.0000
+ok   TC-R4C-E (m=1.3): target price on the default day 200.5377 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+ok   TC-R4C-E (m=1.3): target price fell 727.0 -> 200.5 (the book-equity part alone would give 602.9)
+ok   TC-R4C-E (m=1.3): the borrower's own chapter 11 reset is untouched: its target price 369.0709 = its new price 369.0709
+ok   TC-R4C-E (m=1.3): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0368 -> 0.0368
+ok   TC-R4C-E (m=1.3): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-E (m=1.3): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-E (m=1.3) the player's 20% is paid at market cap 199.5658 x 1.3 less 22% tax: 40.4719 (the existing rule, core.js payK / sim.js kill; the lower target price changes no payout formula)
+ok   TC-R4C-E (m=1.3) the waiting loss stays on the dead bank, as before R4C (R2): woq 60.0000 (nothing books it)
+ok   TC-R4C-E (m=1.3) twenty days after the settlement every price and target is finite and positive, no error
+-- TC-R4C-F bank equity at or below zero after the cut (no new price floor; the cases are material for a separate decision)
+pre  TC-R4C-F (loan 500) world: default day 100, bank close 150
+ok   TC-R4C-F (loan 500) book equity 162.4 -> 12.4: target price 66.0000 = the existing formula on the spec EPS (66.0000) with no extra floor or guard
+ok   TC-R4C-F (loan 500) price and target stay finite and at or above the existing 60 floor on every day from the default to the close + 12 (lowest price 418.2)
+ok   TC-R4C-F (loan 500) the close books the write-off once (150.0000) and clears the queue; the bank's own chapter 11 at the close: bk 0, equity at the close 14.3, target 66.0
+info TC-R4C-F (loan 500) target: before 727.0, book-only 485.4, R4C 66.0 | price: default 795.1 -> d+10 681.2, close-1 459.6, close 445.0, c+1 451.1, c+12 418.2 | target after the close 66.0
+pre  TC-R4C-F (loan 533.34) world: default day 100, bank close 150
+ok   TC-R4C-F (loan 533.34) book equity 162.4 -> 2.4: target price 66.0000 = the existing formula on the spec EPS (66.0000) with no extra floor or guard
+ok   TC-R4C-F (loan 533.34) price and target stay finite and at or above the existing 60 floor on every day from the default to the close + 12 (lowest price 416.5)
+ok   TC-R4C-F (loan 533.34) the close books the write-off once (160.0020) and clears the queue; the bank's own chapter 11 at the close: bk 0, equity at the close 4.2, target 66.0
+info TC-R4C-F (loan 533.34) target: before 727.0, book-only 472.3, R4C 66.0 | price: default 795.1 -> d+10 681.2, close-1 459.6, close 443.7, c+1 449.8, c+12 416.5 | target after the close 66.0
+pre  TC-R4C-F (loan 600) world: default day 100, bank close 150
+ok   TC-R4C-F (loan 600) book equity 162.4 -> -17.6: target price 66.0000 = the existing formula on the spec EPS (66.0000) with no extra floor or guard
+ok   TC-R4C-F (loan 600) price and target stay finite and at or above the existing 60 floor on every day from the default to the close + 12 (lowest price 248.5)
+ok   TC-R4C-F (loan 600) the close books the write-off once (180.0000) and clears the queue; the bank's own chapter 11 at the close: bk 1, equity at the close 126.4, target 247.5
+info TC-R4C-F (loan 600) target: before 727.0, book-only 469.2, R4C 66.0 | price: default 795.1 -> d+10 681.2, close-1 459.6, close 321.7, c+1 248.5, c+12 259.5 | target after the close 247.5
+pre  TC-R4C-F (loan 800) world: default day 100, bank close 150
+ok   TC-R4C-F (loan 800) book equity 162.4 -> -77.6: target price 66.0000 = the existing formula on the spec EPS (66.0000) with no extra floor or guard
+ok   TC-R4C-F (loan 800) price and target stay finite and at or above the existing 60 floor on every day from the default to the close + 12 (lowest price 226.5)
+ok   TC-R4C-F (loan 800) the close books the write-off once (240.0000) and clears the queue; the bank's own chapter 11 at the close: bk 1, equity at the close 117.3, target 229.7
+info TC-R4C-F (loan 800) target: before 727.0, book-only 469.2, R4C 66.0 | price: default 795.1 -> d+10 681.2, close-1 459.6, close 321.7, c+1 226.5, c+12 235.1 | target after the close 229.7
+-- TC-R4C-G regulator check on day 90, between the default (day 75) and the close (day 150)
+pre  TC-R4C-G (rights issue (BIS 7.7% after the cut)) world: default day 75, the day-90 check issued shares 2528.50 -> 2781.35, close day 150
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): write-off 90.0000 = 30% of the loan 300.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): assets 1012.5000 -> 922.5000, book equity without the stake 162.4363 -> 72.4363 (both down by the write-off)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): equity used for valuation 72.4363 = book 72.4363 + stake value 0.0000
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): target price on the default day 141.8072 = the existing formula on the spec EPS -288.9423 (expected 141.8072)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): target price fell 727.0 -> 141.8 (the book-equity part alone would give 609.6)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): the borrower's own chapter 11 reset is untouched: its target price 553.6064 = its new price 553.6064
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): no price shock on the default day: price 772.8238 -> 772.8238, jump term 0.0000 -> 0.0000
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)) the issue is the existing rule: shares x1.1, price x0.95, the waiting loss 90.0000 untouched by it
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)) KNOWN LIMIT: the regulator check does not refresh the target price (141.8072 -> 141.8072), as before R4C
+info TC-R4C-G (rights issue (BIS 7.7% after the cut)) had it been refreshed: target 141.8 before the check, 155.2 after it (shares 2528.50 -> 2781.35, equity 72.4 -> 87.2, waiting loss per share 355.94 -> 323.58)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)) the valuation stays well-defined after the issue (loss per share on the NEW share count, finite positive target 155.2)
+pre  TC-R4C-G (rights issue (BIS 7.7% after the cut)): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): the close on day 150 books 90.0000 of 90.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): the loss sits once in the published quarter: EPS -309.2 = core 14.4 - loss 323.6
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): after the close the valuation EPS is the confirmed trailing EPS -258.1000 (the temporary term is released)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): target price after the close 162.3573 = existing formula on the confirmed EPS (expected 162.3573)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): no double counting: valuation EPS before the close, had the quarter met its own core EPS, -258.1004 = trailing EPS after it -258.1000
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)) the published EPS divides the loss by the shares at the close (2781.35); target 141.8 (default day) -> 162.4 (after the close): the difference is the issue and the close, not a leftover of the temporary term
+info TC-R4C-G (rights issue (BIS 7.7% after the cut)) price/target: before 772.8/727.0 | default instant 772.8/141.8 | default day end 772.0/141.8 | d+10 684.8/141.8 | close-1 456.8/141.8 | close 454.8/162.4 | c+1 463.6/162.4 | c+10 465.8/162.4 | c+30 -
+pre  TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) world: default day 75, the day-90 check issued shares 2528.50 -> 2781.35, close day 150
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): write-off 150.0000 = 30% of the loan 500.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): assets 1012.5000 -> 862.5000, book equity without the stake 162.4363 -> 12.4363 (both down by the write-off)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): equity used for valuation 12.4363 = book 12.4363 + stake value 0.0000
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): target price on the default day 66.0000 = the existing formula on the spec EPS -526.2371 (expected 66.0000)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): target price fell 727.0 -> 66.0 (the book-equity part alone would give 531.2)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): the borrower's own chapter 11 reset is untouched: its target price 922.6773 = its new price 922.6773
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): no price shock on the default day: price 772.8238 -> 772.8238, jump term 0.0000 -> 0.0000
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) the issue is the existing rule: shares x1.1, price x0.95, the waiting loss 150.0000 untouched by it; bank run jump -0.2000
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) KNOWN LIMIT: the regulator check does not refresh the target price (66.0000 -> 66.0000), as before R4C
+info TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) had it been refreshed: target 66.0 before the check, 66.0 after it (shares 2528.50 -> 2781.35, equity 12.4 -> 25.5, waiting loss per share 593.24 -> 539.31)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) the valuation stays well-defined after the issue (loss per share on the NEW share count, finite positive target 66.0)
+pre  TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): the close on day 150 books 150.0000 of 150.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): the loss sits once in the published quarter: EPS -527.5 = core 11.8 - loss 539.3
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): after the close the valuation EPS is the confirmed trailing EPS -476.4000 (the temporary term is released)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): target price after the close 66.0000 = existing formula on the confirmed EPS (expected 66.0000)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): no double counting: valuation EPS before the close, had the quarter met its own core EPS, -476.4301 = trailing EPS after it -476.4000
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) the published EPS divides the loss by the shares at the close (2781.35); target 66.0 (default day) -> 66.0 (after the close): the difference is the issue and the close, not a leftover of the temporary term
+info TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) price/target: before 772.8/727.0 | default instant 772.8/66.0 | default day end 768.4/66.0 | d+10 652.1/66.0 | close-1 300.8/66.0 | close 293.9/66.0 | c+1 298.6/66.0 | c+10 291.5/66.0 | c+30 -
+-- TC-R4C-G3 reverse split 1:10 of the bank on day 120, between the default (day 100) and the close (day 150)
+pre  TC-R4C-G3 world: default day 100, split on day 120, close day 150
+ok   TC-R4C-G3: write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-G3: assets 1012.5000 -> 952.5000, book equity without the stake 162.4363 -> 102.4363 (both down by the write-off)
+ok   TC-R4C-G3: equity used for valuation 102.4363 = book 102.4363 + stake value 0.0000
+ok   TC-R4C-G3: target price on the default day 200.5377 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+ok   TC-R4C-G3: target price fell 727.0 -> 200.5 (the book-equity part alone would give 602.9)
+ok   TC-R4C-G3: the borrower's own chapter 11 reset is untouched: its target price 369.0709 = its new price 369.0709
+ok   TC-R4C-G3: no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-G3: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-G3: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-G3 the split scales the stored target price x10 (200.54 -> 2005.38); the waiting loss 60.0000 and the equity 102.4363 are not per-share numbers and do not change
+ok   TC-R4C-G3 the valuation after the split is the valuation before it x10 (200.54 -> 2005.38): loss per share, EPS history, estimate and shares are all rescaled together, nothing is counted twice
+pre  TC-R4C-G3: no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-G3: the close on day 150 books 60.0000 of 60.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-G3: the loss sits once in the published quarter: EPS -2209.2 = core 163.8 - loss 2372.9
+ok   TC-R4C-G3: after the close the valuation EPS is the confirmed trailing EPS -1698.2000 (the temporary term is released)
+ok   TC-R4C-G3: target price after the close 2054.0207 = existing formula on the confirmed EPS (expected 2054.0207)
+ok   TC-R4C-G3: no double counting: valuation EPS before the close, had the quarter met its own core EPS, -1698.1645 = trailing EPS after it -1698.2000
+info TC-R4C-G3 price/target: before 795.1/727.0 | default instant 795.1/200.5 | default day end 786.6/200.5 | d+10 731.5/200.5 | close-1 5981.0/2005.4 | close 5958.3/2054.0 | c+1 6075.6/2054.0 | c+10 6115.7/2054.0 | c+30 -
+-- TC-R4C-S save and load between the default and the close (autosave and export formats; a save written before R4C)
+pre  TC-R4C-S reference run (no saving): default day 100, close day 150
+pre  TC-R4C-S autosave (full) world: saved on day 101 with 9.0000 waiting and target 415.0410
+ok   TC-R4C-S autosave (full): after loading woq 9.0000, target 415.0410 (as saved)
+ok   TC-R4C-S autosave (full): the close after loading (day 150) books 9.0000 once, nothing left waiting
+ok   TC-R4C-S autosave (full): the target price does not move between loading and the close
+ok   TC-R4C-S autosave (full): target price after that close 435.0381 = existing formula on the confirmed EPS (435.0381)
+ok   TC-R4C-S autosave (full): same close as the run without saving (net income -4.3737 vs -4.3737, target 435.0381 vs 435.0381)
+pre  TC-R4C-S export (packS(1), histories left out) world: saved on day 101 with 9.0000 waiting and target 415.0410
+ok   TC-R4C-S export (packS(1), histories left out): after loading woq 9.0000, target 415.0410 (as saved)
+ok   TC-R4C-S export (packS(1), histories left out): the close after loading (day 150) books 9.0000 once, nothing left waiting
+ok   TC-R4C-S export (packS(1), histories left out): the target price does not move between loading and the close
+ok   TC-R4C-S export (packS(1), histories left out): target price after that close 299.6235 = existing formula on the confirmed EPS (299.6235)
+pre  TC-R4C-S save written before R4C (target price still the stale value) world: saved on day 101 with 9.0000 waiting and target 415.0410
+ok   TC-R4C-S save written before R4C (target price still the stale value): after loading woq 9.0000, target 727.0136 (not re-valued retroactively: the stale 727.0136 stays until the close)
+ok   TC-R4C-S save written before R4C (target price still the stale value): the close after loading (day 150) books 9.0000 once, nothing left waiting
+ok   TC-R4C-S save written before R4C (target price still the stale value): the target price does not move between loading and the close
+ok   TC-R4C-S save written before R4C (target price still the stale value): target price after that close 435.0381 = existing formula on the confirmed EPS (435.0381)
+ok   TC-R4C-S save written before R4C (target price still the stale value): same close as the run without saving (net income -4.3737 vs -4.3737, target 435.0381 vs 435.0381)
+-- TC-R4C-H natural play, seed 12345: BOAX writes off its loan to JYNR (default day 431, close day 494, 286.97)
+pre  TC-R4C-H world: BOAX / JYNR default day 431, write-off 286.9702, close day 494 (1 write-offs in 560 days)
+ok   TC-R4C-H: write-off 286.9702 = 30% of the loan 956.5673 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-H: assets 3315.6800 -> 3028.7098, book equity without the stake 354.4637 -> 67.4935 (both down by the write-off)
+ok   TC-R4C-H: equity used for valuation 100.5621 = book 67.4935 + stake value 33.0687 (loan-to-own stake 80.0%)
+ok   TC-R4C-H: target price on the default day 319.5010 = the existing formula on the spec EPS -1498.1139 (expected 319.5010)
+ok   TC-R4C-H: target price fell 2519.3 -> 319.5 (the book-equity part alone would give 1981.5)
+ok   TC-R4C-H: the borrower's own chapter 11 reset is untouched: its target price 351.1965 = its new price 351.1965
+ok   TC-R4C-H: no price shock on the default day: price 1532.5900 -> 1532.5900, jump term 0.0000 -> 0.0000
+ok   TC-R4C-H: the bank record changed in A, pos, tg, woq only (allowed: A, woq, tg, pos for the stake)
+ok   TC-R4C-H: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-H: no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-H: the close on day 494 books 286.9702 of 286.9702 waiting, nothing left waiting (0)
+ok   TC-R4C-H: the loss sits once in the published quarter: EPS -1595.6 = core 78.8 - loss 1674.5
+ok   TC-R4C-H: after the close the valuation EPS is the confirmed trailing EPS -1331.5000 (the temporary term is released)
+ok   TC-R4C-H: target price after the close 336.8173 = existing formula on the confirmed EPS (expected 336.8173)
+ok   TC-R4C-H: no double counting: valuation EPS before the close, had the quarter met its own core EPS, -1331.5466 = trailing EPS after it -1331.5000
+info TC-R4C-H stale-target check: stored target before the default 2519.2553, the formula on that day's inputs 2519.2553 (difference 0.0000%): the re-valuation moves the target by the write-off plus any drift since the last close
+ok   TC-R4C-H the target price stays 319.5010 from the default to the day before the close (63 days)
+info TC-R4C-H price/target: before 1532.6/2519.3 | default instant 1532.6/319.5 | default day end 1532.6/319.5 | d+10 1266.7/319.5 | close-1 525.0/319.5 | close 518.2/336.8 | c+1 508.4/336.8 | c+10 505.1/336.8 | c+30 432.5/336.8
+info TC-R4C-H target: before 2519.3 | default day: book-only 1981.5, with the waiting loss 319.5 | after the close 336.8
+errs 0 fails 0
+PASS t_r4c_bank_tg.js
+ALL PASS

@@ -1,0 +1,810 @@
+---- t12_sim.js
+boot pg new v 12 seed RLT28M cos 515 countries 27 coins 23 etfs 18 CTRY 30 DIF 5 BK 36 quiz 36 GL 123
+ world A 107.234 7.619 2.667 92608473 3.005 | B (player traded) 107.235 7.619 2.667 92608473 3.005
+ hashed gauss mean 0.044 sd 1.082
+ quarterly [prime,inf,yS,yL,gdp,un,csp,fx] last 3 [[5.07,0.98,4.41,6.32,3.16,5.03,1.94,1554.01],[5.6,1.97,4.53,6.37,3.42,4.82,1.55,1565.04],[5.85,1.64,5,7.32,3.79,4.51,1.56,1591.74]]
+ oil curve 85300,87499,89540,91437,93202,94846 spot 82928 콘탱고 (먼 달이 비쌈 — 정상)
+ after -50% oil: margin 0.86억 mc 1 fl 0
+ put assignment stake 0 -> 2.00
+ swap K 5.56 last -0.20 mtm -1.70
+ etf navs KALL:1.10/3.02조 K50:1.14/1.95조 KSML:1.08/7,814억 GTECH:1.01/2,243억 GCONS:1.13/2,184억 GINDU:1.02/2,948억
+ stable USDX 1,399원 fx 1399
+ group stake 90.0 pub 7.0
+ consolidated: parent NOL 496.1 sub tax note 1.36
+ BIS 12.12 op 26.5 A 4,877억
+ event types 27 strike,talent,scandal,accident,patent,classact,env,antitrust,recall,fire,cyber,supply,bid,launch,custloss,cost,activist,offer,downgrade,payout,buyback,nation,cut,freight,reins,npl,trial
+ after all swans ix 74.5 inv 0
+ preset 가치주 423
+ preset 고배당 394
+ preset 성장주 2
+ preset 우량 대형주 38
+ cmd CJCJ 2.0% 매수 (41억, 나) | CJCJ 매도 20억 수령 (나) | 원유 선물 매수 3계약 | BTC 1.00억 매수 | 코인 선물 진입 요청 | K50 5.00억 매수 | 차트
+ state JSON KB 1759 export KB 329
+ mig inv 0 ix 96.2
+ spectate 3y 천년 밸류 (vg):8,317억 강철 행동주(ag):8,632억 폭풍 매크로(mg):2.03조 텐배거 그로(gg):7,429억 알고리즘 퀀(qg):8,568억 청룡 인베스(raid):8,849억 백호 사모펀(act):1.06조 아이언게이트(idx):1.59조 lessons 26 log 80
+ legend 2y rivals vg:1.10조 res0.60 act:1.44조 res0.60 vg:1.81조 res0.60 mom:1.41조 res0.60 qg:1.72조 res0.60 raid:1.09조 res0.60
+ scenario s73 1979년 9월 1일 ix 58 prime 17.3 inf 8.1 events 12 inv 0
+ scenario s87 1989년 7월 1일 ix 190 prime 6.5 inf 2.1 events 8 inv 0
+ scenario s00 2001년 7월 1일 ix 129 prime 3.1 inf 0.1 events 10 inv 0
+ scenario s08 2009년 7월 1일 ix 115 prime 3.0 inf -2.0 events 12 inv 0
+ scenario s20 2022년 7월 1일 ix 162 prime 6.9 inf 3.6 events 11 inv 0
+errs 0 fails 0
+보통 ix 297 L50 289 SML 303 VIXmax 19 prime 5.4 inf 1.7 coins 18 born 18 dead 23 BTC 0.60x swans 1 listed 525 rvCtl 44 inv 0 ms 7506 KB 1978
+지옥 ix 152 L50 172 SML 142 VIXmax 76 prime 6.3 inf 1.8 coins 24 born 27 dead 26 BTC 2.71x swans 1 listed 518 rvCtl 180 inv 0 ms 12936 KB 2052
+전설 ix 123 L50 109 SML 132 VIXmax 76 prime 9.6 inf 4.3 coins 25 born 34 dead 32 BTC 1.63x swans 1 listed 521 rvCtl 33 inv 0 ms 16965 KB 2048
+보통 ix 265 L50 263 SML 268 VIXmax 50 prime 4.1 inf 3.3 coins 19 born 15 dead 19 BTC 4.06x swans 3 listed 515 rvCtl 46 inv 0 ms 8459 KB 1948
+errs 0 fails 0
+PASS t12_sim.js
+---- t13_ui.js
+720 days ms 1498
+errs 0 fails 0
+PASS t13_ui.js
+---- t14_advisor.js
+errs 0 fails 0
+PASS t14_advisor.js
+---- t18_ai_native.js
+errs 0 fails 0
+PASS t18_ai_native.js
+---- t18_ai_web.js
+errs 0 fails 0
+PASS t18_ai_web.js
+---- t_clean_surplus.js
+seed 12345 quarterly closes 4169 mismatches 0 skipped (cooked books) 0 | bank write-offs booked 1 (286.97), reported in closes 1 (286.97), still waiting 0.00
+seed 777 quarterly closes 4171 mismatches 0 skipped (cooked books) 0 | bank write-offs booked 0 (0.00), reported in closes 0 (0.00), still waiting 0.00
+errs 0 fails 0
+PASS t_clean_surplus.js
+---- t_close_spec.js
+{"closes":8340,"checked":7381,"skipped":959,"goodwill":68,"nolUsed":68,"lossToNol":82,"eqi":166,"dr":297,"payout0":157,"sweep":595,"sweepCapped":0,"shrink":0,"borrow":57,"playerLoan":0}
+errs 0 fails 0
+PASS t_close_spec.js
+---- t_impair_ui.js
+seed 12345 day 431 JYNR write-down 1823.1 dead false
+errs 0 fails 0
+PASS t_impair_ui.js
+---- t_bank_writeoff.js
+before   bank A 1000, cash 100, deposits 1000, book equity 100, reserve llr 50.5700 | borrower loan 200, chapter 11 count 0
+after ch11   bank A 940, book equity 40, NI field unchanged, quarter record unchanged, reserve llr 50.5700, bank stake in borrower 80.0%
+ok   write-off = 30% of the 200 loan = 60 (got 60)
+bank close   NI -56.5247 (op 3.5897, tax 1.4894, dividends 1.3901), provision in close 0.7050, reserve llr 50.5700
+window   book equity moved -57.9148, explained by results -57.9148, unexplained 0.0000
+counterfactual   bank NI without the loss 4.3247 -> NI difference caused by the 60 loss -60.8494
+ok   bank book-equity change over write-off + next close is explained by its results (unexplained 0.0000)
+errs 0 fails 0
+PASS t_bank_writeoff.js
+---- t_bank_writeoff_cases.js
+-- TC-BANK-02 event order (real days) and TC-BANK-03 reported once
+ok   another day: the borrower went into its first chapter 11 at its own close (PNPL, bank JPMX closes on day % 90 = 60)
+     write-off day 25 (borrower PNPL @25), loan 200.4927, cut 60.1478 | bank closes after it: day 60 reported 60.1478, day 150 reported 0.0000, day 240 reported 0.0000
+ok   another day: write-off day 25 is not a bank close day
+ok   another day: assets cut by 30% of the loan 200.4927 = 60.1478, same amount queued 60.1478
+ok   another day: reported by the bank close on day 60 (first close after the write-off: day 60)
+ok   another day: that close reports 60.1478, what was waiting (60.1478), and leaves nothing waiting (0)
+ok   another day: no close before the write-off reports anything ()
+ok   another day: equity from just before the write-off to just after that close is explained by its results (unexplained 0.0000)
+ok   TC-BANK-03 another day: the next 2 closes report nothing (day 150 er.wo 0, fq 0; day 240 er.wo 0, fq 0)
+ok   TC-BANK-03 another day: reported in all closes together 60.1478 = booked 60.1478
+ok   same day, borrower closes first: the borrower went into its first chapter 11 at its own close (PNPL, bank JPMX closes on day % 90 = 60)
+     write-off day 60 (borrower PNPL @60 > bank @60), loan 195.0030, cut 58.5009 | bank closes after it: day 60 reported 58.5009, day 150 reported 0.0000, day 240 reported 0.0000
+ok   same day, borrower closes first: on day 60 the borrower closed (and defaulted) before the bank closed
+ok   same day, borrower closes first: assets cut by 30% of the loan 195.0030 = 58.5009, same amount queued 58.5009
+ok   same day, borrower closes first: reported by the bank close on day 60 (first close after the write-off: day 60)
+ok   same day, borrower closes first: that close reports 58.5009, what was waiting (58.5009), and leaves nothing waiting (0)
+ok   same day, borrower closes first: no close before the write-off reports anything ()
+ok   same day, borrower closes first: equity from just before the write-off to just after that close is explained by its results (unexplained 0.0000)
+ok   TC-BANK-03 same day, borrower closes first: the next 2 closes report nothing (day 150 er.wo 0, fq 0; day 240 er.wo 0, fq 0)
+ok   TC-BANK-03 same day, borrower closes first: reported in all closes together 58.5009 = booked 58.5009
+ok   same day, bank closes first: the borrower went into its first chapter 11 at its own close (DOWC, bank JPMX closes on day % 90 = 60)
+     write-off day 60 (bank @60 > borrower DOWC @60), loan 200.0000, cut 60.0000 | bank closes after it: day 150 reported 60.0000, day 240 reported 0.0000, day 330 reported 0.0000
+ok   same day, bank closes first: on day 60 the bank closed before the borrower closed (and defaulted)
+ok   same day, bank closes first: assets cut by 30% of the loan 200.0000 = 60.0000, same amount queued 60.0000
+ok   same day, bank closes first: reported by the bank close on day 150 (first close after the write-off: day 150)
+ok   same day, bank closes first: that close reports 60.0000, what was waiting (60.0000), and leaves nothing waiting (0)
+ok   same day, bank closes first: no close before the write-off reports anything (day 60)
+ok   same day, bank closes first: equity from just before the write-off to just after that close is explained by its results (unexplained -0.0000)
+ok   TC-BANK-03 same day, bank closes first: the next 2 closes report nothing (day 240 er.wo 0, fq 0; day 330 er.wo 0, fq 0)
+ok   TC-BANK-03 same day, bank closes first: reported in all closes together 60.0000 = booked 60.0000
+ok   TC-BANK-03 two write-offs (day 25 60.1478, day 40 60.0625) before one bank close (day 60)
+ok   TC-BANK-03 that close reports both together once: 120.2103 = 120.2103
+ok   TC-BANK-03 the closes after it report nothing (day 150)
+ok   TC-BANK-03 equity from before the first write-off to that close is explained by its results (unexplained -0.0000)
+-- TC-BANK-04 saves
+ok   TC-BANK-04 autosave (full): saved on day 26 with 60.1478 waiting, loaded: woq 60.1478
+ok   TC-BANK-04 autosave (full): the close after loading (day 60) reports 60.1478 once, nothing left waiting
+ok   TC-BANK-04 autosave (full): equity from before the write-off (before saving) to that close is explained by its results (unexplained 0.0000)
+ok   TC-BANK-04 autosave (full): same close as the run without saving (NI -55.7685 vs -55.7685, equity 192.4798 vs 192.4798)
+ok   TC-BANK-04 export (packS(1), histories left out): saved on day 26 with 60.1478 waiting, loaded: woq 60.1478
+ok   TC-BANK-04 export (packS(1), histories left out): the close after loading (day 60) reports 60.1478 once, nothing left waiting
+ok   TC-BANK-04 export (packS(1), histories left out): equity from before the write-off (before saving) to that close is explained by its results (unexplained 0.0000)
+ok   TC-BANK-04 old save: day 440, 530 companies, none has a woq field
+ok   TC-BANK-04 old save: after loading every company has woq = 0
+ok   TC-BANK-04 old save: played days 441-500 without errors
+ok   TC-BANK-04 old save: 325 closes balance and none reports or keeps a write-off
+ok   TC-BANK-04 old save: BOAX (wrote off 286.97 on day 431, before the save, in the old version) closes on day 494 reporting 0 (no catch-up for write-offs made before the fix), new record row has 24 fields
+ok   TC-BANK-04 old save: BOAX income statement renders clean (old 22-field and new 24-field quarter rows mixed), no write-off row
+ok   TC-BANK-04 new save with the new fields removed: after loading every company has woq = 0
+ok   TC-BANK-04 new save with the new fields removed: the bank closes day 60, day 150 with nothing reported
+-- TC-BANK-05 records and TC-BANK-06 policy (twin runs: same world, the twin drops the queued amount)
+ok   twins reached the same bank close (day 60)
+     write-off 60.1478 | NI -55.7685 vs twin 4.3793 | tax 1.8769/1.8769 | dividends 1.7517/1.7517 | EPS -220.6/17.3
+ok   TC-BANK-05 er.wo = 60.1478 (twin: none)
+ok   TC-BANK-05 net income = twin - write-off: -55.7685 = 4.3793 - 60.1478, and er.ni is the bank's ni
+ok   TC-BANK-05 statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   TC-BANK-05 fq row of that close: day 60, ni -56, wo 60, imp 0 (24 fields)
+ok   TC-BANK-05 EPS history -220.6 won matches net income (twin 17.3)
+ok   TC-BANK-05 yearly net income lower by the write-off: -55.7685 vs 4.3793
+ok   TC-BANK-05 25% holder's equity-method income from this close -13.9421 = 25% of net income (twin 1.0948)
+ok   TC-BANK-05 income statement shows a 대손상각비 row only with a write-off: -60.0 | -60.0 | 0.0
+ok   TC-BANK-05 statement EPS -221 and net income -56.0 match the quarter record
+ok   TC-BANK-06 tax 1.8769, loss carryforward 0.0000, dividends 1.7517, operating profit 4.8812 same as the twin
+ok   TC-BANK-06 balance sheet after the close same as the twin (the loss already left the assets on the write-off day)
+ok   TC-BANK-06 statistical loss 0.7049 and provision 1.6964 unchanged, both still charged (overlap kept, docs/MODEL.md)
+ok   TC-BANK-06 llr untouched by the write-off (10.0000 before and after) and by reporting it
+ok   TC-BANK-06 stake received 80% at cost 0 (worth 20.0976), not offset: write-off stays 30% of the loan = 60.1478
+ok   TC-BANK-06 TC-BANK-01 with starting llr 50.5700 (inherited, as in TC-BANK-01): write-off 60.0000, reported 60.0000, unexplained 0.0000, NI -56.5247 = 3.4753 - 60
+ok   TC-BANK-06 TC-BANK-01 with starting llr 0.0000: write-off 60.0000, reported 60.0000, unexplained -0.0000, NI -61.0948 = -1.0948 - 60
+ok   TC-BANK-06 TC-BANK-01 with starting llr 10.0000: write-off 60.0000, reported 60.0000, unexplained 0.0000, NI -57.2272 = 2.7728 - 60
+errs 0 fails 0
+PASS t_bank_writeoff_cases.js
+---- t_bank_writeoff_cashflow.js
+-- TC-BANK-07 cash flow statement of the quarter that reports a bank write-off (RT-BANK-001-R1)
+ok   both twins: write-off on day 60 after the bank's close that day, next close day 150 (statement quarter 60 -> 150)
+     reports the write-off: write-off 60.0000 | NI -54.9672 | cash change: exact 3.0197, statement 3.0 | CFO 5.0 | financing 9.0 | other -11.0   (tab shows: NI -55.0, CFO 5.0, other -11.0, cash change 3.0)
+     twin, nothing reported: write-off 0.0000 | NI 5.0328 | cash change: exact 3.0197, statement 3.0 | CFO 5.0 | financing 9.0 | other -11.0   (tab shows: NI 5.0, CFO 5.0, other -11.0, cash change 3.0)
+ok   net income differs by exactly the write-off: -54.9672 = 5.0328 - 60.0000
+ok   the write-off moved no cash: cash change 3.0197 vs 3.0197 (statement 3.0 vs 3.0)
+ok   R1 operating cash flow does not move with the non-cash write-off: 5.0 vs twin 5.0 (difference 0.0, allowed 1.1)
+ok   R1 the other cash flow line does not absorb the write-off: -11.0 vs twin -11.0 (difference 0.0, allowed 1.1)
+ok   the twins differ only in net income: exact cash change 3.0197, exact debt change 11.9063, statement: cash change 3.0, financing 9.0, capital spending 0.0, depreciation 0.0, share issue 0.0, dividends 2.0, equity-method/amortization adjustment 0.0 (same in the twin)
+ok   a bank has no capital spending (0.0) and the tab shows no free cash flow line (–)
+ok   the 현금흐름 tab shows the computed lines: CFO 5.0 / 5.0, financing 9.0 / 9.0, other -11.0 / -11.0
+ok   records without the imp/wo fields (5 of 8 rows, 22 fields) read them as 0, and the tab renders clean
+-- TC-BANK-07 second case: cash flow statement of the quarter with an asset impairment (impair)
+ok   an impairment happened within 720 days on the test seeds
+ok   seed 12345 day 431 JYNR (alive true, write-down 1823.0521): the replay without the charge reaches the same quarter (341 -> 431)
+     reports the impairment: write-down 1823.0521 | NI -1840.4701 | cash change: exact 32.0693, statement 32.0 | CFO -6.0 | capital spending 34.0 | FCF -40.0 | financing -848.0 | other 920.0   (tab: CFO -6.0, FCF -40.0, other 920)
+     replay, no charge:      write-down 0.0000 | NI -17.4180 | cash change: exact 32.0693, statement 32.0 | CFO -6.0 | capital spending 34.0 | FCF -40.0 | financing -848.0 | other 920.0   (tab: CFO -6.0, FCF -40.0, other 920)
+ok   net income differs by exactly the write-down: -1840.4701 = -17.4180 - 1823.0521 (record imp 1823.0 / 0.0)
+ok   tax 0.0000 and dividends 0.0000 are the same in both
+ok   the twins differ only in net income: exact cash change 32.0693, exact debt change -848.4240, statement: cash change 32.0, financing -848.0, capital spending 34.0, depreciation 11.0, share issue 0.0, dividends 0.0, equity-method/amortization adjustment 0.0 (same in the replay)
+ok   R1 operating cash flow does not move with the non-cash write-down: -6.0 vs replay -6.0 (difference -0.0, allowed 1.5)
+ok   R1 the other cash flow line does not absorb the write-down: 920.0 vs replay 920.0 (difference 0.0, allowed 1.5)
+ok   R1 free cash flow does not move with the non-cash write-down: -40.0 vs replay -40.0 (difference -0.0, allowed 1.5)
+ok   the 현금흐름 tab shows the computed lines: CFO -6.0 / -6.0, FCF -40.0 / -40.0, other 920 / 920
+-- TC-BANK-07 third part: the 현금흐름 tab shows the non-cash add-back on its own row
+ok   write-off only (bank, write-off 60.0 reported on day 150): row 손상·대손상각(비현금 조정) shown (imp + wo non-zero in 1 of 8 quarters; record fields 24/24/22/22/22/22/22/22)
+ok   write-off only (bank, write-off 60.0 reported on day 150): the row shows imp + wo as a positive add-back: 60.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0
+ok   write-off only (bank, write-off 60.0 reported on day 150): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 0.25; latest quarter -55.0 + 0.0 + 0.0 + 60.0 = 5.0)
+ok   write-off only: the latest quarter carries wo 60.0, no quarter carries imp
+ok   neither (the twin that reports nothing): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 0 of 8 quarters; record fields 24/24/22/22/22/22/22/22)
+ok   neither (the twin that reports nothing): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 0.20; latest quarter 5.0 + 0.0 + 0.0 = 5.0)
+ok   impairment only (JYNR, write-down 1823.1 on day 431): row 손상·대손상각(비현금 조정) shown (imp + wo non-zero in 1 of 8 quarters; record fields 24/24/24/24/24/22/22/22)
+ok   impairment only (JYNR, write-down 1823.1 on day 431): the row shows imp + wo as a positive add-back: 1,823 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0
+ok   impairment only (JYNR, write-down 1823.1 on day 431): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 1.60; latest quarter -1,840 + 11.0 + 0.0 + 1,823 = -6.0)
+ok   impairment only: the latest quarter carries imp 1823.0, no quarter carries wo
+ok   neither (the replay without the charge): row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 0 of 8 quarters; record fields 24/24/24/24/24/22/22/22)
+ok   neither (the replay without the charge): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 1.10; latest quarter -17.0 + 11.0 + 0.0 = -6.0)
+ok   old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): row 손상·대손상각(비현금 조정) shown (imp + wo non-zero in 1 of 8 quarters; record fields 23/23/23/23/23/22/22/22)
+ok   old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): the row shows imp + wo as a positive add-back: 1,823 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0
+ok   old records in the v23 format (JYNR, rows cut to 23 fields: imp kept, no wo): in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 1.60; latest quarter -1,840 + 11.0 + 0.0 + 1,823 = -6.0)
+ok   old records: every row has 22 or 23 fields, wo reads as 0, imp 1823.0 still shown
+ok   old save from before the fix (commit 1ecdc53), BOAX after its day-494 close: row 손상·대손상각(비현금 조정) hidden (imp + wo non-zero in 0 of 8 quarters; record fields 24/22/22/22/22/22/22/22)
+ok   old save from before the fix (commit 1ecdc53), BOAX after its day-494 close: in every quarter the rows above add up to operating cash flow (on screen, worst gap 0.0 vs allowed 0.20; latest quarter 14.0 + 0.0 + 0.0 = 14.0)
+ok   old save: BOAX mixes rows without the new fields (7) and new rows (1)
+errs 0 fails 0
+PASS t_bank_writeoff_cashflow.js
+---- t_reg01_bank_imp_wo.js
+-- REG-01 cases A (impairment only), B (write-off only), C (both), D (neither): SYNTHETIC inputs (ds, eqi, capital set), expectations from stated rules
+pre  case A: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  case A: no borrower defaulted
+pre  case A: waiting before the close 0.0000 = 0
+pre  case A: T2 assets 1000.0000 = T1 (no cut) 1000: nothing else moved the assets between the cut and the close
+pre  case A: ds 3, no loss carryforward, no parent, dividends allowed, pre-tax 4.3330 > 0, no share issue, equity 60.0000 > 0
+pre  case A: this case has impairment by the rule (ds -> 4, debt/equity 15.7, equity before test 61.8199)
+pre  case A: holdings value unchanged until the impairment and no cash sweep (cash 21.8199 <= 121.5000)
+ok   case A [R] the impairment happens exactly when the rule says (ds streak and thresholds): true vs true
+ok   case A [R] T3 assets 646.9301 = T2 1000.0000 + growth 12.5000 - impairment 365.5699
+ok   case A [R] the close cut 365.5699 from the assets (expected 365.5699 = equity before test + 0.3 x assets) and the write-off cut none: record imp 365.5699 (expected 365.5699)
+ok   case A [R] write-off reported 0.0000 (expected 0.0000), nothing waiting after (0)
+ok   case A [R] impairment leaves equity -303.7500 = -30% of assets -303.7500 -> the bank's chapter 11 (0->1), debt 972.5000 -> 571.7105, debt relief cap 400.7895 (expected 400.7895)
+ok   case A [R] net income -462.5368 = before charges -96.9669 - write-off 0.0000 - impairment 365.5699
+ok   case A [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   case A [R] tax 1.2999 = 30% of pre-tax 4.3330 and dividends 1.2132 are the same whatever was written off or impaired
+ok   case A [I] cash 20.0000 -> 21.8199 = + cash profit - tax - dividends = 21.8199 (no write-off or impairment moved cash)
+ok   case A [I] book equity change of the close = net income - equity-method - dividends received - dividends paid + capital transactions + write-off already out of the assets: residual 0.0000
+ok   case A [R] quarter record: day 60, ni -463, imp 366, wo 0 (24 fields)
+ok   case A [R] EPS record -1829.3 won (net income x 1e4 / shares = -1829.29), yearly net income +-462.5368, 25% holder's equity-method income -115.6342 = 25% of net income -115.6342
+ok   case A [R] reserve llr 10.0000 -> 11.3750 = roll-forward of the statistical loss only (expected 11.3750); write-off and impairment do not touch it
+ok   case A [M] model rule cfo = cash profit - tax + dividends received: 3.0331; add-back form 3.0331; statement shows 3.0 (rounding allowed 1.60)
+ok   case A [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 366 (expected shown 366), record fields 24/22/22/22/22/22/22/22
+ok   case A [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.15; newest -463 + 0.0 + 100 + 366 = 3.0)
+ok   case A [R] 손익 tab: 자산 손상차손 row -366, 대손상각비 row hidden, net income -463, EPS -1,831
+info case A [O] FIN-CF-01, recorded only, not judged: debt change dD -4061.0 | debt relief cap 400.7895 | financing cff -4062.2 | other oth 3698.2 | cash change -361.0 (previous quarter row is the synthetic start-of-game row)
+pre  case B: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  case B: the borrower defaulted on day 25, before the close, on a day that is not a bank close day
+pre  case B: waiting before the close 60.1478 = what the cut queued 60.1478
+pre  case B: T2 assets 939.8522 = T1 939.8522: nothing else moved the assets between the cut and the close
+pre  case B: ds 0, no loss carryforward, no parent, dividends allowed, pre-tax 3.5418 > 0, no share issue, equity 39.6947 > 0
+pre  case B: this case has no impairment by the rule (ds -> 1, debt/equity 23.6, equity before test 41.1822)
+pre  case B: holdings value unchanged until the impairment and no cash sweep (cash 21.4876 <= 114.1920)
+ok   case B [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 939.8522, llr untouched (10.0000)
+ok   case B [R] the impairment happens exactly when the rule says (ds streak and thresholds): false vs false
+ok   case B [R] T3 assets 951.6003 = T2 939.8522 + growth 11.7482 - impairment 0.0000
+ok   case B [R] the close cut 0.0000 from the assets (expected 0.0000 = equity before test + 0.3 x assets) and the write-off cut none: record imp 0.0000 (expected 0.0000)
+ok   case B [R] write-off reported 60.1478 (expected 60.1478), nothing waiting after (0)
+ok   case B [R] no chapter 11, no debt relief, debt 971.7482, ds 0 -> 1
+ok   case B [R] net income -157.6685 = before charges -97.5207 - write-off 60.1478 - impairment 0.0000
+ok   case B [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   case B [R] tax 1.0625 = 30% of pre-tax 3.5418 and dividends 0.9917 are the same whatever was written off or impaired
+ok   case B [I] cash 20.0000 -> 21.4876 = + cash profit - tax - dividends = 21.4876 (no write-off or impairment moved cash)
+ok   case B [I] book equity change of the close = net income - equity-method - dividends received - dividends paid + capital transactions + write-off already out of the assets: residual 0.0000
+ok   case B [I] window T0 -> T3: the cut is inside net income, one deduction only: residual 0.0000
+ok   case B [R] quarter record: day 60, ni -158, imp 0, wo 60 (24 fields)
+ok   case B [R] EPS record -623.6 won (net income x 1e4 / shares = -623.57), yearly net income +-157.6685, 25% holder's equity-method income -39.4171 = 25% of net income -39.4171
+ok   case B [R] reserve llr 10.0000 -> 10.9916 = roll-forward of the statistical loss only (expected 10.9916); write-off and impairment do not touch it
+ok   case B [M] model rule cfo = cash profit - tax + dividends received: 2.4793; add-back form 2.4793; statement shows 2.0 (rounding allowed 1.60)
+ok   case B [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 60.0 (expected shown 60.0), record fields 24/22/22/22/22/22/22/22
+ok   case B [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.15; newest -158 + 0.0 + 100 + 60.0 = 2.0)
+ok   case B [R] 손익 tab: 자산 손상차손 row hidden, 대손상각비 row -60.0, net income -158, EPS -625
+info case B [O] FIN-CF-01, recorded only, not judged: debt change dD -3661.0 | debt relief cap 0.0000 | financing cff -3662.0 | other oth 3298.0 | cash change -362.0 (previous quarter row is the synthetic start-of-game row)
+pre  case C: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  case C: the borrower defaulted on day 25, before the close, on a day that is not a bank close day
+pre  case C: waiting before the close 60.1478 = what the cut queued 60.1478
+pre  case C: T2 assets 939.8522 = T1 939.8522: nothing else moved the assets between the cut and the close
+pre  case C: ds 3, no loss carryforward, no parent, dividends allowed, pre-tax 3.5418 > 0, no share issue, equity 39.6947 > 0
+pre  case C: this case has impairment by the rule (ds -> 4, debt/equity 23.6, equity before test 41.1822)
+pre  case C: holdings value unchanged until the impairment and no cash sweep (cash 21.4876 <= 114.1920)
+ok   case C [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 939.8522, llr untouched (10.0000)
+ok   case C [R] the impairment happens exactly when the rule says (ds streak and thresholds): true vs true
+ok   case C [R] T3 assets 624.9380 = T2 939.8522 + growth 11.7482 - impairment 326.6623
+ok   case C [R] the close cut 326.6623 from the assets (expected 326.6623 = equity before test + 0.3 x assets) and the write-off cut none: record imp 326.6623 (expected 326.6623)
+ok   case C [R] write-off reported 60.1478 (expected 60.1478), nothing waiting after (0)
+ok   case C [R] impairment leaves equity -285.4801 = -30% of assets -285.4801 -> the bank's chapter 11 (0->1), debt 971.7482 -> 592.5273, debt relief cap 379.2208 (expected 379.2208)
+ok   case C [R] net income -484.3309 = before charges -97.5207 - write-off 60.1478 - impairment 326.6623
+ok   case C [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   case C [R] tax 1.0625 = 30% of pre-tax 3.5418 and dividends 0.9917 are the same whatever was written off or impaired
+ok   case C [I] cash 20.0000 -> 21.4876 = + cash profit - tax - dividends = 21.4876 (no write-off or impairment moved cash)
+ok   case C [I] book equity change of the close = net income - equity-method - dividends received - dividends paid + capital transactions + write-off already out of the assets: residual -0.0000
+ok   case C [I] window T0 -> T3: the cut is inside net income, one deduction only: residual 0.0000
+ok   case C [R] quarter record: day 60, ni -484, imp 327, wo 60 (24 fields)
+ok   case C [R] EPS record -1915.5 won (net income x 1e4 / shares = -1915.49), yearly net income +-484.3309, 25% holder's equity-method income -121.0827 = 25% of net income -121.0827
+ok   case C [R] reserve llr 10.0000 -> 10.9916 = roll-forward of the statistical loss only (expected 10.9916); write-off and impairment do not touch it
+ok   case C [M] model rule cfo = cash profit - tax + dividends received: 2.4793; add-back form 2.4793; statement shows 3.0 (rounding allowed 2.05)
+ok   case C [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 387 (expected shown 387), record fields 24/22/22/22/22/22/22/22
+ok   case C [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.15; newest -484 + 0.0 + 100 + 387 = 3.0)
+ok   case C [R] 손익 tab: 자산 손상차손 row -327, 대손상각비 row -60.0, net income -484, EPS -1,914
+info case C [O] FIN-CF-01, recorded only, not judged: debt change dD -4040.0 | debt relief cap 379.2208 | financing cff -4041.0 | other oth 3676.0 | cash change -362.0 (previous quarter row is the synthetic start-of-game row)
+pre  case D: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  case D: no borrower defaulted
+pre  case D: waiting before the close 0.0000 = 0
+pre  case D: T2 assets 1000.0000 = T1 (no cut) 1000: nothing else moved the assets between the cut and the close
+pre  case D: ds 0, no loss carryforward, no parent, dividends allowed, pre-tax 4.3330 > 0, no share issue, equity 60.0000 > 0
+pre  case D: this case has no impairment by the rule (ds -> 1, debt/equity 15.7, equity before test 61.8199)
+pre  case D: holdings value unchanged until the impairment and no cash sweep (cash 21.8199 <= 121.5000)
+ok   case D [R] the impairment happens exactly when the rule says (ds streak and thresholds): false vs false
+ok   case D [R] T3 assets 1012.5000 = T2 1000.0000 + growth 12.5000 - impairment 0.0000
+ok   case D [R] the close cut 0.0000 from the assets (expected 0.0000 = equity before test + 0.3 x assets) and the write-off cut none: record imp 0.0000 (expected 0.0000)
+ok   case D [R] write-off reported 0.0000 (expected 0.0000), nothing waiting after (0)
+ok   case D [R] no chapter 11, no debt relief, debt 972.5000, ds 0 -> 1
+ok   case D [R] net income -96.9669 = before charges -96.9669 - write-off 0.0000 - impairment 0.0000
+ok   case D [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   case D [R] tax 1.2999 = 30% of pre-tax 4.3330 and dividends 1.2132 are the same whatever was written off or impaired
+ok   case D [I] cash 20.0000 -> 21.8199 = + cash profit - tax - dividends = 21.8199 (no write-off or impairment moved cash)
+ok   case D [I] book equity change of the close = net income - equity-method - dividends received - dividends paid + capital transactions + write-off already out of the assets: residual -0.0000
+ok   case D [R] quarter record: day 60, ni -97, imp 0, wo 0 (24 fields)
+ok   case D [R] EPS record -383.5 won (net income x 1e4 / shares = -383.50), yearly net income +-96.9669, 25% holder's equity-method income -24.2417 = 25% of net income -24.2417
+ok   case D [R] reserve llr 10.0000 -> 11.3750 = roll-forward of the statistical loss only (expected 11.3750); write-off and impairment do not touch it
+ok   case D [M] model rule cfo = cash profit - tax + dividends received: 3.0331; add-back form 3.0331; statement shows 3.0 (rounding allowed 1.15)
+ok   case D [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) hidden (expected hidden), record fields 24/22/22/22/22/22/22/22
+ok   case D [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.10; newest -97.0 + 0.0 + 100 = 3.0)
+ok   case D [R] 손익 tab: 자산 손상차손 row hidden, 대손상각비 row hidden, net income -97.0, EPS -384
+info case D [O] FIN-CF-01, recorded only, not judged: debt change dD -3660.0 | debt relief cap 0.0000 | financing cff -3661.2 | other oth 3297.2 | cash change -361.0 (previous quarter row is the synthetic start-of-game row)
+-- REG-01 twins of case C: same economic path, the charge left out is the only difference
+pre  twin Cwo: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  twin Cwo: the borrower defaulted on day 25, before the close, on a day that is not a bank close day
+pre  twin Cwo: waiting before the close 60.1478 = what the cut queued 60.1478
+pre  twin Cwo: T2 assets 939.8522 = T1 939.8522: nothing else moved the assets between the cut and the close
+pre  twin Cwo: ds 3, no loss carryforward, no parent, dividends allowed, pre-tax 3.5418 > 0, no share issue, equity 39.6947 > 0
+pre  twin Cwo: this case has impairment by the rule (ds -> 4, debt/equity 23.6, equity before test 41.1822)
+pre  twin Cwo: holdings value unchanged until the impairment and no cash sweep (cash 21.4876 <= 114.1920)
+ok   twin Cwo [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 939.8522, llr untouched (10.0000)
+ok   twin Cwo [R] the impairment happens exactly when the rule says (ds streak and thresholds): true vs true
+ok   twin Cwo [R] T3 assets 624.9380 = T2 939.8522 + growth 11.7482 - impairment 326.6623
+ok   twin Cwo [R] the close cut 326.6623 from the assets (expected 326.6623 = equity before test + 0.3 x assets) and the write-off cut none: record imp 0.0000 (expected 0.0000)
+ok   twin Cwo [R] write-off reported 60.1478 (expected 60.1478), nothing waiting after (0)
+ok   twin Cwo [R] impairment leaves equity -285.4801 = -30% of assets -285.4801 -> the bank's chapter 11 (0->1), debt 971.7482 -> 592.5273, debt relief cap 379.2208 (expected 379.2208)
+ok   twin Cwo [R] net income -157.6685 = before charges -97.5207 - write-off 60.1478 - impairment 0.0000
+ok   twin Cwo [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   twin Cwo [R] tax 1.0625 = 30% of pre-tax 3.5418 and dividends 0.9917 are the same whatever was written off or impaired
+ok   twin Cwo [I] cash 20.0000 -> 21.4876 = + cash profit - tax - dividends = 21.4876 (no write-off or impairment moved cash)
+ok   twin Cwo [R] quarter record: day 60, ni -158, imp 0, wo 60 (24 fields)
+ok   twin Cwo [R] EPS record -623.6 won (net income x 1e4 / shares = -623.57), yearly net income +-157.6685, 25% holder's equity-method income -39.4171 = 25% of net income -39.4171
+ok   twin Cwo [R] reserve llr 10.0000 -> 10.9916 = roll-forward of the statistical loss only (expected 10.9916); write-off and impairment do not touch it
+ok   twin Cwo [M] model rule cfo = cash profit - tax + dividends received: 2.4793; add-back form 2.4793; statement shows 2.0 (rounding allowed 1.60)
+ok   twin Cwo [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 60.0 (expected shown 60.0), record fields 24/22/22/22/22/22/22/22
+ok   twin Cwo [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.15; newest -158 + 0.0 + 100 + 60.0 = 2.0)
+ok   twin Cwo [R] 손익 tab: 자산 손상차손 row hidden, 대손상각비 row -60.0, net income -158, EPS -625
+info twin Cwo [O] FIN-CF-01, recorded only, not judged: debt change dD -4040.0 | debt relief cap 379.2208 | financing cff -4041.0 | other oth 3677.0 | cash change -362.0 (previous quarter row is the synthetic start-of-game row)
+pre  twin Cimp: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  twin Cimp: the borrower defaulted on day 25, before the close, on a day that is not a bank close day
+pre  twin Cimp: waiting before the close 0.0000 = 0
+pre  twin Cimp: T2 assets 939.8522 = T1 939.8522: nothing else moved the assets between the cut and the close
+pre  twin Cimp: ds 3, no loss carryforward, no parent, dividends allowed, pre-tax 3.5418 > 0, no share issue, equity 39.6947 > 0
+pre  twin Cimp: this case has impairment by the rule (ds -> 4, debt/equity 23.6, equity before test 41.1822)
+pre  twin Cimp: holdings value unchanged until the impairment and no cash sweep (cash 21.4876 <= 114.1920)
+ok   twin Cimp [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 939.8522, llr untouched (10.0000)
+ok   twin Cimp [R] the impairment happens exactly when the rule says (ds streak and thresholds): true vs true
+ok   twin Cimp [R] T3 assets 624.9380 = T2 939.8522 + growth 11.7482 - impairment 326.6623
+ok   twin Cimp [R] the close cut 326.6623 from the assets (expected 326.6623 = equity before test + 0.3 x assets) and the write-off cut none: record imp 326.6623 (expected 326.6623)
+ok   twin Cimp [R] write-off reported 0.0000 (expected 0.0000), nothing waiting after (0)
+ok   twin Cimp [R] impairment leaves equity -285.4801 = -30% of assets -285.4801 -> the bank's chapter 11 (0->1), debt 971.7482 -> 592.5273, debt relief cap 379.2208 (expected 379.2208)
+ok   twin Cimp [R] net income -424.1831 = before charges -97.5207 - write-off 0.0000 - impairment 326.6623
+ok   twin Cimp [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   twin Cimp [R] tax 1.0625 = 30% of pre-tax 3.5418 and dividends 0.9917 are the same whatever was written off or impaired
+ok   twin Cimp [I] cash 20.0000 -> 21.4876 = + cash profit - tax - dividends = 21.4876 (no write-off or impairment moved cash)
+ok   twin Cimp [R] quarter record: day 60, ni -424, imp 327, wo 0 (24 fields)
+ok   twin Cimp [R] EPS record -1677.6 won (net income x 1e4 / shares = -1677.61), yearly net income +-424.1831, 25% holder's equity-method income -106.0458 = 25% of net income -106.0458
+ok   twin Cimp [R] reserve llr 10.0000 -> 10.9916 = roll-forward of the statistical loss only (expected 10.9916); write-off and impairment do not touch it
+ok   twin Cimp [M] model rule cfo = cash profit - tax + dividends received: 2.4793; add-back form 2.4793; statement shows 3.0 (rounding allowed 1.60)
+ok   twin Cimp [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 327 (expected shown 327), record fields 24/22/22/22/22/22/22/22
+ok   twin Cimp [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.15; newest -424 + 0.0 + 100 + 327 = 3.0)
+ok   twin Cimp [R] 손익 tab: 자산 손상차손 row -327, 대손상각비 row hidden, net income -424, EPS -1,677
+info twin Cimp [O] FIN-CF-01, recorded only, not judged: debt change dD -4040.0 | debt relief cap 379.2208 | financing cff -4041.0 | other oth 3676.0 | cash change -362.0 (previous quarter row is the synthetic start-of-game row)
+pre  twin C0: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  twin C0: the borrower defaulted on day 25, before the close, on a day that is not a bank close day
+pre  twin C0: waiting before the close 0.0000 = 0
+pre  twin C0: T2 assets 939.8522 = T1 939.8522: nothing else moved the assets between the cut and the close
+pre  twin C0: ds 3, no loss carryforward, no parent, dividends allowed, pre-tax 3.5418 > 0, no share issue, equity 39.6947 > 0
+pre  twin C0: this case has impairment by the rule (ds -> 4, debt/equity 23.6, equity before test 41.1822)
+pre  twin C0: holdings value unchanged until the impairment and no cash sweep (cash 21.4876 <= 114.1920)
+ok   twin C0 [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 939.8522, llr untouched (10.0000)
+ok   twin C0 [R] the impairment happens exactly when the rule says (ds streak and thresholds): true vs true
+ok   twin C0 [R] T3 assets 624.9380 = T2 939.8522 + growth 11.7482 - impairment 326.6623
+ok   twin C0 [R] the close cut 326.6623 from the assets (expected 326.6623 = equity before test + 0.3 x assets) and the write-off cut none: record imp 0.0000 (expected 0.0000)
+ok   twin C0 [R] write-off reported 0.0000 (expected 0.0000), nothing waiting after (0)
+ok   twin C0 [R] impairment leaves equity -285.4801 = -30% of assets -285.4801 -> the bank's chapter 11 (0->1), debt 971.7482 -> 592.5273, debt relief cap 379.2208 (expected 379.2208)
+ok   twin C0 [R] net income -97.5207 = before charges -97.5207 - write-off 0.0000 - impairment 0.0000
+ok   twin C0 [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   twin C0 [R] tax 1.0625 = 30% of pre-tax 3.5418 and dividends 0.9917 are the same whatever was written off or impaired
+ok   twin C0 [I] cash 20.0000 -> 21.4876 = + cash profit - tax - dividends = 21.4876 (no write-off or impairment moved cash)
+ok   twin C0 [R] quarter record: day 60, ni -98, imp 0, wo 0 (24 fields)
+ok   twin C0 [R] EPS record -385.7 won (net income x 1e4 / shares = -385.69), yearly net income +-97.5207, 25% holder's equity-method income -24.3802 = 25% of net income -24.3802
+ok   twin C0 [R] reserve llr 10.0000 -> 10.9916 = roll-forward of the statistical loss only (expected 10.9916); write-off and impairment do not touch it
+ok   twin C0 [M] model rule cfo = cash profit - tax + dividends received: 2.4793; add-back form 2.4793; statement shows 2.0 (rounding allowed 1.15)
+ok   twin C0 [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) hidden (expected hidden), record fields 24/22/22/22/22/22/22/22
+ok   twin C0 [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.10; newest -98.0 + 0.0 + 100 = 2.0)
+ok   twin C0 [R] 손익 tab: 자산 손상차손 row hidden, 대손상각비 row hidden, net income -98.0, EPS -388
+info twin C0 [O] FIN-CF-01, recorded only, not judged: debt change dD -4040.0 | debt relief cap 379.2208 | financing cff -4041.0 | other oth 3677.0 | cash change -362.0 (previous quarter row is the synthetic start-of-game row)
+ok   twins [I] same economic path in all four: assets 624.9380, cash 21.4876, debt 592.5273, debt relief 379.2208, tax 1.0625, dividends 0.9917, reserve 10.9916
+ok   twins [R] net income differs by exactly the charge left out: neither -97.5207, write-off only -157.6685, impairment only -424.1831, both -484.3309 (write-off 60.1478, impairment 326.6623)
+ok   twins [M] exact operating cash flow is the same in all four: 2.4793 / 2.4793 / 2.4793 / 2.4793 = cash profit - tax + dividends received 2.4793
+ok   twins [M] operating cash flow on the tab agrees across the four within rounding: 3.0 / 2.0 / 3.0 / 2.0
+ok   twins [R/I] impairment amount by three routes: rule 326.6623 | assets 326.6623 | net income difference 326.6623 | record 326.6623
+-- natural play, two seeds x 720 days: what happens to banks (information); a close with imp or wo is judged by the net income statement identity
+ok   natural seed 12345: 189 bank closes; with write-off 1, with impairment 0, with both 0 (reaching the combined case in play is not shown on these seeds)
+ok   natural seed 777: 176 bank closes; with write-off 0, with impairment 0, with both 0 (reaching the combined case in play is not shown on these seeds)
+errs 0 fails 0
+PASS t_reg01_bank_imp_wo.js
+---- t_r4c_bank_tg.js
+-- TC-R4C-A no write-off: identical to the existing valuation
+ok   TC-R4C-A1 natural seed 12345 x 720 days: 4170 target-price calculations (1 of them with a write-off waiting) all equal to the spec
+ok   TC-R4C-A1 natural seed 777 x 720 days: 4171 target-price calculations (0 of them with a write-off waiting) all equal to the spec
+ok   TC-R4C-A1 natural seed 20261016 x 720 days: 4159 target-price calculations (0 of them with a write-off waiting) all equal to the spec
+pre  TC-R4C-A2 world: the borrower is in chapter 11 (bk 1), loan to the bank at the default 0.0000
+pre  TC-R4C-A2 the stored target price is stale (mood moved by .4 since the last close): the formula on today's inputs gives 850.1934 vs stored 727.0136, so a refresh would show
+ok   TC-R4C-A2 nothing written off (0.0000): the bank record changed in [], target price 727.0136 -> 727.0136
+pre  TC-R4C-A3 the stored target price is stale (mood moved by .4): the formula on today's inputs gives 850.1934 vs stored 727.0136
+ok   TC-R4C-A3 default without a lender: borrower bk 1, no write-off, the bank target price stays 727.0136
+-- TC-R4C-B one write-off (strong = valuation EPS < 0, mild = valuation EPS > 0)
+pre  TC-R4C-B1 (strong) world: one default on day 100, bank close on day 150 (1 write-offs)
+pre  TC-R4C-B1 (strong): regime strong: the spec valuation EPS is -170.2948 (< 0, tg follows the book-value branch)
+ok   TC-R4C-B1 (strong): write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-B1 (strong): assets 1012.5000 -> 952.5000, book equity without the stake 162.4363 -> 102.4363 (both down by the write-off)
+ok   TC-R4C-B1 (strong): equity used for valuation 102.4363 = book 102.4363 + stake value 0.0000
+ok   TC-R4C-B1 (strong): target price on the default day 200.5377 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+ok   TC-R4C-B1 (strong): target price fell 727.0 -> 200.5 (the book-equity part alone would give 602.9)
+ok   TC-R4C-B1 (strong): the borrower's own chapter 11 reset is untouched: its target price 369.0709 = its new price 369.0709
+ok   TC-R4C-B1 (strong): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-B1 (strong): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-B1 (strong): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-B1 (strong): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-B1 (strong): the close on day 150 books 60.0000 of 60.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-B1 (strong): the loss sits once in the published quarter: EPS -220.9 = core 16.4 - loss 237.3
+ok   TC-R4C-B1 (strong): after the close the valuation EPS is the confirmed trailing EPS -169.8000 (the temporary term is released)
+ok   TC-R4C-B1 (strong): target price after the close 205.4021 = existing formula on the confirmed EPS (expected 205.4021)
+ok   TC-R4C-B1 (strong): no double counting: valuation EPS before the close, had the quarter met its own core EPS, -169.8164 = trailing EPS after it -169.8000
+info TC-R4C-B1 (strong) price/target: before 795.1/727.0 | default instant 795.1/200.5 | default day end 786.6/200.5 | d+10 731.5/200.5 | close-1 613.5/200.5 | close 611.2/205.4 | c+1 623.1/205.4 | c+10 626.4/205.4 | c+30 -
+ok   TC-R4C-B1 (strong) from the default day to the day before the close the target price stays 200.5377 and the loss stays queued (50 days)
+pre  TC-R4C-B4 (strong) world: the old-code run has the same default and close (100, 150)
+ok   TC-R4C-B4 (strong) the close on day 150 is the same as with the old code (assets, cash, deposits, shares, net income, yearly income, EPS history, estimate, results): differing none
+ok   TC-R4C-B4 (strong) the old code leaves the target price at 727.0 on the default day; R4C puts it at 200.5
+info TC-R4C-B4 (strong) bank price, old code / R4C: day 100 792.7 / 786.6 | day 110 794.4 / 731.5 | day 149 857.3 / 613.5 | day 150 855.1 / 611.2 | day 151 870.0 / 623.1 | day 160 859.3 / 626.4
+pre  TC-R4C-B2 (strong, loan-to-own) world: loan-to-own stake 80.0%, close on day 150
+pre  TC-R4C-B2 (strong, loan-to-own): regime strong: the spec valuation EPS is -170.2948 (< 0, tg follows the book-value branch)
+ok   TC-R4C-B2 (strong, loan-to-own): write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-B2 (strong, loan-to-own): assets 1012.5000 -> 952.5000, book equity without the stake 162.4363 -> 102.4363 (both down by the write-off)
+ok   TC-R4C-B2 (strong, loan-to-own): equity used for valuation 122.5339 = book 102.4363 + stake value 20.0976 (loan-to-own stake 80.0%)
+ok   TC-R4C-B2 (strong, loan-to-own): target price on the default day 239.8824 = the existing formula on the spec EPS -170.2948 (expected 239.8824)
+ok   TC-R4C-B2 (strong, loan-to-own): target price fell 727.0 -> 239.9 (the book-equity part alone would give 629.1)
+ok   TC-R4C-B2 (strong, loan-to-own): the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-B2 (strong, loan-to-own): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-B2 (strong, loan-to-own): the bank record changed in A, pos, tg, woq only (allowed: A, woq, tg, pos for the stake)
+ok   TC-R4C-B2 (strong, loan-to-own): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-B2 (strong, loan-to-own) the stake is registered on the bank (pos) and valued 20.0976
+pre  TC-R4C-B2 (strong, loan-to-own): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-B2 (strong, loan-to-own): the close on day 150 books 60.0000 of 60.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-B2 (strong, loan-to-own): the loss sits once in the published quarter: EPS -220.9 = core 16.4 - loss 237.3
+ok   TC-R4C-B2 (strong, loan-to-own): after the close the valuation EPS is the confirmed trailing EPS -169.8000 (the temporary term is released)
+ok   TC-R4C-B2 (strong, loan-to-own): target price after the close 244.7468 = existing formula on the confirmed EPS (expected 244.7468)
+ok   TC-R4C-B2 (strong, loan-to-own): no double counting: valuation EPS before the close, had the quarter met its own core EPS, -169.8164 = trailing EPS after it -169.8000
+info TC-R4C-B2 (strong, loan-to-own) price/target: before 795.1/727.0 | default instant 795.1/239.9 | default day end 787.4/239.9 | d+10 739.9/239.9 | close-1 642.7/239.9 | close 641.1/244.7 | c+1 654.2/244.7 | c+10 662.0/244.7 | c+30 -
+pre  TC-R4C-B1 (mild) world: one default on day 100, bank close on day 150 (1 write-offs)
+pre  TC-R4C-B1 (mild): regime mild: the spec valuation EPS is 31.4058 (> 0, the EPS term decides tg)
+ok   TC-R4C-B1 (mild): write-off 9.0000 = 30% of the loan 30.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-B1 (mild): assets 1012.5000 -> 1003.5000, book equity without the stake 162.4363 -> 153.4363 (both down by the write-off)
+ok   TC-R4C-B1 (mild): equity used for valuation 153.4363 = book 153.4363 + stake value 0.0000
+ok   TC-R4C-B1 (mild): target price on the default day 415.0410 = the existing formula on the spec EPS 31.4058 (expected 415.0410)
+ok   TC-R4C-B1 (mild): target price fell 727.0 -> 415.0 (the book-equity part alone would give 669.4)
+ok   TC-R4C-B1 (mild): the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-B1 (mild): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-B1 (mild): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-B1 (mild): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-B1 (mild): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-B1 (mild): the close on day 150 books 9.0000 of 9.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-B1 (mild): the loss sits once in the published quarter: EPS -17.3 = core 18.3 - loss 35.6
+ok   TC-R4C-B1 (mild): after the close the valuation EPS is the confirmed trailing EPS 33.8000 (the temporary term is released)
+ok   TC-R4C-B1 (mild): target price after the close 435.0381 = existing formula on the confirmed EPS (expected 435.0381)
+ok   TC-R4C-B1 (mild): no double counting: valuation EPS before the close, had the quarter met its own core EPS, 33.8024 = trailing EPS after it 33.8000
+info TC-R4C-B1 (mild) price/target: before 795.1/727.0 | default instant 795.1/415.0 | default day end 790.0/415.0 | d+10 766.4/415.0 | close-1 741.1/415.0 | close 750.0/435.0 | c+1 767.5/435.0 | c+10 796.7/435.0 | c+30 -
+ok   TC-R4C-B1 (mild) from the default day to the day before the close the target price stays 415.0410 and the loss stays queued (50 days)
+pre  TC-R4C-B4 (mild) world: the old-code run has the same default and close (100, 150)
+ok   TC-R4C-B4 (mild) the close on day 150 is the same as with the old code (assets, cash, deposits, shares, net income, yearly income, EPS history, estimate, results): differing none
+ok   TC-R4C-B4 (mild) the old code leaves the target price at 727.0 on the default day; R4C puts it at 415.0
+info TC-R4C-B4 (mild) bank price, old code / R4C: day 100 792.7 / 790.0 | day 110 794.4 / 766.4 | day 149 857.3 / 741.1 | day 150 868.0 / 750.0 | day 151 887.5 / 767.5 | day 160 914.2 / 796.7
+pre  TC-R4C-B2 (mild, loan-to-own) world: loan-to-own stake 44.1%, close on day 150
+pre  TC-R4C-B2 (mild, loan-to-own): regime mild: the spec valuation EPS is 31.4058 (> 0, the EPS term decides tg)
+ok   TC-R4C-B2 (mild, loan-to-own): write-off 9.0000 = 30% of the loan 30.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-B2 (mild, loan-to-own): assets 1012.5000 -> 1003.5000, book equity without the stake 162.4363 -> 153.4363 (both down by the write-off)
+ok   TC-R4C-B2 (mild, loan-to-own): equity used for valuation 164.5195 = book 153.4363 + stake value 11.0832 (loan-to-own stake 44.1%)
+ok   TC-R4C-B2 (mild, loan-to-own): target price on the default day 429.5059 = the existing formula on the spec EPS 31.4058 (expected 429.5059)
+ok   TC-R4C-B2 (mild, loan-to-own): target price fell 727.0 -> 429.5 (the book-equity part alone would give 683.9)
+ok   TC-R4C-B2 (mild, loan-to-own): the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-B2 (mild, loan-to-own): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-B2 (mild, loan-to-own): the bank record changed in A, pos, tg, woq only (allowed: A, woq, tg, pos for the stake)
+ok   TC-R4C-B2 (mild, loan-to-own): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-B2 (mild, loan-to-own) the stake is registered on the bank (pos) and valued 11.0832
+pre  TC-R4C-B2 (mild, loan-to-own): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-B2 (mild, loan-to-own): the close on day 150 books 9.0000 of 9.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-B2 (mild, loan-to-own): the loss sits once in the published quarter: EPS -17.3 = core 18.3 - loss 35.6
+ok   TC-R4C-B2 (mild, loan-to-own): after the close the valuation EPS is the confirmed trailing EPS 33.8000 (the temporary term is released)
+ok   TC-R4C-B2 (mild, loan-to-own): target price after the close 449.5031 = existing formula on the confirmed EPS (expected 449.5031)
+ok   TC-R4C-B2 (mild, loan-to-own): no double counting: valuation EPS before the close, had the quarter met its own core EPS, 33.8024 = trailing EPS after it 33.8000
+info TC-R4C-B2 (mild, loan-to-own) price/target: before 795.1/727.0 | default instant 795.1/429.5 | default day end 790.2/429.5 | d+10 768.1/429.5 | close-1 747.7/429.5 | close 756.9/449.5 | c+1 774.6/449.5 | c+10 805.1/449.5 | c+30 -
+pre  TC-R4C-B3 (no published quarter) world: default day 40, close day 60, published quarters at the default 0
+pre  TC-R4C-B3 (no published quarter): regime mild: the spec valuation EPS is 13.0492 (> 0, the EPS term decides tg)
+ok   TC-R4C-B3 (no published quarter): write-off 3.6000 = 30% of the loan 12.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-B3 (no published quarter): assets 1000.0000 -> 996.4000, book equity without the stake 160.0000 -> 156.4000 (both down by the write-off)
+ok   TC-R4C-B3 (no published quarter): equity used for valuation 156.4000 = book 156.4000 + stake value 0.0000
+ok   TC-R4C-B3 (no published quarter): target price on the default day 302.0882 = the existing formula on the spec EPS 13.0492 (expected 302.0882)
+ok   TC-R4C-B3 (no published quarter): target price fell 2310.9 -> 302.1 (the book-equity part alone would give 2306.2)
+ok   TC-R4C-B3 (no published quarter): the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-B3 (no published quarter): no price shock on the default day: price 2676.0975 -> 2676.0975, jump term 0.0000 -> 0.0000
+ok   TC-R4C-B3 (no published quarter): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-B3 (no published quarter): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-B3 (no published quarter): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-B3 (no published quarter): the close on day 60 books 3.6000 of 3.6000 waiting, nothing left waiting (0)
+ok   TC-R4C-B3 (no published quarter): the loss sits once in the published quarter: EPS 1.7 = core 15.9 - loss 14.2
+ok   TC-R4C-B3 (no published quarter): after the close the valuation EPS is the confirmed trailing EPS 6.8000 (the temporary term is released)
+ok   TC-R4C-B3 (no published quarter): target price after the close 258.3257 = existing formula on the confirmed EPS (expected 258.3257)
+ok   TC-R4C-B3 (no published quarter): no double counting: valuation EPS before the close, had the quarter met its own core EPS, 6.7598 = trailing EPS after it 6.8000
+pre  TC-R4C-B3 (two published quarters) world: default day 40, close day 60, published quarters at the default 2
+pre  TC-R4C-B3 (two published quarters): regime mild: the spec valuation EPS is 22.5410 (> 0, the EPS term decides tg)
+ok   TC-R4C-B3 (two published quarters): write-off 9.0000 = 30% of the loan 30.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-B3 (two published quarters): assets 1000.0000 -> 991.0000, book equity without the stake 160.0000 -> 151.0000 (both down by the write-off)
+ok   TC-R4C-B3 (two published quarters): equity used for valuation 151.0000 = book 151.0000 + stake value 0.0000
+ok   TC-R4C-B3 (two published quarters): target price on the default day 366.3002 = the existing formula on the spec EPS 22.5410 (expected 366.3002)
+ok   TC-R4C-B3 (two published quarters): target price fell 734.3 -> 366.3 (the book-equity part alone would give 722.6)
+ok   TC-R4C-B3 (two published quarters): the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-B3 (two published quarters): no price shock on the default day: price 859.8729 -> 859.8729, jump term 0.0000 -> 0.0000
+ok   TC-R4C-B3 (two published quarters): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-B3 (two published quarters): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-B3 (two published quarters): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-B3 (two published quarters): the close on day 60 books 9.0000 of 9.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-B3 (two published quarters): the loss sits once in the published quarter: EPS -19.9 = core 15.7 - loss 35.6
+ok   TC-R4C-B3 (two published quarters): after the close the valuation EPS is the confirmed trailing EPS 20.1333 (the temporary term is released)
+ok   TC-R4C-B3 (two published quarters): target price after the close 351.3391 = existing formula on the confirmed EPS (expected 351.3391)
+ok   TC-R4C-B3 (two published quarters): no double counting: valuation EPS before the close, had the quarter met its own core EPS, 20.1823 = trailing EPS after it 20.1333
+-- TC-R4C-C several write-offs
+pre  TC-R4C-C1 (strong) world: two write-offs on days 95 and 100, one close on day 150
+ok   TC-R4C-C1 (strong) first: write-off 45.0000 = 30% of the loan 150.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-C1 (strong) first: assets 1012.5000 -> 967.5000, book equity without the stake 162.4363 -> 117.4363 (both down by the write-off)
+ok   TC-R4C-C1 (strong) first: equity used for valuation 117.4363 = book 117.4363 + stake value 0.0000
+ok   TC-R4C-C1 (strong) first: target price on the default day 229.9029 = the existing formula on the spec EPS -110.9711 (expected 229.9029)
+ok   TC-R4C-C1 (strong) first: target price fell 727.0 -> 229.9 (the book-equity part alone would give 622.4)
+ok   TC-R4C-C1 (strong) first: the borrower's own chapter 11 reset is untouched: its target price 276.8032 = its new price 276.8032
+ok   TC-R4C-C1 (strong) first: no price shock on the default day: price 747.5657 -> 747.5657, jump term 0.0000 -> 0.0000
+ok   TC-R4C-C1 (strong) first: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-C1 (strong) first: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-C1 (strong) second default: waiting 45.0000 + 75.0000 = 120.0000 (each loss once)
+pre  TC-R4C-C1 (strong) regime: valuation EPS with both losses -407.5897
+ok   TC-R4C-C1 (strong) second default: target price 83.0767 = formula on the spec EPS with BOTH losses once, built from the history before the first default (EPS -407.5897)
+ok   TC-R4C-C1 (strong) second default: target price 229.9 -> 83.1, bank record changed in A, tg, woq only
+pre  TC-R4C-C1 (strong): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-C1 (strong): the close on day 150 books 120.0000 of 120.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-C1 (strong): the loss sits once in the published quarter: EPS -460.5 = core 14.1 - loss 474.6
+ok   TC-R4C-C1 (strong): after the close the valuation EPS is the confirmed trailing EPS -409.4000 (the temporary term is released)
+ok   TC-R4C-C1 (strong): target price after the close 87.2709 = existing formula on the confirmed EPS (expected 87.2709)
+ok   TC-R4C-C1 (strong): no double counting: valuation EPS before the close, had the quarter met its own core EPS, -409.3681 = trailing EPS after it -409.4000
+ok   TC-R4C-C1 (strong) the close books both losses in one line: 120.0000 = 45.0000 + 75.0000
+pre  TC-R4C-C1 (strong) single-borrower world: loan 400.0000 vs the two loans 400.0000
+ok   TC-R4C-C1 (strong) after the second default the bank is the same as after one combined write-off (assets, cash, deposits, waiting loss, equity, target price 83.0767 vs 83.0767): differing none
+ok   TC-R4C-C1 (strong) and the close is the same: net income -116.4294 vs -116.4294, target price 87.2709 vs 87.2709
+pre  TC-R4C-C1 (mild) world: two write-offs on days 95 and 100, one close on day 150
+ok   TC-R4C-C1 (mild) first: write-off 6.0000 = 30% of the loan 20.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-C1 (mild) first: assets 1012.5000 -> 1006.5000, book equity without the stake 162.4363 -> 156.4363 (both down by the write-off)
+ok   TC-R4C-C1 (mild) first: equity used for valuation 156.4363 = book 156.4363 + stake value 0.0000
+ok   TC-R4C-C1 (mild) first: target price on the default day 500.1008 = the existing formula on the spec EPS 43.2705 (expected 500.1008)
+ok   TC-R4C-C1 (mild) first: target price fell 727.0 -> 500.1 (the book-equity part alone would give 673.3)
+ok   TC-R4C-C1 (mild) first: the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-C1 (mild) first: no price shock on the default day: price 747.5657 -> 747.5657, jump term 0.0000 -> 0.0000
+ok   TC-R4C-C1 (mild) first: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-C1 (mild) first: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-C1 (mild) second default: waiting 6.0000 + 9.0000 = 15.0000 (each loss once)
+pre  TC-R4C-C1 (mild) regime: valuation EPS with both losses 7.6763
+ok   TC-R4C-C1 (mild) second default: target price 244.9214 = formula on the spec EPS with BOTH losses once, built from the history before the first default (EPS 7.6763)
+ok   TC-R4C-C1 (mild) second default: target price 500.1 -> 244.9, bank record changed in A, tg, woq only
+pre  TC-R4C-C1 (mild): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-C1 (mild): the close on day 150 books 15.0000 of 15.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-C1 (mild): the loss sits once in the published quarter: EPS -41.3 = core 18.1 - loss 59.3
+ok   TC-R4C-C1 (mild): after the close the valuation EPS is the confirmed trailing EPS 9.8000 (the temporary term is released)
+ok   TC-R4C-C1 (mild): target price after the close 263.0237 = existing formula on the confirmed EPS (expected 263.0237)
+ok   TC-R4C-C1 (mild): no double counting: valuation EPS before the close, had the quarter met its own core EPS, 9.8473 = trailing EPS after it 9.8000
+ok   TC-R4C-C1 (mild) the close books both losses in one line: 15.0000 = 6.0000 + 9.0000
+pre  TC-R4C-C1 (mild) single-borrower world: loan 50.0000 vs the two loans 50.0000
+ok   TC-R4C-C1 (mild) after the second default the bank is the same as after one combined write-off (assets, cash, deposits, waiting loss, equity, target price 244.9214 vs 244.9214): differing none
+ok   TC-R4C-C1 (mild) and the close is the same: net income -10.4308 vs -10.4308, target price 263.0237 vs 263.0237
+pre  TC-R4C-C2 world: defaults on days 100, 200; closes on days 150, 240
+pre  TC-R4C-C2 first: regime mild: the spec valuation EPS is 31.4058 (> 0, the EPS term decides tg)
+ok   TC-R4C-C2 first: write-off 9.0000 = 30% of the loan 30.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-C2 first: assets 1012.5000 -> 1003.5000, book equity without the stake 162.4363 -> 153.4363 (both down by the write-off)
+ok   TC-R4C-C2 first: equity used for valuation 153.4363 = book 153.4363 + stake value 0.0000
+ok   TC-R4C-C2 first: target price on the default day 415.0410 = the existing formula on the spec EPS 31.4058 (expected 415.0410)
+ok   TC-R4C-C2 first: target price fell 727.0 -> 415.0 (the book-equity part alone would give 669.4)
+ok   TC-R4C-C2 first: the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-C2 first: no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-C2 first: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-C2 first: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-C2 first: no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-C2 first: the close on day 150 books 9.0000 of 9.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-C2 first: the loss sits once in the published quarter: EPS -17.3 = core 18.3 - loss 35.6
+ok   TC-R4C-C2 first: after the close the valuation EPS is the confirmed trailing EPS 33.8000 (the temporary term is released)
+ok   TC-R4C-C2 first: target price after the close 435.0381 = existing formula on the confirmed EPS (expected 435.0381)
+ok   TC-R4C-C2 first: no double counting: valuation EPS before the close, had the quarter met its own core EPS, 33.8024 = trailing EPS after it 33.8000
+pre  TC-R4C-C2 second: regime mild: the spec valuation EPS is 15.9029 (> 0, the EPS term decides tg)
+ok   TC-R4C-C2 second: write-off 4.5000 = 30% of the loan 15.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-C2 second: assets 1016.0438 -> 1011.5438, book equity without the stake 156.2121 -> 151.7121 (both down by the write-off)
+ok   TC-R4C-C2 second: equity used for valuation 151.7121 = book 151.7121 + stake value 0.0000
+ok   TC-R4C-C2 second: target price on the default day 307.4431 = the existing formula on the spec EPS 15.9029 (expected 307.4431)
+ok   TC-R4C-C2 second: target price fell 435.0 -> 307.4 (the book-equity part alone would give 430.6)
+ok   TC-R4C-C2 second: the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-C2 second: no price shock on the default day: price 853.8477 -> 853.8477, jump term 0.0000 -> 0.0000
+ok   TC-R4C-C2 second: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-C2 second: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-C2 second: no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-C2 second: the close on day 240 books 4.5000 of 4.5000 waiting, nothing left waiting (0)
+ok   TC-R4C-C2 second: the loss sits once in the published quarter: EPS 1.0 = core 18.8 - loss 17.8
+ok   TC-R4C-C2 second: after the close the valuation EPS is the confirmed trailing EPS 17.3000 (the temporary term is released)
+ok   TC-R4C-C2 second: target price after the close 320.7758 = existing formula on the confirmed EPS (expected 320.7758)
+ok   TC-R4C-C2 second: no double counting: valuation EPS before the close, had the quarter met its own core EPS, 17.2813 = trailing EPS after it 17.3000
+ok   TC-R4C-C2 the second quarter waits only for its own loss (4.5000) and books only that (4.5000), not 13.5000
+ok   TC-R4C-C2 the first loss is in the published EPS history once (last quarter -17.3) and the second default is valued on top of it: target 307.4
+-- TC-R4C-D two banks default on the same day (bank 1 mild, bank 2 strong)
+pre  TC-R4C-D world: write-offs 2 (both banks), 1 (bank 1 only), 1 (bank 2 only)
+pre  TC-R4C-D bank 1: regime mild: the spec valuation EPS is 31.4058 (> 0, the EPS term decides tg)
+ok   TC-R4C-D bank 1: write-off 9.0000 = 30% of the loan 30.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-D bank 1: assets 1012.5000 -> 1003.5000, book equity without the stake 162.4363 -> 153.4363 (both down by the write-off)
+ok   TC-R4C-D bank 1: equity used for valuation 153.4363 = book 153.4363 + stake value 0.0000
+ok   TC-R4C-D bank 1: target price on the default day 415.0410 = the existing formula on the spec EPS 31.4058 (expected 415.0410)
+ok   TC-R4C-D bank 1: target price fell 727.0 -> 415.0 (the book-equity part alone would give 669.4)
+ok   TC-R4C-D bank 1: the borrower's own chapter 11 reset is untouched: its target price 60.0000 = its new price 60.0000
+ok   TC-R4C-D bank 1: no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-D bank 1: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-D bank 1: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-D bank 2: regime strong: the spec valuation EPS is -304.8091 (< 0, tg follows the book-value branch)
+ok   TC-R4C-D bank 2: write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-D bank 2: assets 1012.5000 -> 952.5000, book equity without the stake 162.4216 -> 102.4216 (both down by the write-off)
+ok   TC-R4C-D bank 2: equity used for valuation 102.4216 = book 102.4216 + stake value 0.0000
+ok   TC-R4C-D bank 2: target price on the default day 325.4087 = the existing formula on the spec EPS -304.8091 (expected 325.4087)
+ok   TC-R4C-D bank 2: target price fell 932.6 -> 325.4 (the book-equity part alone would give 753.1)
+ok   TC-R4C-D bank 2: the borrower's own chapter 11 reset is untouched: its target price 527.4061 = its new price 527.4061
+ok   TC-R4C-D bank 2: no price shock on the default day: price 817.7772 -> 817.7772, jump term 0.0000 -> 0.0000
+ok   TC-R4C-D bank 2: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-D bank 2: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-D bank 1 on the day both default: target 415.0410 = when only it defaults 415.0410 (write-offs differ: 9.00 / 60.00)
+ok   TC-R4C-D bank 2 on the day both default: target 325.4087 = when only it defaults 325.4087
+ok   TC-R4C-D the bank whose borrower does not default keeps its target price and queues nothing
+pre  TC-R4C-D every bank has its close
+pre  TC-R4C-D bank 1: no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-D bank 1: the close on day 150 books 9.0000 of 9.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-D bank 1: the loss sits once in the published quarter: EPS -17.3 = core 18.3 - loss 35.6
+ok   TC-R4C-D bank 1: after the close the valuation EPS is the confirmed trailing EPS 33.8000 (the temporary term is released)
+ok   TC-R4C-D bank 1: target price after the close 435.0381 = existing formula on the confirmed EPS (expected 435.0381)
+ok   TC-R4C-D bank 1: no double counting: valuation EPS before the close, had the quarter met its own core EPS, 33.8024 = trailing EPS after it 33.8000
+pre  TC-R4C-D bank 2: no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-D bank 2: the close on day 150 books 60.0000 of 60.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-D bank 2: the loss sits once in the published quarter: EPS -358.5 = core 26.6 - loss 385.1
+ok   TC-R4C-D bank 2: after the close the valuation EPS is the confirmed trailing EPS -297.6000 (the temporary term is released)
+ok   TC-R4C-D bank 2: target price after the close 333.3080 = existing formula on the confirmed EPS (expected 333.3080)
+ok   TC-R4C-D bank 2: no double counting: valuation EPS before the close, had the quarter met its own core EPS, -297.6121 = trailing EPS after it -297.6000
+ok   TC-R4C-D each close is the same as in the world where only that bank is hit (targets 435.0381 / 333.3080, write-offs 9.0000 / 60.0000)
+-- TC-R4C-E the bank is settled before its close (kill: bankruptcy m=.02, nationalisation m=.6, takeover m=1.3)
+pre  TC-R4C-E (m=0.02) world: default on day 100, the bank is settled on day 105
+ok   TC-R4C-E (m=0.02): write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-E (m=0.02): assets 1012.5000 -> 952.5000, book equity without the stake 162.4363 -> 102.4363 (both down by the write-off)
+ok   TC-R4C-E (m=0.02): equity used for valuation 102.4363 = book 102.4363 + stake value 0.0000
+ok   TC-R4C-E (m=0.02): target price on the default day 200.5377 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+ok   TC-R4C-E (m=0.02): target price fell 727.0 -> 200.5 (the book-equity part alone would give 602.9)
+ok   TC-R4C-E (m=0.02): the borrower's own chapter 11 reset is untouched: its target price 369.0709 = its new price 369.0709
+ok   TC-R4C-E (m=0.02): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0368 -> 0.0368
+ok   TC-R4C-E (m=0.02): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-E (m=0.02): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-E (m=0.02) the player's 20% is paid at market cap 199.5658 x 0.02 less 22% tax: 0.6226 (the existing rule, core.js payK / sim.js kill; the lower target price changes no payout formula)
+ok   TC-R4C-E (m=0.02) the waiting loss stays on the dead bank, as before R4C (R2): woq 60.0000 (nothing books it)
+ok   TC-R4C-E (m=0.02) twenty days after the settlement every price and target is finite and positive, no error
+pre  TC-R4C-E (m=0.6) world: default on day 100, the bank is settled on day 105
+ok   TC-R4C-E (m=0.6): write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-E (m=0.6): assets 1012.5000 -> 952.5000, book equity without the stake 162.4363 -> 102.4363 (both down by the write-off)
+ok   TC-R4C-E (m=0.6): equity used for valuation 102.4363 = book 102.4363 + stake value 0.0000
+ok   TC-R4C-E (m=0.6): target price on the default day 200.5377 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+ok   TC-R4C-E (m=0.6): target price fell 727.0 -> 200.5 (the book-equity part alone would give 602.9)
+ok   TC-R4C-E (m=0.6): the borrower's own chapter 11 reset is untouched: its target price 369.0709 = its new price 369.0709
+ok   TC-R4C-E (m=0.6): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0368 -> 0.0368
+ok   TC-R4C-E (m=0.6): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-E (m=0.6): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-E (m=0.6) the player's 20% is paid at market cap 199.5658 x 0.6 less 22% tax: 18.6794 (the existing rule, core.js payK / sim.js kill; the lower target price changes no payout formula)
+ok   TC-R4C-E (m=0.6) the waiting loss stays on the dead bank, as before R4C (R2): woq 60.0000 (nothing books it)
+ok   TC-R4C-E (m=0.6) twenty days after the settlement every price and target is finite and positive, no error
+pre  TC-R4C-E (m=1.3) world: default on day 100, the bank is settled on day 105
+ok   TC-R4C-E (m=1.3): write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-E (m=1.3): assets 1012.5000 -> 952.5000, book equity without the stake 162.4363 -> 102.4363 (both down by the write-off)
+ok   TC-R4C-E (m=1.3): equity used for valuation 102.4363 = book 102.4363 + stake value 0.0000
+ok   TC-R4C-E (m=1.3): target price on the default day 200.5377 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+ok   TC-R4C-E (m=1.3): target price fell 727.0 -> 200.5 (the book-equity part alone would give 602.9)
+ok   TC-R4C-E (m=1.3): the borrower's own chapter 11 reset is untouched: its target price 369.0709 = its new price 369.0709
+ok   TC-R4C-E (m=1.3): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0368 -> 0.0368
+ok   TC-R4C-E (m=1.3): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-E (m=1.3): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-E (m=1.3) the player's 20% is paid at market cap 199.5658 x 1.3 less 22% tax: 40.4719 (the existing rule, core.js payK / sim.js kill; the lower target price changes no payout formula)
+ok   TC-R4C-E (m=1.3) the waiting loss stays on the dead bank, as before R4C (R2): woq 60.0000 (nothing books it)
+ok   TC-R4C-E (m=1.3) twenty days after the settlement every price and target is finite and positive, no error
+-- TC-R4C-F bank equity at or below zero after the cut (no new price floor; the cases are material for a separate decision)
+pre  TC-R4C-F (loan 500) world: default day 100, bank close 150
+ok   TC-R4C-F (loan 500) book equity 162.4 -> 12.4: target price 66.0000 = the existing formula on the spec EPS (66.0000) with no extra floor or guard
+ok   TC-R4C-F (loan 500) price and target stay finite and at or above the existing 60 floor on every day from the default to the close + 12 (lowest price 418.2)
+ok   TC-R4C-F (loan 500) the close books the write-off once (150.0000) and clears the queue; the bank's own chapter 11 at the close: bk 0, equity at the close 14.3, target 66.0
+info TC-R4C-F (loan 500) target: before 727.0, book-only 485.4, R4C 66.0 | price: default 795.1 -> d+10 681.2, close-1 459.6, close 445.0, c+1 451.1, c+12 418.2 | target after the close 66.0
+pre  TC-R4C-F (loan 533.34) world: default day 100, bank close 150
+ok   TC-R4C-F (loan 533.34) book equity 162.4 -> 2.4: target price 66.0000 = the existing formula on the spec EPS (66.0000) with no extra floor or guard
+ok   TC-R4C-F (loan 533.34) price and target stay finite and at or above the existing 60 floor on every day from the default to the close + 12 (lowest price 416.5)
+ok   TC-R4C-F (loan 533.34) the close books the write-off once (160.0020) and clears the queue; the bank's own chapter 11 at the close: bk 0, equity at the close 4.2, target 66.0
+info TC-R4C-F (loan 533.34) target: before 727.0, book-only 472.3, R4C 66.0 | price: default 795.1 -> d+10 681.2, close-1 459.6, close 443.7, c+1 449.8, c+12 416.5 | target after the close 66.0
+pre  TC-R4C-F (loan 600) world: default day 100, bank close 150
+ok   TC-R4C-F (loan 600) book equity 162.4 -> -17.6: target price 66.0000 = the existing formula on the spec EPS (66.0000) with no extra floor or guard
+ok   TC-R4C-F (loan 600) price and target stay finite and at or above the existing 60 floor on every day from the default to the close + 12 (lowest price 248.5)
+ok   TC-R4C-F (loan 600) the close books the write-off once (180.0000) and clears the queue; the bank's own chapter 11 at the close: bk 1, equity at the close 126.4, target 247.5
+info TC-R4C-F (loan 600) target: before 727.0, book-only 469.2, R4C 66.0 | price: default 795.1 -> d+10 681.2, close-1 459.6, close 321.7, c+1 248.5, c+12 259.5 | target after the close 247.5
+pre  TC-R4C-F (loan 800) world: default day 100, bank close 150
+ok   TC-R4C-F (loan 800) book equity 162.4 -> -77.6: target price 66.0000 = the existing formula on the spec EPS (66.0000) with no extra floor or guard
+ok   TC-R4C-F (loan 800) price and target stay finite and at or above the existing 60 floor on every day from the default to the close + 12 (lowest price 226.5)
+ok   TC-R4C-F (loan 800) the close books the write-off once (240.0000) and clears the queue; the bank's own chapter 11 at the close: bk 1, equity at the close 117.3, target 229.7
+info TC-R4C-F (loan 800) target: before 727.0, book-only 469.2, R4C 66.0 | price: default 795.1 -> d+10 681.2, close-1 459.6, close 321.7, c+1 226.5, c+12 235.1 | target after the close 229.7
+-- TC-R4C-G regulator check on day 90, between the default (day 75) and the close (day 150)
+pre  TC-R4C-G (rights issue (BIS 7.7% after the cut)) world: default day 75, the day-90 check issued shares 2528.50 -> 2781.35, close day 150
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): write-off 90.0000 = 30% of the loan 300.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): assets 1012.5000 -> 922.5000, book equity without the stake 162.4363 -> 72.4363 (both down by the write-off)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): equity used for valuation 72.4363 = book 72.4363 + stake value 0.0000
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): target price on the default day 141.8072 = the existing formula on the spec EPS -288.9423 (expected 141.8072)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): target price fell 727.0 -> 141.8 (the book-equity part alone would give 609.6)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): the borrower's own chapter 11 reset is untouched: its target price 553.6064 = its new price 553.6064
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): no price shock on the default day: price 772.8238 -> 772.8238, jump term 0.0000 -> 0.0000
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)) the issue is the existing rule: shares x1.1, price x0.95, the waiting loss 90.0000 untouched by it
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)) KNOWN LIMIT: the regulator check does not refresh the target price (141.8072 -> 141.8072), as before R4C
+info TC-R4C-G (rights issue (BIS 7.7% after the cut)) had it been refreshed: target 141.8 before the check, 155.2 after it (shares 2528.50 -> 2781.35, equity 72.4 -> 87.2, waiting loss per share 355.94 -> 323.58)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)) the valuation stays well-defined after the issue (loss per share on the NEW share count, finite positive target 155.2)
+pre  TC-R4C-G (rights issue (BIS 7.7% after the cut)): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): the close on day 150 books 90.0000 of 90.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): the loss sits once in the published quarter: EPS -309.2 = core 14.4 - loss 323.6
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): after the close the valuation EPS is the confirmed trailing EPS -258.1000 (the temporary term is released)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): target price after the close 162.3573 = existing formula on the confirmed EPS (expected 162.3573)
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)): no double counting: valuation EPS before the close, had the quarter met its own core EPS, -258.1004 = trailing EPS after it -258.1000
+ok   TC-R4C-G (rights issue (BIS 7.7% after the cut)) the published EPS divides the loss by the shares at the close (2781.35); target 141.8 (default day) -> 162.4 (after the close): the difference is the issue and the close, not a leftover of the temporary term
+info TC-R4C-G (rights issue (BIS 7.7% after the cut)) price/target: before 772.8/727.0 | default instant 772.8/141.8 | default day end 772.0/141.8 | d+10 684.8/141.8 | close-1 456.8/141.8 | close 454.8/162.4 | c+1 463.6/162.4 | c+10 465.8/162.4 | c+30 -
+pre  TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) world: default day 75, the day-90 check issued shares 2528.50 -> 2781.35, close day 150
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): write-off 150.0000 = 30% of the loan 500.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): assets 1012.5000 -> 862.5000, book equity without the stake 162.4363 -> 12.4363 (both down by the write-off)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): equity used for valuation 12.4363 = book 12.4363 + stake value 0.0000
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): target price on the default day 66.0000 = the existing formula on the spec EPS -526.2371 (expected 66.0000)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): target price fell 727.0 -> 66.0 (the book-equity part alone would give 531.2)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): the borrower's own chapter 11 reset is untouched: its target price 922.6773 = its new price 922.6773
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): no price shock on the default day: price 772.8238 -> 772.8238, jump term 0.0000 -> 0.0000
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) the issue is the existing rule: shares x1.1, price x0.95, the waiting loss 150.0000 untouched by it; bank run jump -0.2000
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) KNOWN LIMIT: the regulator check does not refresh the target price (66.0000 -> 66.0000), as before R4C
+info TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) had it been refreshed: target 66.0 before the check, 66.0 after it (shares 2528.50 -> 2781.35, equity 12.4 -> 25.5, waiting loss per share 593.24 -> 539.31)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) the valuation stays well-defined after the issue (loss per share on the NEW share count, finite positive target 66.0)
+pre  TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): the close on day 150 books 150.0000 of 150.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): the loss sits once in the published quarter: EPS -527.5 = core 11.8 - loss 539.3
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): after the close the valuation EPS is the confirmed trailing EPS -476.4000 (the temporary term is released)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): target price after the close 66.0000 = existing formula on the confirmed EPS (expected 66.0000)
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)): no double counting: valuation EPS before the close, had the quarter met its own core EPS, -476.4301 = trailing EPS after it -476.4000
+ok   TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) the published EPS divides the loss by the shares at the close (2781.35); target 66.0 (default day) -> 66.0 (after the close): the difference is the issue and the close, not a leftover of the temporary term
+info TC-R4C-G (rights issue and bank run (BIS 1.2% after the cut)) price/target: before 772.8/727.0 | default instant 772.8/66.0 | default day end 768.4/66.0 | d+10 652.1/66.0 | close-1 300.8/66.0 | close 293.9/66.0 | c+1 298.6/66.0 | c+10 291.5/66.0 | c+30 -
+-- TC-R4C-G3 reverse split 1:10 of the bank on day 120, between the default (day 100) and the close (day 150)
+pre  TC-R4C-G3 world: default day 100, split on day 120, close day 150
+ok   TC-R4C-G3: write-off 60.0000 = 30% of the loan 200.0000 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-G3: assets 1012.5000 -> 952.5000, book equity without the stake 162.4363 -> 102.4363 (both down by the write-off)
+ok   TC-R4C-G3: equity used for valuation 102.4363 = book 102.4363 + stake value 0.0000
+ok   TC-R4C-G3: target price on the default day 200.5377 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+ok   TC-R4C-G3: target price fell 727.0 -> 200.5 (the book-equity part alone would give 602.9)
+ok   TC-R4C-G3: the borrower's own chapter 11 reset is untouched: its target price 369.0709 = its new price 369.0709
+ok   TC-R4C-G3: no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> 0.0000
+ok   TC-R4C-G3: the bank record changed in A, tg, woq only (allowed: A, woq, tg)
+ok   TC-R4C-G3: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+ok   TC-R4C-G3 the split scales the stored target price x10 (200.54 -> 2005.38); the waiting loss 60.0000 and the equity 102.4363 are not per-share numbers and do not change
+ok   TC-R4C-G3 the valuation after the split is the valuation before it x10 (200.54 -> 2005.38): loss per share, EPS history, estimate and shares are all rescaled together, nothing is counted twice
+pre  TC-R4C-G3: no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-G3: the close on day 150 books 60.0000 of 60.0000 waiting, nothing left waiting (0)
+ok   TC-R4C-G3: the loss sits once in the published quarter: EPS -2209.2 = core 163.8 - loss 2372.9
+ok   TC-R4C-G3: after the close the valuation EPS is the confirmed trailing EPS -1698.2000 (the temporary term is released)
+ok   TC-R4C-G3: target price after the close 2054.0207 = existing formula on the confirmed EPS (expected 2054.0207)
+ok   TC-R4C-G3: no double counting: valuation EPS before the close, had the quarter met its own core EPS, -1698.1645 = trailing EPS after it -1698.2000
+info TC-R4C-G3 price/target: before 795.1/727.0 | default instant 795.1/200.5 | default day end 786.6/200.5 | d+10 731.5/200.5 | close-1 5981.0/2005.4 | close 5958.3/2054.0 | c+1 6075.6/2054.0 | c+10 6115.7/2054.0 | c+30 -
+-- TC-R4C-S save and load between the default and the close (autosave and export formats; a save written before R4C)
+pre  TC-R4C-S reference run (no saving): default day 100, close day 150
+pre  TC-R4C-S autosave (full) world: saved on day 101 with 9.0000 waiting and target 415.0410
+ok   TC-R4C-S autosave (full): after loading woq 9.0000, target 415.0410 (as saved)
+ok   TC-R4C-S autosave (full): the close after loading (day 150) books 9.0000 once, nothing left waiting
+ok   TC-R4C-S autosave (full): the target price does not move between loading and the close
+ok   TC-R4C-S autosave (full): target price after that close 435.0381 = existing formula on the confirmed EPS (435.0381)
+ok   TC-R4C-S autosave (full): same close as the run without saving (net income -4.3737 vs -4.3737, target 435.0381 vs 435.0381)
+pre  TC-R4C-S export (packS(1), histories left out) world: saved on day 101 with 9.0000 waiting and target 415.0410
+ok   TC-R4C-S export (packS(1), histories left out): after loading woq 9.0000, target 415.0410 (as saved)
+ok   TC-R4C-S export (packS(1), histories left out): the close after loading (day 150) books 9.0000 once, nothing left waiting
+ok   TC-R4C-S export (packS(1), histories left out): the target price does not move between loading and the close
+ok   TC-R4C-S export (packS(1), histories left out): target price after that close 299.6235 = existing formula on the confirmed EPS (299.6235)
+pre  TC-R4C-S save written before R4C (target price still the stale value) world: saved on day 101 with 9.0000 waiting and target 415.0410
+ok   TC-R4C-S save written before R4C (target price still the stale value): after loading woq 9.0000, target 727.0136 (not re-valued retroactively: the stale 727.0136 stays until the close)
+ok   TC-R4C-S save written before R4C (target price still the stale value): the close after loading (day 150) books 9.0000 once, nothing left waiting
+ok   TC-R4C-S save written before R4C (target price still the stale value): the target price does not move between loading and the close
+ok   TC-R4C-S save written before R4C (target price still the stale value): target price after that close 435.0381 = existing formula on the confirmed EPS (435.0381)
+ok   TC-R4C-S save written before R4C (target price still the stale value): same close as the run without saving (net income -4.3737 vs -4.3737, target 435.0381 vs 435.0381)
+-- TC-R4C-H natural play, seed 12345: BOAX writes off its loan to JYNR (default day 431, close day 494, 286.97)
+pre  TC-R4C-H world: BOAX / JYNR default day 431, write-off 286.9702, close day 494 (1 write-offs in 560 days)
+ok   TC-R4C-H: write-off 286.9702 = 30% of the loan 956.5673 owed at the default (the existing rule, sim.js ch11x)
+ok   TC-R4C-H: assets 3315.6800 -> 3028.7098, book equity without the stake 354.4637 -> 67.4935 (both down by the write-off)
+ok   TC-R4C-H: equity used for valuation 100.5621 = book 67.4935 + stake value 33.0687 (loan-to-own stake 80.0%)
+ok   TC-R4C-H: target price on the default day 319.5010 = the existing formula on the spec EPS -1498.1139 (expected 319.5010)
+ok   TC-R4C-H: target price fell 2519.3 -> 319.5 (the book-equity part alone would give 1981.5)
+ok   TC-R4C-H: the borrower's own chapter 11 reset is untouched: its target price 351.1965 = its new price 351.1965
+ok   TC-R4C-H: no price shock on the default day: price 1532.5900 -> 1532.5900, jump term 0.0000 -> 0.0000
+ok   TC-R4C-H: the bank record changed in A, pos, tg, woq only (allowed: A, woq, tg, pos for the stake)
+ok   TC-R4C-H: eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+pre  TC-R4C-H: no other close between the default and this one (eh before the close = eh before the default)
+ok   TC-R4C-H: the close on day 494 books 286.9702 of 286.9702 waiting, nothing left waiting (0)
+ok   TC-R4C-H: the loss sits once in the published quarter: EPS -1595.6 = core 78.8 - loss 1674.5
+ok   TC-R4C-H: after the close the valuation EPS is the confirmed trailing EPS -1331.5000 (the temporary term is released)
+ok   TC-R4C-H: target price after the close 336.8173 = existing formula on the confirmed EPS (expected 336.8173)
+ok   TC-R4C-H: no double counting: valuation EPS before the close, had the quarter met its own core EPS, -1331.5466 = trailing EPS after it -1331.5000
+info TC-R4C-H stale-target check: stored target before the default 2519.2553, the formula on that day's inputs 2519.2553 (difference 0.0000%): the re-valuation moves the target by the write-off plus any drift since the last close
+ok   TC-R4C-H the target price stays 319.5010 from the default to the day before the close (63 days)
+info TC-R4C-H price/target: before 1532.6/2519.3 | default instant 1532.6/319.5 | default day end 1532.6/319.5 | d+10 1266.7/319.5 | close-1 525.0/319.5 | close 518.2/336.8 | c+1 508.4/336.8 | c+10 505.1/336.8 | c+30 432.5/336.8
+info TC-R4C-H target: before 2519.3 | default day: book-only 1981.5, with the waiting loss 319.5 | after the close 336.8
+errs 0 fails 0
+PASS t_r4c_bank_tg.js
+---- t_golden.js
+errs 0 fails 0
+PASS t_golden.js
+ALL PASS

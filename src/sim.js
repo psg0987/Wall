@@ -6,7 +6,8 @@ function impair(c,wd){c.ni-=wd;c.yni=(c.yni||0)-wd;c.er.imp=(c.er.imp||0)+wd;c.e
 for(const k in c.own)if(k[0]==="c"&&c.own[k]>=20)S.co[+k.slice(1)].eqi-=wd*c.own[k]/100;if(c.own.P||mine(c))L(c.tk+" 자산 손상차손 "+F(wd)+" (순이익에 반영)")}
 // bank loan write-off (RT-BANK-001): ch11x takes 30% of a defaulted borrower's loan off the bank's assets on the day of the
 // default and queues the same amount in woq. The bank's first close after that reports it once, after tax like an
-// impairment: tax, loss carryforward and dividends were already computed and do not change (docs/MODEL.md)
+// impairment: tax, loss carryforward and dividends were already computed and do not change (docs/MODEL.md). The default day also
+// re-values the bank's target price (end of ch11x, epsV): the asset cut is in its book equity and the waiting loss in its valuation EPS.
 function woBook(c){const w=c.woq||0;if(!(w>0))return;c.woq=0;c.ni-=w;c.yni=(c.yni||0)-w;c.er.wo=(c.er.wo||0)+w;c.er.ni=c.ni;if(c.eh&&c.eh.length)c.eh[c.eh.length-1]=Math.round(c.ni*1e5/c.sh)/10;
 for(const k in c.own)if(k[0]==="c"&&c.own[k]>=20)S.co[+k.slice(1)].eqi-=w*c.own[k]/100;if(c.own.P||mine(c))L(c.tk+" 대손상각비 "+F(w)+" (순이익에 반영)")}
 function earn(c){const r=rating(c),rt=(S.prime+SPR[r]*sprM())/100;let op;
@@ -148,9 +149,9 @@ const bkE=c=>c.A+c.cs+c.gw-c.D+(c.fmg||0);
 function ch11(c,why){const b0=bkE(c);ch11x(c,why);if(!c.dead&&c.er&&c.er.d===S.day)c.er.cap=(c.er.cap||0)+(bkE(c)-b0)}
 function ch11x(c,why){const had=c.own.P>0||mine(c);c.bk++;
 if(c.bk>=2){S.st.del++;eco("🪦 "+c.tk+" "+c.n+" 상장폐지 ("+why+")"+(had?" — 내 지분 휴지조각!":""));if(had)toast(c.tk+" 상장폐지! 지분 소멸");kill(c,.02);return}
-const b=S.co[c.ln];if(b&&!b.dead){const ls=loanOf(c)*.3;b.A-=ls;b.woq=(b.woq||0)+ls;if(mine(b))L(b.tk+" 은행: "+c.tk+" 부실로 대손 "+F(ls)+" (다음 결산 순이익에 반영)",1)}
+const b=S.co[c.ln];let wb=null;if(b&&!b.dead){const ls=loanOf(c)*.3;b.A-=ls;b.woq=(b.woq||0)+ls;if(ls>0)wb=b;if(mine(b))L(b.tk+" 은행: "+c.tk+" 부실로 대손 "+F(ls)+" (다음 결산 순이익에 반영)",1)}
 if(!c.kd&&c.A>20)fsAdd(c,.15,"법정관리");eco("💥 "+c.tk+" 법정관리 ("+why+")"+(had?" — 내 지분 소멸!":""));if(had)toast(c.tk+" 법정관리! 지분 소멸");
-if(c.pa)c.pa*=.3;for(const k of Object.keys(c.own))setOwn(c,k,0);c.priv=0;{const b=S.co[c.ln];if(b&&!b.dead&&b.kd===1&&loanOf(c)>c.A*.1){const st=Math.min(80,30+loanOf(c)/Math.max(1,c.A)*60);setOwn(c,"c"+b.id,st);c.bs["c"+b.id]=0;eco("🏦 "+b.tk+" 대출 출자전환 — 법정관리 "+c.tk+" 지분 "+st.toFixed(0)+"% 확보");if(mine(b))L("🏦 loan-to-own: "+b.tk+" 은행이 "+c.tk+" 지분 "+st.toFixed(0)+"%를 받았습니다",1);ctlAll()}}c.bh*=.4;c.bond*=.4;c.D=Math.max(0,c.A+c.cs+c.gw+pfv(c)-.15*c.A);if(c.bond>c.D)c.bond=c.D;if(c.pa>c.D-c.bond)c.pa=Math.max(0,c.D-c.bond);c.nol=0;c.mg=-1;c.p=Math.max(60,eq(c)*1e4/c.sh*.5);c.tg=c.p}
+if(c.pa)c.pa*=.3;for(const k of Object.keys(c.own))setOwn(c,k,0);c.priv=0;{const b=S.co[c.ln];if(b&&!b.dead&&b.kd===1&&loanOf(c)>c.A*.1){const st=Math.min(80,30+loanOf(c)/Math.max(1,c.A)*60);setOwn(c,"c"+b.id,st);c.bs["c"+b.id]=0;eco("🏦 "+b.tk+" 대출 출자전환 — 법정관리 "+c.tk+" 지분 "+st.toFixed(0)+"% 확보");if(mine(b))L("🏦 loan-to-own: "+b.tk+" 은행이 "+c.tk+" 지분 "+st.toFixed(0)+"%를 받았습니다",1);ctlAll()}}c.bh*=.4;c.bond*=.4;c.D=Math.max(0,c.A+c.cs+c.gw+pfv(c)-.15*c.A);if(c.bond>c.D)c.bond=c.D;if(c.pa>c.D-c.bond)c.pa=Math.max(0,c.D-c.bond);c.nol=0;c.mg=-1;c.p=Math.max(60,eq(c)*1e4/c.sh*.5);c.tg=c.p;if(wb&&!wb.dead)wb.tg=tgCalc(wb)}
 // bank b calls fraction f of borrower x's bank loan; shortfall forces asset sales, then chapter 11
 function callLoan(b,x,f){const amt=loanOf(x)*f;if(amt<1)return 0;let paid=Math.min(x.cs,amt);x.cs-=paid;let need=amt-paid;
 if(need>0&&!x.kd){fsAdd(x,Math.min(.6,need/.75/Math.max(1,x.A)),"대출 회수");const p2=Math.min(x.cs,need);x.cs-=p2;paid+=p2;need-=p2}
@@ -201,9 +202,17 @@ function l50Upd(){const a=S.co.filter(c=>!c.dead&&!c.priv).sort((x,y)=>mc(y)-mc(
 // earnings shock: a persistent part (half-life ~2.5 years, like real business momentum) plus a small one-quarter wobble
 function eShock(c,a){a*=1+(ctr(c).fx||0)*.5;c.pe=Math.max(-.5,Math.min(.5,(c.pe||0)*.93+a*.075*hgn(c.id,5)));return c.pe+(hu(c.id,8)-.5)*a*.35}
 // fair value: 70% earnings power (TTM EPS × a P/E that rises with growth, falls with rates and fear) + 30% book value
-function tgCalc(c){const eps=epsT(c),bps=Math.max(0,eq(c))*1e4/c.sh,mu=Math.max(4,Math.min(26,7+c.g*55+(7.5-S.prime)*1.1+S.mood*8));let t=Math.max(60,eps>0?.7*eps*mu+.3*bps:bps*.45);if(c.i===HOLD)t=Math.max(t,bps*.85);return t*cvm(c)}
+function tgCalc(c){const eps=epsV(c),bps=Math.max(0,eq(c))*1e4/c.sh,mu=Math.max(4,Math.min(26,7+c.g*55+(7.5-S.prime)*1.1+S.mood*8));let t=Math.max(60,eps>0?.7*eps*mu+.3*bps:bps*.45);if(c.i===HOLD)t=Math.max(t,bps*.85);return t*cvm(c)}
 // trailing-12-month EPS (원, annual): the market values a company on its last four quarters, not one noisy quarter
 function epsT(c){const h=c.eh;if(!h||!h.length)return c.ni*4e4/c.sh;const n=Math.min(4,h.length);let s=0;for(let j=h.length-n;j<h.length;j++)s+=h[j];return s*4/n}
+// EPS the target price is valued on. Normally epsT. While a bank has a loan write-off booked in its assets but not yet in its
+// earnings (woq > 0, RT-BANK-R4C), the market already knows the quarter that will carry it, so the valuation uses the trailing
+// year as it will stand after that report if the report meets consensus: the expected core EPS (est) minus the waiting loss per
+// share, in place of the oldest quarter. This is the shape the close pushes into eh (core - wo, rounded), but it only reads: eh,
+// ni, er, yni and the other records are untouched, and woBook clears woq before the close's tgCalc, so the loss is never in both.
+function epsV(c){const w=c.woq||0;if(!(w>0))return epsT(c);const h=c.eh||[],m=h.length,n=Math.min(4,m+1),e1=c.ni*1e4/c.sh;
+let core=c.est!=null&&isFinite(c.est)?c.est:null;if(core==null){const k=Math.min(4,m);core=k?h.slice(m-k).reduce((a,v)=>a+v,0)/k:e1}
+let s=core-w*1e4/c.sh;for(let j=m-(n-1);j<m;j++)s+=h[j];return s*4/n}
 // ---------- daily factors ----------
 function mktDay(){const M=S.mk;M.h=Math.min(.0016,Math.max(2e-5,1.2e-6+.07*M.r*M.r+.91*M.h));const sd=Math.sqrt(M.h),b=.00012+S.mood*.0007,e=sd*gzt(),j=M.j||0;M.j=0;
 const r=Math.max(-.2,Math.min(.15,b+j+e));M.r=r;M.c=[b,j,e];M.why=M.jw||"";M.jw="";

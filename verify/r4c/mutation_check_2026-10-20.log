@@ -1,0 +1,76 @@
+ok   none (the unmodified game) -> passes
+ok   M1 tgCalc values on epsT again (the waiting loss is not in the valuation EPS) -> CAUGHT by R4C test (26 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-A1 natural seed 12345 x 720 days: 4170 target-price calculations (1 of them with a write-off waiting) all equal to the spec MISMATCH BOAX day 431 (waiting 286.97): 1981.4665 vs 319.5010
+       FAIL TC-R4C-B1 (strong): target price on the default day 602.8557 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+       FAIL TC-R4C-B2 (strong, loan-to-own): target price on the default day 629.0855 = the existing formula on the spec EPS -170.2948 (expected 239.8824)
+ok   M2 the waiting loss is subtracted twice -> CAUGHT by R4C test (9 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-B1 (mild): target price on the default day 300.3795 = the existing formula on the spec EPS 31.4058 (expected 415.0410)
+       FAIL TC-R4C-B2 (mild, loan-to-own): target price on the default day 322.0769 = the existing formula on the spec EPS 31.4058 (expected 429.5059)
+       FAIL TC-R4C-B3 (no published quarter): target price on the default day 306.1815 = the existing formula on the spec EPS 13.0492 (expected 302.0882)
+ok   M3 the waiting loss is not subtracted (only the book equity cut reaches tg) -> CAUGHT by R4C test (26 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-A1 natural seed 12345 x 720 days: 4170 target-price calculations (1 of them with a write-off waiting) all equal to the spec MISMATCH BOAX day 431 (waiting 286.97): 1981.9810 vs 319.5010
+       FAIL TC-R4C-B1 (strong): target price on the default day 591.9131 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+       FAIL TC-R4C-B2 (strong, loan-to-own): target price on the default day 618.1429 = the existing formula on the spec EPS -170.2948 (expected 239.8824)
+ok   M4 the waiting quarter keeps all four old quarters and divides by one more (window off by one) -> CAUGHT by R4C test (7 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-B1 (mild): target price on the default day 534.7256 = the existing formula on the spec EPS 31.4058 (expected 415.0410)
+       FAIL TC-R4C-B2 (mild, loan-to-own): target price on the default day 549.1906 = the existing formula on the spec EPS 31.4058 (expected 429.5059)
+       FAIL TC-R4C-C1 (mild) first: target price on the default day 619.7855 = the existing formula on the spec EPS 43.2705 (expected 500.1008)
+ok   M5 the window does not count the waiting quarter (n = min(4, m)) -> CAUGHT by R4C test (2 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-B3 (no published quarter): target price fell 2310.9 -> Infinity (the book-equity part alone would give 2306.2)
+       FAIL TC-R4C-B3 (two published quarters): target price on the default day 295.6100 = the existing formula on the spec EPS 22.5410 (expected 366.3002)
+ok   M6 the expected core EPS ignores the analysts' estimate (average of the history instead) -> CAUGHT by R4C test (8 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-B1 (mild): target price on the default day 423.5899 = the existing formula on the spec EPS 31.4058 (expected 415.0410)
+       FAIL TC-R4C-B2 (mild, loan-to-own): target price on the default day 438.0549 = the existing formula on the spec EPS 31.4058 (expected 429.5059)
+       FAIL TC-R4C-B3 (no published quarter): target price on the default day 1878.6632 = the existing formula on the spec EPS 13.0492 (expected 302.0882)
+ok   M7 woBook does not clear the queue (the loss stays in the valuation after the close) -> CAUGHT by R4C test (50 FAIL = calculation differs, 1 ERR = precondition/other) | older bank tests/REG-01: t_bank_writeoff_cases.js, t_reg01_bank_imp_wo.js
+       FAIL TC-R4C-B1 (strong): the close on day 150 books 60.0000 of 60.0000 waiting, nothing left waiting (60)
+       FAIL TC-R4C-B1 (strong): after the close the valuation EPS is the confirmed trailing EPS -169.8000 (the temporary term is released)
+       FAIL TC-R4C-B2 (strong, loan-to-own): the close on day 150 books 60.0000 of 60.0000 waiting, nothing left waiting (60)
+ok   M8 the queue is cleared after the close's tgCalc (woBook moved behind the target price) -> CAUGHT by R4C test (11 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: t_reg01_bank_imp_wo.js
+       FAIL TC-R4C-B1 (mild): target price after the close 434.3937 = existing formula on the confirmed EPS (expected 435.0381)
+       FAIL TC-R4C-B2 (mild, loan-to-own): target price after the close 448.8587 = existing formula on the confirmed EPS (expected 449.5031)
+       FAIL TC-R4C-B3 (no published quarter): target price after the close 454.4563 = existing formula on the confirmed EPS (expected 258.3257)
+ok   M9 no re-valuation on the default day (the old behaviour) -> CAUGHT by R4C test (67 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-B1 (strong): target price on the default day 727.0136 = the existing formula on the spec EPS -170.2948 (expected 200.5377)
+       FAIL TC-R4C-B1 (strong): target price fell 727.0 -> 727.0 (the book-equity part alone would give 602.9)
+       FAIL TC-R4C-B1 (strong): the bank record changed in A, woq only (allowed: A, woq, tg)
+ok   M10 every live bank is re-valued on a default, not only the lender -> CAUGHT by R4C test (1 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-D the bank whose borrower does not default keeps its target price and queues nothing
+ok   M11 the borrower is re-valued instead of its reset price being kept -> CAUGHT by R4C test (21 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-B1 (strong): the borrower's own chapter 11 reset is untouched: its target price 12406.4712 = its new price 369.0709
+       FAIL TC-R4C-B2 (strong, loan-to-own): the borrower's own chapter 11 reset is untouched: its target price 12177.9579 = its new price 60.0000
+       FAIL TC-R4C-B1 (mild): the borrower's own chapter 11 reset is untouched: its target price 11027.0343 = its new price 60.0000
+ok   M12 the re-valuation also runs when nothing was written off (guard ls>0 removed) -> CAUGHT by R4C test (1 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-A2 nothing written off (0.0000): the bank record changed in [tg], target price 727.0136 -> 850.1934
+ok   M13 the re-valuation happens before the loan-to-own stake is registered (stake not in equity) -> CAUGHT by R4C test (3 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-B2 (strong, loan-to-own): target price on the default day 200.5377 = the existing formula on the spec EPS -170.2948 (expected 239.8824)
+       FAIL TC-R4C-B2 (mild, loan-to-own): target price on the default day 415.0410 = the existing formula on the spec EPS 31.4058 (expected 429.5059)
+       FAIL TC-R4C-H: target price on the default day 214.4369 = the existing formula on the spec EPS -1498.1139 (expected 319.5010)
+ok   M14 an immediate price shock of -6% on the bank -> CAUGHT by R4C test (40 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-B1 (strong): no price shock on the default day: price 795.0521 -> 747.3489, jump term 0.0000 -> 0.0000
+       FAIL TC-R4C-B1 (strong): the bank record changed in A, p, tg, woq only (allowed: A, woq, tg)
+       FAIL TC-R4C-B2 (strong, loan-to-own): no price shock on the default day: price 795.0521 -> 747.3489, jump term 0.0000 -> 0.0000
+ok   M15 a jump term of -0.05 on the bank -> CAUGHT by R4C test (40 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-B1 (strong): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> -0.0500
+       FAIL TC-R4C-B1 (strong): the bank record changed in A, tg, woq, jx only (allowed: A, woq, tg)
+       FAIL TC-R4C-B2 (strong, loan-to-own): no price shock on the default day: price 795.0521 -> 795.0521, jump term 0.0000 -> -0.0500
+ok   M16 a post-default drift (pd/pdn) on the bank -> CAUGHT by R4C test (21 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-B1 (strong): the bank record changed in A, tg, woq, pd, pdn only (allowed: A, woq, tg)
+       FAIL TC-R4C-B2 (strong, loan-to-own): the bank record changed in A, pos, tg, woq, pd, pdn only (allowed: A, woq, tg, pos for the stake)
+       FAIL TC-R4C-B1 (mild): the bank record changed in A, tg, woq, pd, pdn only (allowed: A, woq, tg)
+ok   M17 the loss is booked early in the yearly net income -> CAUGHT by R4C test (40 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-B1 (strong): the bank record changed in A, tg, woq, yni only (allowed: A, woq, tg)
+       FAIL TC-R4C-B1 (strong): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+       FAIL TC-R4C-B2 (strong, loan-to-own): the bank record changed in A, pos, tg, woq, yni only (allowed: A, woq, tg, pos for the stake)
+ok   M18 the estimate is lowered by the loss (est manipulation) -> CAUGHT by R4C test (43 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-B1 (strong): the bank record changed in A, tg, woq, est only (allowed: A, woq, tg)
+       FAIL TC-R4C-B1 (strong): eh, ni, yni, eqi, est unchanged by the default (the loss is not booked early)
+       FAIL TC-R4C-B2 (strong, loan-to-own): the bank record changed in A, pos, tg, woq, est only (allowed: A, woq, tg, pos for the stake)
+ok   M19 a price floor for negative-equity banks inside tgCalc -> CAUGHT by R4C test (2 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: none catch it
+       FAIL TC-R4C-F (loan 600) book equity 162.4 -> -17.6: target price 246.9349 = the existing formula on the spec EPS (66.0000) with no extra floor or guard
+       FAIL TC-R4C-F (loan 800) book equity 162.4 -> -77.6: target price 229.1378 = the existing formula on the spec EPS (66.0000) with no extra floor or guard
+ok   M20 a second write-off overwrites the queue instead of adding -> CAUGHT by R4C test (4 FAIL = calculation differs, 0 ERR = precondition/other) | older bank tests/REG-01: t_bank_writeoff_cases.js
+       FAIL TC-R4C-C1 (strong) after the second default the bank is the same as after one combined write-off (assets, cash, deposits, waiting loss, equity, target price 83.0767 vs 83.0767): differing woq
+       FAIL TC-R4C-C1 (strong) and the close is the same: net income -71.4294 vs -116.4294, target price 87.2709 vs 87.2709
+       FAIL TC-R4C-C1 (mild) after the second default the bank is the same as after one combined write-off (assets, cash, deposits, waiting loss, equity, target price 407.2102 vs 244.9214): differing woq,tg
+ALL MUTANTS CAUGHT (documented survivors aside), unmodified game passes

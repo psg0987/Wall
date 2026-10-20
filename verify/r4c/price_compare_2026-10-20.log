@@ -1,0 +1,22 @@
+BOAX, natural seed 12345 (default day 431, close day 494). price p and target tg: main | branch (R4C)
+day       p main    tg main |   p branch  tg branch |   p b/m     woq | note
+429       1507.1     2519.3 |     1507.1     2519.3 |   1.000     0.0 | 
+430       1517.9     2519.3 |     1517.9     2519.3 |   1.000     0.0 | day before the default
+431       1532.6     2519.3 |     1532.6      319.5 |   1.000   287.0 | JYNR chapter 11: BOAX assets -286.97, woq 286.97
+432       1527.7     2519.3 |     1508.9      319.5 |   0.988   287.0 | 
+436       1508.0     2519.3 |     1418.5      319.5 |   0.941   287.0 | 
+441       1429.1     2519.3 |     1266.7      319.5 |   0.886   287.0 | 
+446       1309.5     2519.3 |     1095.7      319.5 |   0.837   287.0 | 
+461       1065.7     2519.3 |      757.7      319.5 |   0.711   287.0 | 
+476       1037.3     2519.3 |      635.6      319.5 |   0.613   287.0 | 
+493        998.7     2519.3 |      525.0      319.5 |   0.526   287.0 | 
+494        982.4      346.8 |      518.2      336.8 |   0.527     0.0 | BOAX close: loss booked (er.wo 286.97), woq cleared
+495        960.4      346.8 |      508.4      336.8 |   0.529     0.0 | day after the close
+499        941.6      346.8 |      505.7      336.8 |   0.537     0.0 | 
+504        924.1      346.8 |      505.1      336.8 |   0.547     0.0 | 
+524        741.3      346.8 |      432.5      336.8 |   0.583     0.0 | 
+554        417.2      346.8 |      264.8      336.8 |   0.635     0.0 | 
+analyst rating changes of BOAX from day 431 (main, -2 sell .. 2 buy; each step adds a -0.012 jump when market cap >= 1500): 1
+    day 450: rating 2 -> null (target null, price 1003.6)
+analyst rating changes of BOAX from day 431 (branch, -2 sell .. 2 buy; each step adds a -0.012 jump when market cap >= 1500): 1
+    day 450: rating 2 -> null (target null, price 802.9)
