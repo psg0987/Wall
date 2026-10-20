@@ -1,0 +1,5 @@
+# golden after fix, 2026-10-20T08:35:40Z
+---- t_golden.js
+errs 0 fails 0
+PASS t_golden.js
+ALL PASS

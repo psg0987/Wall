@@ -1,0 +1,16 @@
+ok   V0 unchanged test -> PASS, summary 0 0, FIXTURE INVALID lines 0, other ERR 0, exceptions 0
+ok   V1 the bank never closes (run stops after 20 days, before the day-60 close) -> FAIL, summary 7 0, FIXTURE INVALID lines 7, other ERR 0, exceptions 0
+       ERR  FIXTURE INVALID: case A: the bank did not close within the run (no close record) (case A); the case is not judged
+       ERR  FIXTURE INVALID: case B: the bank did not close within the run (no close record) (case B); the case is not judged
+       ERR  FIXTURE INVALID: case C: the bank did not close within the run (no close record) (case C); the case is not judged
+       ERR  FIXTURE INVALID: case D: the bank did not close within the run (no close record) (case D); the case is not judged
+ok   V2 the bank is gone after the close of case C only -> FAIL, summary 1 0, FIXTURE INVALID lines 1, other ERR 0, exceptions 0
+       ERR  FIXTURE INVALID: case C: the bank is gone after its close (case C); the case is not judged
+ok   V3 close recorded but the statement tabs not read (R.cf missing) -> FAIL, summary 7 0, FIXTURE INVALID lines 7, other ERR 0, exceptions 0
+       ERR  FIXTURE INVALID: case A: the statement tabs could not be read after the close (case A); the case is not judged
+       ERR  FIXTURE INVALID: case B: the statement tabs could not be read after the close (case B); the case is not judged
+       ERR  FIXTURE INVALID: case C: the statement tabs could not be read after the close (case C); the case is not judged
+       ERR  FIXTURE INVALID: case D: the statement tabs could not be read after the close (case D); the case is not judged
+ok   V4 only one twin has no close (twin Cimp stops after 20 days) -> FAIL, summary 1 0, FIXTURE INVALID lines 1, other ERR 0, exceptions 0
+       ERR  FIXTURE INVALID: twin Cimp: the bank did not close within the run (no close record) (case C); the case is not judged
+error classification works

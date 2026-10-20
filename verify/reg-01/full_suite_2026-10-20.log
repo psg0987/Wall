@@ -1,0 +1,18 @@
+# REG-01 full suite after check() guard fix, 2026-10-20T08:32:01Z, branch rt-reg-01, base 954cdfabda5a58cef9870637c3250db7adf22e45, node v22.22.0
+# dist/game.js sha256 8ab99f982b32b138…  tests/t_reg01_bank_imp_wo.js sha256 65af237f760ad3cd…
+built dist/raider.html 661358 bytes
+PASS t12_sim.js
+PASS t13_ui.js
+PASS t14_advisor.js
+PASS t18_ai_native.js
+PASS t18_ai_web.js
+PASS t_clean_surplus.js
+PASS t_close_spec.js
+PASS t_impair_ui.js
+PASS t_bank_writeoff.js
+PASS t_bank_writeoff_cases.js
+PASS t_bank_writeoff_cashflow.js
+PASS t_reg01_bank_imp_wo.js
+PASS t_golden.js
+ALL PASS
+exit 0

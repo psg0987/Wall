@@ -111,8 +111,18 @@ function run(kind, opt) {
   return R;
 }
 
+// is there a usable close to judge? A missing close (the bank never closed, or died in it) is a broken FIXTURE, reported as
+// `ERR  FIXTURE INVALID` (counts in errs), never a JavaScript exception and never a silent pass
+function usable(R, label) {
+  const why = !R || !R.rec ? 'the bank did not close within the run (no close record)' : !R.rec.s || !R.rec.er ? 'the close record is incomplete' :
+    R.rec.dead || R.b.dead ? 'the bank is gone after its close' : !R.cf || !R.op || !R.is ? 'the statement tabs could not be read after the close' : '';
+  if (why) pre(false, label + ': ' + why + ' (' + (R ? 'case ' + R.kind : 'no run') + '); the case is not judged');
+  return !why;
+}
+
 // ---- expected values: from the inputs (fixture + snapshot T2) and the stated rules, never from the run's own outputs ----
 function expectOf(R) {
+  if (!R || !R.rec) return null;
   const { T, rec, opt, kind } = R, s = rec.s, er = rec.er, K = KIND[kind], E = {};
   E.ls = K.def ? 0.3 * T.loan : 0;                                 // [R] sim.js ch11x: 30% of the borrower's bank loan
   E.woRep = K.def && !opt.dropWo ? E.ls : 0;                       //     what woBook reports in this close
@@ -143,6 +153,7 @@ function expectOf(R) {
 
 // ---- one world ---------------------------------------------------------------------------------------------------
 function check(R, E, label) {
+  if (!E || !usable(R, label)) return;
   const { T, rec, entry, opt, kind } = R, s = rec.s, er = rec.er, K = KIND[kind], full = !opt.dropWo && !opt.noImp, q = fqo(rec.fq);
   const imp = er.imp || 0, wo = er.wo || 0, cap = er.cap || 0;
   // preconditions
@@ -209,15 +220,15 @@ try {
   for (const kind of ['A', 'B', 'C', 'D']) {
     const R = run(kind), tag = 'case ' + kind;
     run1[kind] = R;
-    if (!R.rec) { pre(false, tag + ': the bank closed within 120 days'); continue }
+    if (!usable(R, tag)) continue;
     R.E = expectOf(R); check(R, R.E, tag);
   }
 
   // ---- four twins of case C on one economic path ---------------------------------------------------------------
   console.log('-- REG-01 twins of case C: same economic path, the charge left out is the only difference');
   const tw = { C: run1.C, Cwo: run('C', { noImp: true }), Cimp: run('C', { dropWo: true }), C0: run('C', { dropWo: true, noImp: true }) };
-  for (const k of ['Cwo', 'Cimp', 'C0']) { const R = tw[k]; if (!R.rec) { pre(false, 'twin ' + k + ': the bank closed'); continue } R.E = expectOf(R); check(R, R.E, 'twin ' + k) }
-  if (tw.C.rec && tw.Cwo.rec && tw.Cimp.rec && tw.C0.rec) {
+  for (const k of ['Cwo', 'Cimp', 'C0']) { const R = tw[k]; if (!usable(R, 'twin ' + k)) continue; R.E = expectOf(R); check(R, R.E, 'twin ' + k) }
+  if (['C', 'Cwo', 'Cimp', 'C0'].every(k => tw[k].E && usable(tw[k], 'twins ' + k + ' (comparison)'))) {
     const rs = [tw.C, tw.Cwo, tw.Cimp, tw.C0], E = tw.C.E, v = (R, f) => f(R.rec);
     const sameAll = f => rs.every(R => near(v(R, f), v(rs[0], f), 1e-12));
     ok(sameAll(r => r.A) && sameAll(r => r.cs) && sameAll(r => r.D) && sameAll(r => r.gw) && sameAll(r => r.bk) && sameAll(r => r.ds) && sameAll(r => r.sh) && sameAll(r => r.er.cap || 0) && sameAll(r => r.er.tax) && sameAll(r => r.er.dv) && sameAll(r => r.er.op) && sameAll(r => r.llr),

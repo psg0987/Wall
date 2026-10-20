@@ -1,0 +1,194 @@
+# REG-01 verbose after fix, 2026-10-20T08:35:47Z, test sha256 65af237f760ad3cd…
+---- t_reg01_bank_imp_wo.js
+-- REG-01 cases A (impairment only), B (write-off only), C (both), D (neither): SYNTHETIC inputs (ds, eqi, capital set), expectations from stated rules
+pre  case A: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  case A: no borrower defaulted
+pre  case A: waiting before the close 0.0000 = 0
+pre  case A: T2 assets 1000.0000 = T1 (no cut) 1000: nothing else moved the assets between the cut and the close
+pre  case A: ds 3, no loss carryforward, no parent, dividends allowed, pre-tax 4.3330 > 0, no share issue, equity 60.0000 > 0
+pre  case A: this case has impairment by the rule (ds -> 4, debt/equity 15.7, equity before test 61.8199)
+pre  case A: holdings value unchanged until the impairment and no cash sweep (cash 21.8199 <= 121.5000)
+ok   case A [R] the impairment happens exactly when the rule says (ds streak and thresholds): true vs true
+ok   case A [R] T3 assets 646.9301 = T2 1000.0000 + growth 12.5000 - impairment 365.5699
+ok   case A [R] the close cut 365.5699 from the assets (expected 365.5699 = equity before test + 0.3 x assets) and the write-off cut none: record imp 365.5699 (expected 365.5699)
+ok   case A [R] write-off reported 0.0000 (expected 0.0000), nothing waiting after (0)
+ok   case A [R] impairment leaves equity -303.7500 = -30% of assets -303.7500 -> the bank's chapter 11 (0->1), debt 972.5000 -> 571.7105, debt relief cap 400.7895 (expected 400.7895)
+ok   case A [R] net income -462.5368 = before charges -96.9669 - write-off 0.0000 - impairment 365.5699
+ok   case A [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   case A [R] tax 1.2999 = 30% of pre-tax 4.3330 and dividends 1.2132 are the same whatever was written off or impaired
+ok   case A [I] cash 20.0000 -> 21.8199 = + cash profit - tax - dividends = 21.8199 (no write-off or impairment moved cash)
+ok   case A [I] book equity change of the close = net income - equity-method - dividends received - dividends paid + capital transactions + write-off already out of the assets: residual 0.0000
+ok   case A [R] quarter record: day 60, ni -463, imp 366, wo 0 (24 fields)
+ok   case A [R] EPS record -1829.3 won (net income x 1e4 / shares = -1829.29), yearly net income +-462.5368, 25% holder's equity-method income -115.6342 = 25% of net income -115.6342
+ok   case A [R] reserve llr 10.0000 -> 11.3750 = roll-forward of the statistical loss only (expected 11.3750); write-off and impairment do not touch it
+ok   case A [M] model rule cfo = cash profit - tax + dividends received: 3.0331; add-back form 3.0331; statement shows 3.0 (rounding allowed 1.60)
+ok   case A [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 366 (expected shown 366), record fields 24/22/22/22/22/22/22/22
+ok   case A [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.15; newest -463 + 0.0 + 100 + 366 = 3.0)
+ok   case A [R] 손익 tab: 자산 손상차손 row -366, 대손상각비 row hidden, net income -463, EPS -1,831
+info case A [O] FIN-CF-01, recorded only, not judged: debt change dD -4061.0 | debt relief cap 400.7895 | financing cff -4062.2 | other oth 3698.2 | cash change -361.0 (previous quarter row is the synthetic start-of-game row)
+pre  case B: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  case B: the borrower defaulted on day 25, before the close, on a day that is not a bank close day
+pre  case B: waiting before the close 60.1478 = what the cut queued 60.1478
+pre  case B: T2 assets 939.8522 = T1 939.8522: nothing else moved the assets between the cut and the close
+pre  case B: ds 0, no loss carryforward, no parent, dividends allowed, pre-tax 3.5418 > 0, no share issue, equity 39.6947 > 0
+pre  case B: this case has no impairment by the rule (ds -> 1, debt/equity 23.6, equity before test 41.1822)
+pre  case B: holdings value unchanged until the impairment and no cash sweep (cash 21.4876 <= 114.1920)
+ok   case B [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 939.8522, llr untouched (10.0000)
+ok   case B [R] the impairment happens exactly when the rule says (ds streak and thresholds): false vs false
+ok   case B [R] T3 assets 951.6003 = T2 939.8522 + growth 11.7482 - impairment 0.0000
+ok   case B [R] the close cut 0.0000 from the assets (expected 0.0000 = equity before test + 0.3 x assets) and the write-off cut none: record imp 0.0000 (expected 0.0000)
+ok   case B [R] write-off reported 60.1478 (expected 60.1478), nothing waiting after (0)
+ok   case B [R] no chapter 11, no debt relief, debt 971.7482, ds 0 -> 1
+ok   case B [R] net income -157.6685 = before charges -97.5207 - write-off 60.1478 - impairment 0.0000
+ok   case B [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   case B [R] tax 1.0625 = 30% of pre-tax 3.5418 and dividends 0.9917 are the same whatever was written off or impaired
+ok   case B [I] cash 20.0000 -> 21.4876 = + cash profit - tax - dividends = 21.4876 (no write-off or impairment moved cash)
+ok   case B [I] book equity change of the close = net income - equity-method - dividends received - dividends paid + capital transactions + write-off already out of the assets: residual 0.0000
+ok   case B [I] window T0 -> T3: the cut is inside net income, one deduction only: residual 0.0000
+ok   case B [R] quarter record: day 60, ni -158, imp 0, wo 60 (24 fields)
+ok   case B [R] EPS record -623.6 won (net income x 1e4 / shares = -623.57), yearly net income +-157.6685, 25% holder's equity-method income -39.4171 = 25% of net income -39.4171
+ok   case B [R] reserve llr 10.0000 -> 10.9916 = roll-forward of the statistical loss only (expected 10.9916); write-off and impairment do not touch it
+ok   case B [M] model rule cfo = cash profit - tax + dividends received: 2.4793; add-back form 2.4793; statement shows 2.0 (rounding allowed 1.60)
+ok   case B [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 60.0 (expected shown 60.0), record fields 24/22/22/22/22/22/22/22
+ok   case B [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.15; newest -158 + 0.0 + 100 + 60.0 = 2.0)
+ok   case B [R] 손익 tab: 자산 손상차손 row hidden, 대손상각비 row -60.0, net income -158, EPS -625
+info case B [O] FIN-CF-01, recorded only, not judged: debt change dD -3661.0 | debt relief cap 0.0000 | financing cff -3662.0 | other oth 3298.0 | cash change -362.0 (previous quarter row is the synthetic start-of-game row)
+pre  case C: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  case C: the borrower defaulted on day 25, before the close, on a day that is not a bank close day
+pre  case C: waiting before the close 60.1478 = what the cut queued 60.1478
+pre  case C: T2 assets 939.8522 = T1 939.8522: nothing else moved the assets between the cut and the close
+pre  case C: ds 3, no loss carryforward, no parent, dividends allowed, pre-tax 3.5418 > 0, no share issue, equity 39.6947 > 0
+pre  case C: this case has impairment by the rule (ds -> 4, debt/equity 23.6, equity before test 41.1822)
+pre  case C: holdings value unchanged until the impairment and no cash sweep (cash 21.4876 <= 114.1920)
+ok   case C [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 939.8522, llr untouched (10.0000)
+ok   case C [R] the impairment happens exactly when the rule says (ds streak and thresholds): true vs true
+ok   case C [R] T3 assets 624.9380 = T2 939.8522 + growth 11.7482 - impairment 326.6623
+ok   case C [R] the close cut 326.6623 from the assets (expected 326.6623 = equity before test + 0.3 x assets) and the write-off cut none: record imp 326.6623 (expected 326.6623)
+ok   case C [R] write-off reported 60.1478 (expected 60.1478), nothing waiting after (0)
+ok   case C [R] impairment leaves equity -285.4801 = -30% of assets -285.4801 -> the bank's chapter 11 (0->1), debt 971.7482 -> 592.5273, debt relief cap 379.2208 (expected 379.2208)
+ok   case C [R] net income -484.3309 = before charges -97.5207 - write-off 60.1478 - impairment 326.6623
+ok   case C [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   case C [R] tax 1.0625 = 30% of pre-tax 3.5418 and dividends 0.9917 are the same whatever was written off or impaired
+ok   case C [I] cash 20.0000 -> 21.4876 = + cash profit - tax - dividends = 21.4876 (no write-off or impairment moved cash)
+ok   case C [I] book equity change of the close = net income - equity-method - dividends received - dividends paid + capital transactions + write-off already out of the assets: residual -0.0000
+ok   case C [I] window T0 -> T3: the cut is inside net income, one deduction only: residual 0.0000
+ok   case C [R] quarter record: day 60, ni -484, imp 327, wo 60 (24 fields)
+ok   case C [R] EPS record -1915.5 won (net income x 1e4 / shares = -1915.49), yearly net income +-484.3309, 25% holder's equity-method income -121.0827 = 25% of net income -121.0827
+ok   case C [R] reserve llr 10.0000 -> 10.9916 = roll-forward of the statistical loss only (expected 10.9916); write-off and impairment do not touch it
+ok   case C [M] model rule cfo = cash profit - tax + dividends received: 2.4793; add-back form 2.4793; statement shows 3.0 (rounding allowed 2.05)
+ok   case C [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 387 (expected shown 387), record fields 24/22/22/22/22/22/22/22
+ok   case C [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.15; newest -484 + 0.0 + 100 + 387 = 3.0)
+ok   case C [R] 손익 tab: 자산 손상차손 row -327, 대손상각비 row -60.0, net income -484, EPS -1,914
+info case C [O] FIN-CF-01, recorded only, not judged: debt change dD -4040.0 | debt relief cap 379.2208 | financing cff -4041.0 | other oth 3676.0 | cash change -362.0 (previous quarter row is the synthetic start-of-game row)
+pre  case D: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  case D: no borrower defaulted
+pre  case D: waiting before the close 0.0000 = 0
+pre  case D: T2 assets 1000.0000 = T1 (no cut) 1000: nothing else moved the assets between the cut and the close
+pre  case D: ds 0, no loss carryforward, no parent, dividends allowed, pre-tax 4.3330 > 0, no share issue, equity 60.0000 > 0
+pre  case D: this case has no impairment by the rule (ds -> 1, debt/equity 15.7, equity before test 61.8199)
+pre  case D: holdings value unchanged until the impairment and no cash sweep (cash 21.8199 <= 121.5000)
+ok   case D [R] the impairment happens exactly when the rule says (ds streak and thresholds): false vs false
+ok   case D [R] T3 assets 1012.5000 = T2 1000.0000 + growth 12.5000 - impairment 0.0000
+ok   case D [R] the close cut 0.0000 from the assets (expected 0.0000 = equity before test + 0.3 x assets) and the write-off cut none: record imp 0.0000 (expected 0.0000)
+ok   case D [R] write-off reported 0.0000 (expected 0.0000), nothing waiting after (0)
+ok   case D [R] no chapter 11, no debt relief, debt 972.5000, ds 0 -> 1
+ok   case D [R] net income -96.9669 = before charges -96.9669 - write-off 0.0000 - impairment 0.0000
+ok   case D [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   case D [R] tax 1.2999 = 30% of pre-tax 4.3330 and dividends 1.2132 are the same whatever was written off or impaired
+ok   case D [I] cash 20.0000 -> 21.8199 = + cash profit - tax - dividends = 21.8199 (no write-off or impairment moved cash)
+ok   case D [I] book equity change of the close = net income - equity-method - dividends received - dividends paid + capital transactions + write-off already out of the assets: residual -0.0000
+ok   case D [R] quarter record: day 60, ni -97, imp 0, wo 0 (24 fields)
+ok   case D [R] EPS record -383.5 won (net income x 1e4 / shares = -383.50), yearly net income +-96.9669, 25% holder's equity-method income -24.2417 = 25% of net income -24.2417
+ok   case D [R] reserve llr 10.0000 -> 11.3750 = roll-forward of the statistical loss only (expected 11.3750); write-off and impairment do not touch it
+ok   case D [M] model rule cfo = cash profit - tax + dividends received: 3.0331; add-back form 3.0331; statement shows 3.0 (rounding allowed 1.15)
+ok   case D [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) hidden (expected hidden), record fields 24/22/22/22/22/22/22/22
+ok   case D [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.10; newest -97.0 + 0.0 + 100 = 3.0)
+ok   case D [R] 손익 tab: 자산 손상차손 row hidden, 대손상각비 row hidden, net income -97.0, EPS -384
+info case D [O] FIN-CF-01, recorded only, not judged: debt change dD -3660.0 | debt relief cap 0.0000 | financing cff -3661.2 | other oth 3297.2 | cash change -361.0 (previous quarter row is the synthetic start-of-game row)
+-- REG-01 twins of case C: same economic path, the charge left out is the only difference
+pre  twin Cwo: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  twin Cwo: the borrower defaulted on day 25, before the close, on a day that is not a bank close day
+pre  twin Cwo: waiting before the close 60.1478 = what the cut queued 60.1478
+pre  twin Cwo: T2 assets 939.8522 = T1 939.8522: nothing else moved the assets between the cut and the close
+pre  twin Cwo: ds 3, no loss carryforward, no parent, dividends allowed, pre-tax 3.5418 > 0, no share issue, equity 39.6947 > 0
+pre  twin Cwo: this case has impairment by the rule (ds -> 4, debt/equity 23.6, equity before test 41.1822)
+pre  twin Cwo: holdings value unchanged until the impairment and no cash sweep (cash 21.4876 <= 114.1920)
+ok   twin Cwo [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 939.8522, llr untouched (10.0000)
+ok   twin Cwo [R] the impairment happens exactly when the rule says (ds streak and thresholds): true vs true
+ok   twin Cwo [R] T3 assets 624.9380 = T2 939.8522 + growth 11.7482 - impairment 326.6623
+ok   twin Cwo [R] the close cut 326.6623 from the assets (expected 326.6623 = equity before test + 0.3 x assets) and the write-off cut none: record imp 0.0000 (expected 0.0000)
+ok   twin Cwo [R] write-off reported 60.1478 (expected 60.1478), nothing waiting after (0)
+ok   twin Cwo [R] impairment leaves equity -285.4801 = -30% of assets -285.4801 -> the bank's chapter 11 (0->1), debt 971.7482 -> 592.5273, debt relief cap 379.2208 (expected 379.2208)
+ok   twin Cwo [R] net income -157.6685 = before charges -97.5207 - write-off 60.1478 - impairment 0.0000
+ok   twin Cwo [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   twin Cwo [R] tax 1.0625 = 30% of pre-tax 3.5418 and dividends 0.9917 are the same whatever was written off or impaired
+ok   twin Cwo [I] cash 20.0000 -> 21.4876 = + cash profit - tax - dividends = 21.4876 (no write-off or impairment moved cash)
+ok   twin Cwo [R] quarter record: day 60, ni -158, imp 0, wo 60 (24 fields)
+ok   twin Cwo [R] EPS record -623.6 won (net income x 1e4 / shares = -623.57), yearly net income +-157.6685, 25% holder's equity-method income -39.4171 = 25% of net income -39.4171
+ok   twin Cwo [R] reserve llr 10.0000 -> 10.9916 = roll-forward of the statistical loss only (expected 10.9916); write-off and impairment do not touch it
+ok   twin Cwo [M] model rule cfo = cash profit - tax + dividends received: 2.4793; add-back form 2.4793; statement shows 2.0 (rounding allowed 1.60)
+ok   twin Cwo [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 60.0 (expected shown 60.0), record fields 24/22/22/22/22/22/22/22
+ok   twin Cwo [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.15; newest -158 + 0.0 + 100 + 60.0 = 2.0)
+ok   twin Cwo [R] 손익 tab: 자산 손상차손 row hidden, 대손상각비 row -60.0, net income -158, EPS -625
+info twin Cwo [O] FIN-CF-01, recorded only, not judged: debt change dD -4040.0 | debt relief cap 379.2208 | financing cff -4041.0 | other oth 3677.0 | cash change -362.0 (previous quarter row is the synthetic start-of-game row)
+pre  twin Cimp: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  twin Cimp: the borrower defaulted on day 25, before the close, on a day that is not a bank close day
+pre  twin Cimp: waiting before the close 0.0000 = 0
+pre  twin Cimp: T2 assets 939.8522 = T1 939.8522: nothing else moved the assets between the cut and the close
+pre  twin Cimp: ds 3, no loss carryforward, no parent, dividends allowed, pre-tax 3.5418 > 0, no share issue, equity 39.6947 > 0
+pre  twin Cimp: this case has impairment by the rule (ds -> 4, debt/equity 23.6, equity before test 41.1822)
+pre  twin Cimp: holdings value unchanged until the impairment and no cash sweep (cash 21.4876 <= 114.1920)
+ok   twin Cimp [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 939.8522, llr untouched (10.0000)
+ok   twin Cimp [R] the impairment happens exactly when the rule says (ds streak and thresholds): true vs true
+ok   twin Cimp [R] T3 assets 624.9380 = T2 939.8522 + growth 11.7482 - impairment 326.6623
+ok   twin Cimp [R] the close cut 326.6623 from the assets (expected 326.6623 = equity before test + 0.3 x assets) and the write-off cut none: record imp 326.6623 (expected 326.6623)
+ok   twin Cimp [R] write-off reported 0.0000 (expected 0.0000), nothing waiting after (0)
+ok   twin Cimp [R] impairment leaves equity -285.4801 = -30% of assets -285.4801 -> the bank's chapter 11 (0->1), debt 971.7482 -> 592.5273, debt relief cap 379.2208 (expected 379.2208)
+ok   twin Cimp [R] net income -424.1831 = before charges -97.5207 - write-off 0.0000 - impairment 326.6623
+ok   twin Cimp [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   twin Cimp [R] tax 1.0625 = 30% of pre-tax 3.5418 and dividends 0.9917 are the same whatever was written off or impaired
+ok   twin Cimp [I] cash 20.0000 -> 21.4876 = + cash profit - tax - dividends = 21.4876 (no write-off or impairment moved cash)
+ok   twin Cimp [R] quarter record: day 60, ni -424, imp 327, wo 0 (24 fields)
+ok   twin Cimp [R] EPS record -1677.6 won (net income x 1e4 / shares = -1677.61), yearly net income +-424.1831, 25% holder's equity-method income -106.0458 = 25% of net income -106.0458
+ok   twin Cimp [R] reserve llr 10.0000 -> 10.9916 = roll-forward of the statistical loss only (expected 10.9916); write-off and impairment do not touch it
+ok   twin Cimp [M] model rule cfo = cash profit - tax + dividends received: 2.4793; add-back form 2.4793; statement shows 3.0 (rounding allowed 1.60)
+ok   twin Cimp [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) shown = imp + wo = 327 (expected shown 327), record fields 24/22/22/22/22/22/22/22
+ok   twin Cimp [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.15; newest -424 + 0.0 + 100 + 327 = 3.0)
+ok   twin Cimp [R] 손익 tab: 자산 손상차손 row -327, 대손상각비 row hidden, net income -424, EPS -1,677
+info twin Cimp [O] FIN-CF-01, recorded only, not judged: debt change dD -4040.0 | debt relief cap 379.2208 | financing cff -4041.0 | other oth 3676.0 | cash change -362.0 (previous quarter row is the synthetic start-of-game row)
+pre  twin C0: the bank's first close ran on day 60 (before the first bankQ day), bank alive
+pre  twin C0: the borrower defaulted on day 25, before the close, on a day that is not a bank close day
+pre  twin C0: waiting before the close 0.0000 = 0
+pre  twin C0: T2 assets 939.8522 = T1 939.8522: nothing else moved the assets between the cut and the close
+pre  twin C0: ds 3, no loss carryforward, no parent, dividends allowed, pre-tax 3.5418 > 0, no share issue, equity 39.6947 > 0
+pre  twin C0: this case has impairment by the rule (ds -> 4, debt/equity 23.6, equity before test 41.1822)
+pre  twin C0: holdings value unchanged until the impairment and no cash sweep (cash 21.4876 <= 114.1920)
+ok   twin C0 [R] T0->T1: loan 200.4927, cut and queued 60.1478 = 30% = 60.1478, assets 1000.0000 -> 939.8522, llr untouched (10.0000)
+ok   twin C0 [R] the impairment happens exactly when the rule says (ds streak and thresholds): true vs true
+ok   twin C0 [R] T3 assets 624.9380 = T2 939.8522 + growth 11.7482 - impairment 326.6623
+ok   twin C0 [R] the close cut 326.6623 from the assets (expected 326.6623 = equity before test + 0.3 x assets) and the write-off cut none: record imp 0.0000 (expected 0.0000)
+ok   twin C0 [R] write-off reported 0.0000 (expected 0.0000), nothing waiting after (0)
+ok   twin C0 [R] impairment leaves equity -285.4801 = -30% of assets -285.4801 -> the bank's chapter 11 (0->1), debt 971.7482 -> 592.5273, debt relief cap 379.2208 (expected 379.2208)
+ok   twin C0 [R] net income -97.5207 = before charges -97.5207 - write-off 0.0000 - impairment 0.0000
+ok   twin C0 [I] statement adds up: operating profit - interest + interest income - amortization - tax + equity-method + dividends - impairment - write-off = net income
+ok   twin C0 [R] tax 1.0625 = 30% of pre-tax 3.5418 and dividends 0.9917 are the same whatever was written off or impaired
+ok   twin C0 [I] cash 20.0000 -> 21.4876 = + cash profit - tax - dividends = 21.4876 (no write-off or impairment moved cash)
+ok   twin C0 [R] quarter record: day 60, ni -98, imp 0, wo 0 (24 fields)
+ok   twin C0 [R] EPS record -385.7 won (net income x 1e4 / shares = -385.69), yearly net income +-97.5207, 25% holder's equity-method income -24.3802 = 25% of net income -24.3802
+ok   twin C0 [R] reserve llr 10.0000 -> 10.9916 = roll-forward of the statistical loss only (expected 10.9916); write-off and impairment do not touch it
+ok   twin C0 [M] model rule cfo = cash profit - tax + dividends received: 2.4793; add-back form 2.4793; statement shows 2.0 (rounding allowed 1.15)
+ok   twin C0 [R] 현금흐름 tab: row 손상·대손상각(비현금 조정) hidden (expected hidden), record fields 24/22/22/22/22/22/22/22
+ok   twin C0 [R] in every quarter the rows above add up to operating cash flow (on screen worst gap 0.0 vs allowed 1.10; newest -98.0 + 0.0 + 100 = 2.0)
+ok   twin C0 [R] 손익 tab: 자산 손상차손 row hidden, 대손상각비 row hidden, net income -98.0, EPS -388
+info twin C0 [O] FIN-CF-01, recorded only, not judged: debt change dD -4040.0 | debt relief cap 379.2208 | financing cff -4041.0 | other oth 3677.0 | cash change -362.0 (previous quarter row is the synthetic start-of-game row)
+ok   twins [I] same economic path in all four: assets 624.9380, cash 21.4876, debt 592.5273, debt relief 379.2208, tax 1.0625, dividends 0.9917, reserve 10.9916
+ok   twins [R] net income differs by exactly the charge left out: neither -97.5207, write-off only -157.6685, impairment only -424.1831, both -484.3309 (write-off 60.1478, impairment 326.6623)
+ok   twins [M] exact operating cash flow is the same in all four: 2.4793 / 2.4793 / 2.4793 / 2.4793 = cash profit - tax + dividends received 2.4793
+ok   twins [M] operating cash flow on the tab agrees across the four within rounding: 3.0 / 2.0 / 3.0 / 2.0
+ok   twins [R/I] impairment amount by three routes: rule 326.6623 | assets 326.6623 | net income difference 326.6623 | record 326.6623
+-- natural play, two seeds x 720 days: what happens to banks (information); a close with imp or wo is judged by the net income statement identity
+ok   natural seed 12345: 189 bank closes; with write-off 1, with impairment 0, with both 0 (reaching the combined case in play is not shown on these seeds)
+ok   natural seed 777: 176 bank closes; with write-off 0, with impairment 0, with both 0 (reaching the combined case in play is not shown on these seeds)
+errs 0 fails 0
+PASS t_reg01_bank_imp_wo.js
+ALL PASS
