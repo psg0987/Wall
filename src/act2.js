@@ -7,9 +7,9 @@ else if(k==="g"){c.g=v;L(c.tk+" 성장률 "+Math.round(v*100)+"%",1)}
 else if(k==="mgr"){c.cs-=2;c.mg=rnd()<.7?Math.min(3,c.mg+1+rnd()*1.5):c.mg-1;L(c.tk+" 경영진 교체 → 경영능력 "+c.mg.toFixed(1),1)}
 else if(k==="rs"){const w=c.A*.05;c.A-=w;c.nol+=w;c.mg=Math.min(4,c.mg+1.5);L(c.tk+" 구조조정: "+F(w)+" 상각, 수익성 개선 기대",1)}
 else if(k==="ceo"){S.ceo=S.ceo===i?-1:i;S.ceoD=S.day;L(S.ceo<0?"CEO에서 물러났습니다":c.tk+" CEO 취임 · 연봉 "+F(ceoSal(c))+" (회사가 매일 나눠 지급, 이익이 해마다 15% 넘게 늘면 연말 보너스)",1)}
-else if(k==="iss"){if(c.priv)return toast("비상장 회사는 먼저 상장해야 해요");const f=v||.1,r=mc(c)*f*.95;c.cs+=r;c.sh*=1+f;rescale(c,1/(1+f));c.p*=1-f*.3;L(c.tk+" 유상증자 "+F(r)+" 조달 (지분 희석)",1);afterCtl(c,"P")}
+else if(k==="iss"){if(c.priv)return toast("비상장 회사는 먼저 상장해야 해요");const f=v||.1,r=mc(c)*f*.95;c.cs+=r;eqCash(c,r);c.sh*=1+f;rescale(c,1/(1+f));c.p*=1-f*.3;L(c.tk+" 유상증자 "+F(r)+" 조달 (지분 희석)",1);afterCtl(c,"P")}
 else if(k==="xd"){const a=Math.max(0,eq(c)*.4);c.D+=a;payDiv(c,a);L(c.tk+" 차입 특별배당 "+F(a)+" (내 몫 세후 "+F(a*(c.own.P||0)/100*.6)+"). 부채 급증!",1)}
-else if(k==="bb"){if(c.priv)return;const n=Math.min(v||5,pub(c)-1);if(n<=0)return toast("시장에 남은 물량이 없습니다");const x=mc(c)*n/100*1.05;if(!ePay(i,x))return toast(c.tk+" 자금 부족: 필요 "+F(x));c.sh*=1-n/100;rescale(c,1/(1-n/100));c.p*=1.03;L(c.tk+" 자사주 "+n.toFixed(1)+"% 매입·소각 ("+F(x)+")",1);ctlAll()}
+else if(k==="bb"){if(c.priv)return;const n=Math.min(v||5,pub(c)-1);if(n<=0)return toast("시장에 남은 물량이 없습니다");const x=mc(c)*n/100*1.05;if(!ePay(i,x))return toast(c.tk+" 자금 부족: 필요 "+F(x));eqCash(c,-x);c.sh*=1-n/100;rescale(c,1/(1-n/100));c.p*=1.03;L(c.tk+" 자사주 "+n.toFixed(1)+"% 매입·소각 ("+F(x)+")",1);ctlAll()}
 else if(k==="sw"){c.sweep=c.sweep===2?1:2;toast(c.sweep===2?"남는 현금으로 부채를 자동 상환합니다":"현금을 쌓아 인수 자금으로 씁니다")}
 else if(k==="pill"){if(!ePay(i,5))return toast("5억이 필요합니다");c.pill=S.day+180;L(c.tk+" 포이즌 필 발동 (180일간 적대적 매집·공개매수 차단)",1)}
 render()};
@@ -41,7 +41,7 @@ for(const k of Object.keys(c.own)){if(k===bk)continue;payK(c,k,c.own[k]/100*mc(c
 setOwn(c,bk,100);c.bs[bk]=(c.bs[bk]||0)+need;c.priv=1;c.pt=S.day;c.p*=1+prem/100*.6;S.fl.tn=1;if(lbo)S.fl.lb=1;ctlAll();rec(lbo?"LBO":"공개매수",c,need);
 L(c.tk+(lbo?" LBO 성공! 인수가의 70%를 회사 부채로 떠안겼습니다":" 공개매수 성공! 100% 비상장 자회사로 전환")+" ("+eName(e)+" 명의, "+F(need)+")",1);render()};
 G.gm=i=>{const c=S.co[i],e=teOK(),k=eKey(e),own=c.own[k]||0;if(c.priv||own<8||mine(c))return toast("경영권이 없는 회사에 지분 8% 이상이 있어야 합니다");
-if(rnd()<Math.min(.8,own/25)){const pr=mc(c)*own/100*1.25;c.cs-=pr;if(c.cs<0){c.D-=c.cs;c.cs=0}const net=payK(c,k,pr);setOwn(c,k,0);c.sh*=1-own/100;rescale(c,1/(1-own/100));S.fl.gm=1;rec("그린메일",c,pr);L(c.tk+" 그린메일 성공! 지분 "+own.toFixed(1)+"%를 프리미엄 25%에 넘기고 "+F(net)+" 수령",1);ctlAll()}
+if(rnd()<Math.min(.8,own/25)){const pr=mc(c)*own/100*1.25;c.cs-=pr;if(c.cs<0){c.D-=c.cs;c.cs=0}eqCash(c,-pr);const net=payK(c,k,pr);setOwn(c,k,0);c.sh*=1-own/100;rescale(c,1/(1-own/100));S.fl.gm=1;rec("그린메일",c,pr);L(c.tk+" 그린메일 성공! 지분 "+own.toFixed(1)+"%를 프리미엄 25%에 넘기고 "+F(net)+" 수령",1);ctlAll()}
 else{ePay(e,Math.min(3,eAvail(e)));S.heat+=3;L(c.tk+" 그린메일 거절 — 소송비 3억",1)}render()};
 G.ipoMy=i=>{const c=S.co[i],k=ownerK(c);if(!c.priv||!k||root(k)!=="P")return toast("내 그룹이 100% 가진 비상장 회사만 상장할 수 있어요");if(c.sz>S.day)return toast("시즈닝 기간입니다. 설립 후 1년 반이 지나야 상장할 수 있어요 ("+(c.sz-S.day)+"일 남음)");if(S.day-(c.pt||0)<180)return toast("인수·설립 후 180일이 지나야 상장할 수 있어요 ("+(180-(S.day-c.pt))+"일 남음)");
 c.p=ipoPx(c);c.tg=c.p;c.priv=0;const net=sellK(c,k,40,mc(c)/100*.93);if(c.fo)S.fl.ip=1;rec("상장",c,net,hName(k));L("🔔 "+c.tk+" 상장! 지분 40%를 팔아 "+F(net)+" 확보 ("+hName(k)+")",1);ctlAll();render()};
@@ -64,7 +64,7 @@ else if(ev.id==="pr"){if(y){if(!ePay("P",x))return no();c.p*=.85;c.tg*=.92;S.hea
 else if(ev.id==="front"){if(y){c.cs+=x;S.heat+=20;L(c.tk+" 선행매매로 "+F(x)+" 추가 이익",1)}else S.hon++}
 else if(ev.id==="gift"){if(y){if(!ePay("P",x))return no();if(rnd()<.6){S.heat=Math.max(0,S.heat-30);L("접대가 통했습니다. 주목도 하락",1)}else{S.heat+=25;L("접대 시도가 들통났습니다! 주목도 급등",1)}}}
 else if(ev.id==="strike"){if(y){c.mg-=.5;L(c.tk+" 임금 인상 합의",1)}else if(rnd()<.5){c.A*=.97;c.p*=.9;L(c.tk+" 파업 강행! 생산 차질, 주가 하락",1)}else L(c.tk+" 노조가 물러섰습니다",1)}
-else if(ev.id==="bail"&&y){c.cs+=x;c.sh/=.7;rescale(c,.7);L(c.tk+" 구제금융 "+F(x)+" 수령, 신주 발행",1);ctlAll()}
+else if(ev.id==="bail"&&y){c.cs+=x;eqCash(c,x);c.sh/=.7;rescale(c,.7);L(c.tk+" 구제금융 "+F(x)+" 수령, 신주 발행",1);ctlAll()}
 render()};
 const upAI=(id,t)=>{const e=$(id);if(e)e.textContent=t};
 // ---- AI providers: rule (free, built in) / claude (artifact sample) / gemini (own API key, works outside claude.ai) ----
@@ -160,9 +160,9 @@ c.D+=x;const r=rating(c);c.cs+=x*.985;c.bond=x;c.cpn=S.prime+SPR[r]+1;c.bmat=S.d
 G.bcall=i=>{const c=S.co[i];if(!mine(c)||c.bond<=0)return;const px=Math.min(1.05,bd(c)*1.02),face=c.bond,cost=face*px;if(!ePay(i,cost))return toast(c.tk+" 자금 부족: 필요 "+F(cost));
 if(c.bh){S.cash+=c.bh*px;c.bh=0}const g=face-cost;c.D-=face;if(g>0)c.nol=Math.max(0,c.nol-g);c.bond=0;c.cpn=0;rec("회사채 상환",c,cost);L(c.tk+" 회사채 "+F(face)+" 조기 상환 (가격 "+(px*100).toFixed(0)+")"+(g>0?" · 할인 매입 이익 "+F(g):""),1);render()};
 G.pp=(i,pct)=>{const c=S.co[i],e=teOK();if(!mine(c)||c.priv)return;if(e===i)return toast("거래 주체를 나 또는 다른 내 회사로 바꾸세요");const N=c.sh*pct/(100-pct),cost=N*c.p*.98/1e4;if(!ePay(e,cost))return toast(eName(e)+" 자금 부족: 필요 "+F(cost));
-const k=eKey(e);rescale(c,(100-pct)/100);setOwn(c,k,(c.own[k]||0)+pct);c.bs[k]=(c.bs[k]||0)+cost;c.sh+=N;c.cs+=cost;c.p*=.98;ctlAll();S.fl.pp=1;rec("사모증자",c,cost);L(c.tk+" 사모 유상증자: "+eName(e)+"에 신주 "+pct+"% 배정 ("+F(cost)+") → 내 그룹 "+grp(c,"P").toFixed(1)+"%",1);render()};
+const k=eKey(e);rescale(c,(100-pct)/100);setOwn(c,k,(c.own[k]||0)+pct);c.bs[k]=(c.bs[k]||0)+cost;c.sh+=N;c.cs+=cost;eqCash(c,cost);c.p*=.98;ctlAll();S.fl.pp=1;rec("사모증자",c,cost);L(c.tk+" 사모 유상증자: "+eName(e)+"에 신주 "+pct+"% 배정 ("+F(cost)+") → 내 그룹 "+grp(c,"P").toFixed(1)+"%",1);render()};
 G.wk=(i,pct)=>{const c=S.co[i];if(!mine(c)||c.priv)return;const N=c.sh*pct/(100-pct),cost=N*c.p*.95/1e4,w=S.co.filter(x=>!x.dead&&!x.priv&&!x.ctl&&x.id!==i&&!x.kd&&x.cs>=cost&&!c.own["c"+x.id]).sort((a,b)=>b.cs-a.cs)[0];
-if(!w)return toast("백기사를 맡을 만큼 현금 많은 중립 회사가 없습니다");w.cs-=cost;rescale(c,(100-pct)/100);setOwn(c,"c"+w.id,pct);c.bs["c"+w.id]=cost;c.sh+=N;c.cs+=cost;c.p*=.97;ctlAll();L(c.tk+" 백기사 "+w.tk+"에 신주 "+pct+"% 배정 ("+F(cost)+"). 라이벌 지분이 희석됩니다",1);render()};
+if(!w)return toast("백기사를 맡을 만큼 현금 많은 중립 회사가 없습니다");w.cs-=cost;rescale(c,(100-pct)/100);setOwn(c,"c"+w.id,pct);c.bs["c"+w.id]=cost;c.sh+=N;c.cs+=cost;eqCash(c,cost);c.p*=.97;ctlAll();L(c.tk+" 백기사 "+w.tk+"에 신주 "+pct+"% 배정 ("+F(cost)+"). 라이벌 지분이 희석됩니다",1);render()};
 G.advP=(i,x)=>{const c=S.co[i];if(!mine(c))return;if(!ePay("P",x))return toast("개인 자금 부족");c.pa=(c.pa||0)+x;c.D+=x;c.cs+=x;L("개인 자금 "+F(x)+"을 "+c.tk+"에 대여 (기준금리 이자)",1);render()};
 G.advR=i=>{const c=S.co[i],x=Math.min(c.pa||0,c.cs);if(x<=0)return toast("회수할 대여금이나 회사 현금이 없습니다");c.pa-=x;c.D-=x;c.cs-=x;S.cash+=x;L(c.tk+" 대여금 "+F(x)+" 회수",1);render()};
 G.asell=(i,f)=>{const c=S.co[i];if(!mine(c)||c.kd)return;const a=c.A*f;c.A-=a;c.cs+=a*.9;c.nol+=a*.1;rec("자산 매각",c,a*.9);L(c.tk+" 사업 자산 "+F(a)+" 매각 → 현금 "+F(a*.9)+" (매각 비용 10%)",1);render()};
@@ -225,9 +225,9 @@ if(how==="stk"){const Y=S.co[MV.y];if(!Y||Y.dead||Y===T)return toast("넘길 주
 const v=hv(Y,p);setOwn(Y,fk,own-p);if(Y.own[fk])Y.bs[fk]-=b;setOwn(Y,tk2,(Y.own[tk2]||0)+p);Y.bs[tk2]=(Y.bs[tk2]||0)+b;T.bs[fk]=(T.bs[fk]||0)+b;ctlAll();S.fl.inc=1;rec("현물출자",Y,v,eName(fr));
 L("주식 현물출자: "+eName(fr)+"의 "+Y.tk+" 지분 "+p.toFixed(1)+"% ("+F(v)+")를 "+T.tk+"로 이전. 세금 없음, 장부가 승계",1);MV.y=-1;return render()}
 if(!(x>0))return toast("금액을 입력하세요");
-if(how==="cap"){if(!ePay(fr,x))return toast(eName(fr)+" 자금 부족: 가용 "+F(eAvail(fr)));T.cs+=x;T.bs[fk]=(T.bs[fk]||0)+x;rec("출자",T,x,eName(fr));L(eName(fr)+" → "+T.tk+" 현금 출자 "+F(x),1)}
+if(how==="cap"){if(!ePay(fr,x))return toast(eName(fr)+" 자금 부족: 가용 "+F(eAvail(fr)));T.cs+=x;eqCash(T,x);T.bs[fk]=(T.bs[fk]||0)+x;rec("출자",T,x,eName(fr));L(eName(fr)+" → "+T.tk+" 현금 출자 "+F(x),1)}
 else if(how==="adv"){if(!ePay("P",x))return toast("개인 자금 부족: 가용 "+F(eAvail("P")));T.pa=(T.pa||0)+x;T.D+=x;T.cs+=x;rec("대여",T,x,"나");L("개인 자금 "+F(x)+"을 "+T.tk+"에 대여 (기준금리 이자)",1)}
-else if(how==="pp"){const N=x*1e4/(T.p*.98),pct=N/(T.sh+N)*100;if(!ePay(fr,x))return toast(eName(fr)+" 자금 부족: 가용 "+F(eAvail(fr)));rescale(T,(100-pct)/100);setOwn(T,fk,(T.own[fk]||0)+pct);T.bs[fk]=(T.bs[fk]||0)+x;T.sh+=N;T.cs+=x;T.p*=.98;ctlAll();S.fl.pp=1;rec("신주 인수",T,x,eName(fr));L(T.tk+" 신주 "+pct.toFixed(1)+"%를 "+eName(fr)+"가 인수 ("+F(x)+") → 내 그룹 "+grp(T,"P").toFixed(1)+"%",1)}
+else if(how==="pp"){const N=x*1e4/(T.p*.98),pct=N/(T.sh+N)*100;if(!ePay(fr,x))return toast(eName(fr)+" 자금 부족: 가용 "+F(eAvail(fr)));rescale(T,(100-pct)/100);setOwn(T,fk,(T.own[fk]||0)+pct);T.bs[fk]=(T.bs[fk]||0)+x;T.sh+=N;T.cs+=x;eqCash(T,x);T.p*=.98;ctlAll();S.fl.pp=1;rec("신주 인수",T,x,eName(fr));L(T.tk+" 신주 "+pct.toFixed(1)+"%를 "+eName(fr)+"가 인수 ("+F(x)+") → 내 그룹 "+grp(T,"P").toFixed(1)+"%",1)}
 else if(how==="rec"){const y=Math.min(x,Fc.pa||0,Fc.cs);if(y<=0)return toast("회수할 대여금이나 회사 현금이 없습니다");Fc.pa-=y;Fc.D-=y;Fc.cs-=y;S.cash+=y;rec("대여금 회수",Fc,y,"나");L(Fc.tk+" 대여금 "+F(y)+" 회수",1)}
 else if(how==="div"){if(x>Fc.cs+1e-9)return toast("배당은 회사 현금("+F(Fc.cs)+") 안에서만 할 수 있어요");const p=to==="P"?Fc.own.P||0:Fc.own["c"+to]||0,h=to==="P"?null:S.co[to],t=h?(h.i===HOLD||p>=80?0:p>=20?.05:.1):.4,me=p*x/100*(1-t);
 Fc.cs-=x;payDiv(Fc,x);rec("특별배당",Fc,x,Fc.tk);L(Fc.tk+" 특별배당 "+F(x)+" → "+(h?h.tk:"내")+" 몫 "+F(me)+(t?" (세후)":" (비과세)")+(p<99.9?" · 나머지는 다른 주주에게":""),1)}

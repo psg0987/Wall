@@ -29,7 +29,7 @@ if(c.ni<0&&c.D/Math.max(eq(c),1)>(c.kd?12:1.2))c.ds++;else c.ds=0;
 if(c.ds>=4){c.ds=0;const e=eq(c);if(e>-.3*c.A){const a0=c.A;c.A=Math.max(c.A*.2,c.A-(e+.3*c.A));const wd=a0-c.A;if(wd>0)impair(c,wd)}}
 if(eq(c)<(c.kd?0:-.25*c.A)){ch11(c,"자본잠식");if(c.dead)return}
 c.tg=tgCalc(c);if(c.surp){c.tg*=1+c.surp;c.jx=(c.jx||0)+Math.log(1+c.surp*.5);c.surp=0}
-if(c.ncq){c.rlf={d:Math.round(S.day),R:c.ncq};c.ncq=0}qPush(c,[S.day,rev,op,rdx,it,iinc,ga,c.er.eq,c.er.dr,tax,c.ni,dv,gr,c.cs,c.A,c.gw,pfv(c),c.D,c.bond,c.pa||0,c.sh,c.p,c.er.imp||0,c.er.wo||0]);if(c.own.P||mine(c))L(c.tk+" 실적: 순이익 "+F(c.ni)+(smsg?" · "+smsg:"")+(c.own.P&&dv>0?" · 배당 "+F(dv*c.own.P/100*.6):""))}
+if(c.ncq){c.rlf={d:Math.round(S.day),R:c.ncq};c.ncq=0}if(c.eqq){const dq=Math.round(S.day);(c.isq=c.isq||{})[dq]=(c.isq[dq]||0)+c.eqq;c.eqq=0}qPush(c,[S.day,rev,op,rdx,it,iinc,ga,c.er.eq,c.er.dr,tax,c.ni,dv,gr,c.cs,c.A,c.gw,pfv(c),c.D,c.bond,c.pa||0,c.sh,c.p,c.er.imp||0,c.er.wo||0]);if(c.own.P||mine(c))L(c.tk+" 실적: 순이익 "+F(c.ni)+(smsg?" · "+smsg:"")+(c.own.P&&dv>0?" · 배당 "+F(dv*c.own.P/100*.6):""))}
 // remove a company. m = multiple of market cap paid to holders; paid=true when caller already paid holders
 function kill(c,m,paid){const v=mc(c)*m;settleNew(c,m);
 if(c.sp>0){const x=c.sb-v*c.sp/100,t=Math.max(0,x)*.22;S.cash+=x-t;if(x>0)S.fl.sh=1;c.sp=0;c.sb=0}
@@ -37,7 +37,7 @@ if(c.bh>0){S.cash+=c.bh*(m>=1?1:m<.1?.1:.6);c.bh=0}if(c.pa){S.cash+=c.pa*(m>=1?1
 S.op=S.op.filter(o=>{if(o.i!==c.id)return true;S.cash+=o.nsh*Math.max(0,o.t==="C"?c.p*m-o.k:o.k-c.p*m)/1e4;return false});
 for(const k of Object.keys(c.own)){if(!paid)payK(c,k,c.own[k]/100*v);setOwn(c,k,0)}
 for(const t of Object.keys(c.pos))setOwn(S.co[t],"c"+c.id,0);
-S.wl=S.wl.filter(x=>x!==c.id);if(S.ceo===c.id)S.ceo=-1;if(S.te===c.id)S.te="P";if(sel===c.id)sel=-1;c.dead=1;S.cd=1;c.hr=null;c.fq=[];c.hm=[];c.eh=[];c.xvd=null;c.w10=null;c.wd=null;c.ncq=0;delete c.rlf}
+S.wl=S.wl.filter(x=>x!==c.id);if(S.ceo===c.id)S.ceo=-1;if(S.te===c.id)S.te="P";if(sel===c.id)sel=-1;c.dead=1;S.cd=1;c.hr=null;c.fq=[];c.hm=[];c.eh=[];c.xvd=null;c.w10=null;c.wd=null;c.ncq=0;delete c.rlf;c.eqq=0;delete c.isq}
 // move target t's assets & holdings into acquirer a (after holders were settled)
 function absorb(a,t,paidVal){if(a.i===HOLD&&t.i!==HOLD&&t.A>0){a.i=t.i;if(t.kd){a.kd=t.kd;a.ln=-1}if(mine(a))L(a.tk+" 지주회사가 "+t.tk+"를 흡수해 "+SEC[t.i][0]+" 회사가 됐습니다",1)}const va=t.own["c"+a.id]?hv(t,t.own["c"+a.id]):0,et=eq(t);setOwn(t,"c"+a.id,0);
 a.A+=t.A;a.cs+=t.cs;a.D+=t.D;a.gw+=t.gw+Math.max(0,paidVal+va-et);a.nol+=t.nol*.5;
@@ -273,8 +273,13 @@ return Math.max(0,c.A*x.to/4*(1+2*(S.dg[c.i]-S.cg[c.i]))*(1+.03*hgn(c.id,13)))}
 // record: [day,rev,op,rd,int exp,int inc,goodwill amort,equity-method,div income,tax,ni,div paid,capex growth,cash,A,gw,investments,D,bond,adv,shares,price,impairment,bank loan write-off]
 const FQ=["d","rev","op","rd","it","ii","ga","eq","dr","tax","ni","dv","gr","cs","A","gw","pv","D","bond","pa","sh","p","imp","wo"],fqo=r=>{const o={};FQ.forEach((k,j)=>o[k]=r[j]);return o};
 const r1=x=>Math.abs(x)>=10?Math.round(x):Math.round(x*10)/10;
-function qPush(c,a){(c.fq=c.fq||[]).push(a.map((x,j)=>j===0||j===21?Math.round(x):r1(x)));if(c.fq.length>8)c.fq.shift()}
-function qBack(c){if(c.priv&&c.fo)return;const x=SX[c.i]||SX[0],g=x.dg||.03,rev0=revQ(c),pf=pfv(c);c.fq=[];delete c.rlf;c.cfd=S.day-720;
+// FIN-CF-02 share-issue cash ledger: every path that issues or buys back shares for cash, or takes a cash capital contribution, calls
+// eqCash(company, cash really received (+) or paid (-)). The amount waits in c.eqq; earn() confirms it as c.isq[close day] just before the
+// quarter record is pushed; fqDerive shows it as 증자·출자(자사주). Share-count changes without cash (splits, stock-merger consideration,
+// founding) do not call it. Recording only: nothing in the simulation reads eqq / isq / isd.
+function eqCash(c,x){if(c&&x&&isFinite(x))c.eqq=(c.eqq||0)+x}
+function qPush(c,a){(c.fq=c.fq||[]).push(a.map((x,j)=>j===0||j===21?Math.round(x):r1(x)));if(c.fq.length>8)c.fq.shift();if(c.isq){const d0=c.fq[0][0];for(const k in c.isq)if(+k<d0)delete c.isq[k];if(!Object.keys(c.isq).length)delete c.isq}}
+function qBack(c){if(c.priv&&c.fo)return;const x=SX[c.i]||SX[0],g=x.dg||.03,rev0=revQ(c),pf=pfv(c);c.fq=[];delete c.rlf;c.cfd=S.day-720;delete c.isq;c.isd=S.day-720;
 for(let k=8;k>=1;k--){const sc=Math.exp(-g*k/4+.03*gz()),rev=rev0*sc,A=c.A*sc,opm=c.kd?.0035*c.A*sc:A*(SEC[c.i][1]+(S.dg[c.i]-S.cg[c.i])*.5)*(1+.22*gz()),
 it=c.kd?0:loanOf(c)*sc*(S.prime+2)/400,ii=c.cs*sc*Math.max(0,S.prime-2)/400,pre=opm-it+ii,tax=Math.max(0,pre)*ctax(c),ni=pre-tax,dv=Math.max(0,ni)*c.pay,
 p=closeAgo(c,k*90);qPush(c,[S.day-k*90,rev,opm,c.kd?0:A*(c.ps||0)*.0025,it,ii,0,0,0,tax,ni,dv,A*c.g/4,c.cs*sc,A,c.gw,pf*sc,c.D*sc,c.bond*sc,(c.pa||0),c.sh,p])}

@@ -1,0 +1,26 @@
+MERGER PNPL absorbs SNWF | target before: cash 103.03 debt 1117.80 assets 2058.44 mcap 1146.14
+  acquirer change: cash 103.03 debt 1117.80 assets 2058.44 goodwill 560.92 shares 1151.58 price now 13515.88
+  close 207 : statement 증자 1642.02  차입 증감 1118.00  재무활동 2709.02  기타 -2658.02  현금증감 136.00  (cash really raised by shares: 0)
+
+seed 20261016 — quarter rows (still visible at day 720) with a share-count change: 2
+  BABX row 571 [go@2058] Δsh 346.07 real 197.30 statement 231.92 error 34.63 (17.55% of real; mcap 773.53)
+  NTRX row 297 [go@2041] Δsh -291.75 real -251.18 statement -225.04 error 26.14 (10.41% of real; mcap 4271.99)
+
+seed 777 — quarter rows (still visible at day 720) with a share-count change: 1
+  DJSC(bank) row 589 [splitDo@1841] Δsh -150.75 real 0.00 statement 0.00 error 0.00 (0.00% of real; mcap 15.19)
+
+seed 12345 — quarter rows (still visible at day 720) with a share-count change: 6
+  BOAX(bank) row 494 [bankQ@1960] Δsh 155.80 real 14.56 statement 7.88 error -6.69 (-45.92% of real; mcap 89.78)
+  BOAX(bank) row 584 [bankQ@1960] Δsh 171.38 real 5.44 statement 4.57 error -0.87 (-16.03% of real; mcap 48.01)
+  BOAX(bank) row 674 [splitDo@1841,bankQ@1960] Δsh -1677.81 real 4.16 statement 3.88 error -0.28 (-6.82% of real; mcap 44.61)
+  SHFN(bank) row 616 [bankQ@1960] Δsh 73.25 real 10.91 statement 15.04 error 4.13 (37.89% of real; mcap 166.04)
+  EXYM(bank) row 409 [splitDo@1841] Δsh -81.90 real 0.00 statement 0.00 error 0.00 (0.00% of real; mcap 8.66)
+  TJVY(bank) row 553 [splitDo@1841] Δsh -193.50 real 0.00 statement 0.00 error 0.00 (0.00% of real; mcap 14.58)
+
+seed 4242 — quarter rows (still visible at day 720) with a share-count change: 2
+  CNRX row 487 [go@2055] Δsh -130.64 real -91.31 statement -97.12 error -5.81 (-6.36% of real; mcap 2324.29)
+  TWRP(bank) row 618 [splitDo@1841] Δsh -90.00 real 0.00 statement 0.00 error 0.00 (0.00% of real; mcap 9.11)
+
+seed 9001 — quarter rows (still visible at day 720) with a share-count change: 0
+errs 0 fails 0
+

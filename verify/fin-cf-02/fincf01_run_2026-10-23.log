@@ -1,0 +1,306 @@
+# fin-cf-02 working tree, VERBOSE=1 python3 tests/run.py fincf01, 2026-10-23
+---- t_fincf01_relief.js
+-- harness ready
+
+-- TC-CF01-F1 ordinary borrowing then repayment: nothing changes (no relief, no ledger entry)
+pre  F1: target PNPL (kd 0) lender KNYA A 6549.0 D 3160.5 cs 457.7 bk 0
+pre  F1a borrow 300 in the quarter: every share-count change in the quarter is known (0 write(s): none)
+  --- F1a borrow 300 in the quarter (close day 207, no relief)
+  ledger : relief R 0.00 | asset-market cash 0.00 | injected borrow 300.00 | injected issue cash 0.00 | injected spending 0.00 | loan-call repayment 0.00 | dividend 38.52
+  true   : dD -160.30 | dc -136.54 | cfo-capex(indep.) 62.28 | cff(real cash) -198.82 | oth(clean) 0.00
+  game   : cff -199.00 | oth 1.00 | 차입 증감 -160.00 | nc 0.00 | rlf undefined | ncq 0
+ok   F1a: no relief, nothing pending (nc 0, ncq 0)
+ok   F1a: cff -199.0 vs expected -198.8 (err -0.18); other 1.0 vs expected -0.0 (err 1.00)
+ok   F1a no rlf record exists (undefined)
+ok   F1a cff = dD - dividend + issue (dD -160.30): the old formula is kept when there is no relief
+ok   F1a borrow 300 in the quarter: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+pre  F1b repay 120 in the next quarter: every share-count change in the quarter is known (0 write(s): none)
+  --- F1b repay 120 in the next quarter (close day 297, no relief)
+  ledger : relief R 0.00 | asset-market cash 0.00 | injected borrow -120.00 | injected issue cash 0.00 | injected spending 0.00 | loan-call repayment 0.00 | dividend 48.72
+  true   : dD -120.00 | dc -72.74 | cfo-capex(indep.) 95.98 | cff(real cash) -168.72 | oth(clean) 0.00
+  game   : cff -169.00 | oth 0.00 | 차입 증감 -120.00 | nc 0.00 | rlf undefined | ncq 0
+ok   F1b: no relief, nothing pending (nc 0, ncq 0)
+ok   F1b: cff -169.0 vs expected -168.7 (err -0.28); other 0.0 vs expected 0.0 (err 0.00)
+ok   F1b repay 120 in the next quarter: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+
+-- TC-CF01-F2 chapter-11 relief only, inside earn() (SYNTHETIC: a non-cash asset write-down makes earn()'s own equity test trip)
+pre  F2: target PNPL (kd 0) lender KNYA A 6549.0 D 3160.5 cs 457.7 bk 0
+pre  F2 relief quarter: every share-count change in the quarter is known (0 write(s): none)
+  --- F2 relief quarter (close day 207, relief inside earn())
+  ledger : relief R 1432.88 | asset-market cash 165.01 | injected borrow 0.00 | injected issue cash 0.00 | injected spending 0.00 | loan-call repayment 0.00 | dividend 0.00
+  true   : dD -1847.76 | dc -288.31 | cfo-capex(indep.) -38.44 | cff(real cash) -414.87 | oth(clean) 165.01
+  game   : cff -414.12 | oth 164.12 | 차입 증감 -414.12 | nc 1432.88 | rlf {"d":207,"R":1432.8834564338936} | ncq 0
+ok   F2 exactly one relief, inside earn() (1)
+ok   F2 relief R = 1432.88 (non-cash; the forced asset sale cash 165.01 is a separate investing inflow)
+ok   F2 rlf = {d: 207, R: 1432.88} = the close day 207 and the ledger R 1432.88 exactly; ncq back to 0
+ok   F2: cff -414.1 vs expected -414.9 (err 0.76); other 164.1 vs expected 165.0 (err -0.89)
+ok   F2 the row takes R out of the borrowing line: cff = dD + R - dv + iss; 차입 증감 = dD + R = -414.12 (dD -1847.76 + R 1432.88)
+ok   F2 independent cash closure: oth_clean 165.01 = asset-market cash 165.01 (residual 0.00)
+ok   F2 er.cap is UNCHANGED (FIN-EQ-01 not touched): 1377.88 = R 1432.88 - 0.25 x forced sale 220.01
+ok   F2 dD -1847.76 and the real cash financing -414.87 differ by R 1432.88 (the old statement showed dD)
+ok   F2 relief quarter: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+
+-- TC-CF01-F3 relief and cash borrowing in the same quarter (SYNTHETIC)
+pre  F3: target PNPL (kd 0) lender KNYA A 6549.0 D 3160.5 cs 457.7 bk 0
+pre  F3: every share-count change in the quarter is known (0 write(s): none)
+  --- F3 (close day 207, relief inside earn())
+  ledger : relief R 1435.89 | asset-market cash 165.01 | injected borrow 250.00 | injected issue cash 0.00 | injected spending 0.00 | loan-call repayment 0.00 | dividend 0.00
+  true   : dD -1847.76 | dc -288.31 | cfo-capex(indep.) -41.45 | cff(real cash) -411.87 | oth(clean) 165.01
+  game   : cff -411.11 | oth 164.11 | 차입 증감 -411.11 | nc 1435.89 | rlf {"d":207,"R":1435.8903377147499} | ncq 0
+ok   F3 one relief
+ok   F3: cff -411.1 vs expected -411.9 (err 0.76); other 164.1 vs expected 165.0 (err -0.90)
+ok   F3 independent closure residual 0.00
+ok   F3 rlf.R 1435.89 = ledger R 1435.89
+info F3 dD -1847.76 = relief -1435.89 + cash borrowing (netted inside chapter 11, which re-sets D from assets + cash)
+ok   F3: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+
+-- TC-CF01-F4 relief with a regular dividend and a real share issue (the game's credit-downgrade event, issue 10%; SYNTHETIC timing)
+pre  F4: target PNPL (kd 0) lender KNYA A 6549.0 D 3160.5 cs 457.7 bk 0
+pre  F4: every share-count change in the quarter is known (1 write(s): an injected real share issue)
+  --- F4 (close day 207, relief inside earn())
+  ledger : relief R 2771.71 | asset-market cash 1015.29 | injected borrow 4120.67 | injected issue cash 457.30 | injected spending 5119.29 | loan-call repayment 0.00 | dividend 109.20
+  true   : dD 1090.28 | dc 277.96 | cfo-capex(indep.) 171.87 | cff(real cash) 4210.09 | oth(clean) -4103.99
+  game   : cff 4211.01 | oth -4104.01 | 차입 증감 3862.71 | nc 2771.71 | rlf {"d":207,"R":2771.705910722785} | ncq 0
+ok   F4 one relief
+ok   F4 regular dividend paid 109.20
+pre  F4 the event issued 327.45 shares for 457.30 (measured around the call)
+info F4 the old rule (share-count change x close price; chapter 11 reset the price) would show 27.50 (error -429.80)
+ok   F4 증자·출자 457.30 = the cash really raised 457.30
+ok   F4 (relief R 2771.71 and the issue both accounted): cff 4211.0 vs expected 4210.1 (err 0.92); other -4104.0 vs expected -4104.0 (err -0.02)
+ok   F4 rlf.R = ledger R; independent closure residual 0.00
+ok   F4: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+
+-- TC-CF01-F5 a second relief is a delisting (SYNTHETIC)
+pre  F5: target PNPL (kd 0) lender KNYA A 6549.0 D 3160.5 cs 457.7 bk 0
+  (F5 second relief right after the first (same day, after the close): company gone, dead=1)
+ok   F5 first relief: bk 1, rlf {"d":207,"R":1432.8834564338936}, ncq 0
+ok   F5 second attempt: bk 2 = delisting (dead), no exception
+ok   F5 the dead company keeps no relief fields: ncq 0, rlf undefined, fq rows 0
+ok   F5 the delisting relief is not a ledger entry (killed: 1)
+pre  F5b first relief outside earn: bk 1, ncq 1406.50 = ledger R 1406.50
+ok   F5b a pending ncq of 1406.50 is cleared by the delisting: dead 1, ncq 0, rlf undefined
+ok   F5b 100 days later nothing reappeared on the dead company (ncq 0, rlf undefined)
+pre  F5c acquirer MCSF
+pre  F5c pending relief 1406.50
+ok   F5c acquired target had ncq 1406.50: after absorb dead 1, ncq 0, rlf undefined; acquirer ncq 7 (untouched, 7 planted) rlf undefined
+
+-- TC-CF01-F2b relief reached through callLoan (outside earn(); only the player or a rival bank can do this) (SYNTHETIC)
+pre  F2b: target PNPL (kd 0) lender KNYA A 6549.0 D 3160.5 cs 457.7 bk 0
+pre  F2b: every share-count change in the quarter is known (0 write(s): none)
+  --- F2b (close day 207, relief inside callLoan/ch11, outside earn())
+  ledger : relief R 1786.57 | asset-market cash 921.08 | injected borrow 0.00 | injected issue cash 0.00 | injected spending 541.32 | loan-call repayment 788.60 | dividend 0.00
+  true   : dD -2668.56 | dc -509.55 | cfo-capex(indep.) -7.32 | cff(real cash) -881.99 | oth(clean) 379.76
+  game   : cff -881.43 | oth 379.73 | 차입 증감 -881.43 | nc 1786.57 | rlf {"d":207,"R":1786.5681394430985} | ncq 0
+ok   F2b relief happened outside earn() (1)
+ok   F2b between the call and the close the amount waits in ncq: 1786.57 = ledger R 1786.57 (rlf not yet set: undefined)
+ok   F2b at the close ncq becomes rlf {d 207, R 1786.57} and ncq is 0
+ok   F2b er.cap is still ABSENT on this path (absent): FIN-EQ-01 / the callLoan er.cap omission is deliberately not fixed here
+ok   F2b (loan-call cash repayment 788.60 correctly stays in financing): cff -881.4 vs expected -882.0 (err 0.56); other 379.7 vs expected 379.8 (err -0.03)
+ok   F2b closure residual 0.00
+ok   F2b: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+
+-- TC-CF01-F6 relief quarter, then the next quarter
+pre  F6: target PNPL (kd 0) lender KNYA A 6549.0 D 3160.5 cs 457.7 bk 0
+pre  F6a relief quarter: every share-count change in the quarter is known (0 write(s): none)
+  --- F6a relief quarter (close day 207, relief inside earn())
+  ledger : relief R 1432.88 | asset-market cash 165.01 | injected borrow 0.00 | injected issue cash 0.00 | injected spending 0.00 | loan-call repayment 0.00 | dividend 0.00
+  true   : dD -1847.76 | dc -288.31 | cfo-capex(indep.) -38.44 | cff(real cash) -414.87 | oth(clean) 165.01
+  game   : cff -414.12 | oth 164.12 | 차입 증감 -414.12 | nc 1432.88 | rlf {"d":207,"R":1432.8834564338936} | ncq 0
+ok   F6a relief recorded: {"d":207,"R":1432.8834564338936}
+ok   F6a relief quarter: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+pre  F6b next quarter (no events): every share-count change in the quarter is known (1 write(s): splits only)
+  --- F6b next quarter (no events) (close day 297, no relief)
+  ledger : relief R 0.00 | asset-market cash 76.30 | injected borrow 0.00 | injected issue cash 0.00 | injected spending 0.00 | loan-call repayment 0.00 | dividend 0.00
+  true   : dD -248.31 | dc -185.45 | cfo-capex(indep.) -13.44 | cff(real cash) -248.31 | oth(clean) 76.30
+  game   : cff -249.00 | oth 77.50 | 차입 증감 -249.00 | nc 0.00 | rlf {"d":207,"R":1432.8834564338936} | ncq 0
+ok   F6b next quarter (no events): the share count changed only by a split (328 -> 327, no cash): 증자·출자 0.00 (the old rule showed -0.85)
+ok   F6b the next quarter has no relief and takes no R (nc 0)
+ok   F6b: cff -249.0 vs expected -248.3 (err -0.69); other 77.5 vs expected 76.3 (err 1.20)
+ok   F6b the old rlf (day 207) stays but matches only its own quarter, not the new day 297
+ok   F6b the relief row is still corrected while visible (row 6, nc 1432.88)
+ok   F6b next quarter (no events): every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+
+-- done with the F cases
+
+-- TC-CF01-N1 negative relief: a healthy company forced into chapter 11 is re-levered; ch11 called outside earn() (SYNTHETIC)
+pre  N1: target PNPL (kd 0) lender KNYA A 6549.0 D 3160.5 cs 457.7 bk 0
+pre  N1 forced chapter 11 of a healthy company: every share-count change in the quarter is known (0 write(s): none)
+  --- N1 forced chapter 11 of a healthy company (close day 207, relief inside callLoan/ch11, outside earn())
+  ledger : relief R -2958.87 | asset-market cash 360.74 | injected borrow 0.00 | injected issue cash 0.00 | injected spending 0.00 | loan-call repayment 0.00 | dividend 0.00
+  true   : dD 2489.19 | dc -177.82 | cfo-capex(indep.) -68.88 | cff(real cash) -469.68 | oth(clean) 360.74
+  game   : cff -468.87 | oth 359.37 | 차입 증감 -468.87 | nc -2958.87 | rlf {"d":207,"R":-2958.8716787184226} | ncq 0
+ok   N1 the relief happened outside earn() and is NEGATIVE: R = -2958.87 (debt before 3160.48, after 6119.35)
+ok   N1 ncq keeps the sign while it waits: -2958.87 (rlf not yet set)
+ok   N1 rlf = {d 207, R -2958.87} negative, equal to the ledger R
+ok   N1: cff -468.9 vs expected -469.7 (err 0.81); other 359.4 vs expected 360.7 (err -1.36)
+ok   N1 independent cash closure residual 0.00
+ok   N1 the debt row rose by 2489.19 but 차입 증감 shows -468.87 = dD + R: the non-cash increase is taken out
+ok   N1 forced chapter 11 of a healthy company: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   N1 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+ok   N1 UI the memo row shows the negative amount in the relief column: -2,959 | – | – | – | – | – | – | –
+
+-- TC-CF01-B1 a bank (kd 1) forced into chapter 11 outside earn() (SYNTHETIC; bank/insurer deposits and mergers are FIN-CF-03, not touched)
+pre  B1 bank JPMX
+ok   B1 bank relief R = 1860.14 recorded: rlf {"d":254,"R":1860.144718855971}
+ok   B1 bank 차입 증감 -151.86 = dD(true) -2011.22 + R 1860.14
+ok   B1: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   B1 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+
+-- TC-CF01-SD relief on the same day after the company's close (outside earn(), before the day ends): it belongs to the NEXT close (SYNTHETIC)
+ok   SD relief R 1392.91 on close day 207 after earn(): waits in ncq (1392.91), rlf not set (undefined)
+ok   SD the row of the close that came BEFORE the relief is unchanged: nc 0, cff -39.00 (was -39.00), rlf undefined
+pre  SD share-count changes in the quarter: 1 (all by splits: no cash)
+ok   SD the next row (day 297) follows the pre-relief row (day 207)
+ok   SD at the next close ncq becomes rlf {d 297, R 1392.91} and the next row takes it (nc 1392.91)
+ok   SD the split moved no cash: 증자·출자 0.00 (the old rule showed -0.20)
+ok   SD next-row cff -715.09 vs expected -715.43 (err 0.35); other 236.09 vs 236.64 (err -0.56); closure vs asset-market cash 236.64: 0.00
+ok   SD: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   SD UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+
+-- TC-CF01-RET 8-quarter retention: the corrected row shifts one column per quarter and leaves the window (SYNTHETIC relief, then 9 quiet closes)
+pre  RET: target PNPL (kd 0) lender KNYA A 6549.0 D 3160.5 cs 457.7 bk 0
+pre  RET relief quarter: every share-count change in the quarter is known (0 write(s): none)
+  --- RET relief quarter (close day 207, relief inside earn())
+  ledger : relief R 1432.88 | asset-market cash 165.01 | injected borrow 0.00 | injected issue cash 0.00 | injected spending 0.00 | loan-call repayment 0.00 | dividend 0.00
+  true   : dD -1847.76 | dc -288.31 | cfo-capex(indep.) -38.44 | cff(real cash) -414.87 | oth(clean) 165.01
+  game   : cff -414.12 | oth 164.12 | 차입 증감 -414.12 | nc 1432.88 | rlf {"d":207,"R":1432.8834564338936} | ncq 0
+ok   RET relief quarter: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+pre  RET relief recorded {"d":207,"R":1432.8834564338936}
+pre  RET relief row is the newest of 8 rows, nc 1432.88
+ok   RET +1 quarters: rows 8, relief row at index 6 (expected 6) | still corrected: nc 1432.88, cff -414.12 = first value -414.12
+ok   RET +1 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+ok   RET +1 memo row shown as the relief row is visible with a previous quarter
+ok   RET +1: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   RET +2 quarters: rows 8, relief row at index 5 (expected 5) | still corrected: nc 1432.88, cff -414.12 = first value -414.12
+ok   RET +2 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+ok   RET +2 memo row shown as the relief row is visible with a previous quarter
+ok   RET +2: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   RET +3 quarters: rows 8, relief row at index 4 (expected 4) | still corrected: nc 1432.88, cff -414.12 = first value -414.12
+ok   RET +3 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+ok   RET +3 memo row shown as the relief row is visible with a previous quarter
+ok   RET +3: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   RET +4 quarters: rows 8, relief row at index 3 (expected 3) | still corrected: nc 1432.88, cff -414.12 = first value -414.12
+ok   RET +4 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+ok   RET +4 memo row shown as the relief row is visible with a previous quarter
+ok   RET +4: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   RET +5 quarters: rows 8, relief row at index 2 (expected 2) | still corrected: nc 1432.88, cff -414.12 = first value -414.12
+ok   RET +5 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+ok   RET +5 memo row shown as the relief row is visible with a previous quarter
+ok   RET +5: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   RET +6 quarters: rows 8, relief row at index 1 (expected 1) | still corrected: nc 1432.88, cff -414.12 = first value -414.12
+ok   RET +6 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+ok   RET +6 memo row shown as the relief row is visible with a previous quarter
+ok   RET +6: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   RET +7 quarters: rows 8, relief row at index 0 (expected 0) | no previous quarter to compare with: oldest row, cff null
+ok   RET +7 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden
+ok   RET +7 memo row hidden as the relief row is not comparable / gone
+ok   RET +7: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   RET +8 quarters: rows 8, relief row at index -1 (expected -1) | no previous quarter to compare with: row gone, rlf kept but inert
+ok   RET +8 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden
+ok   RET +8 memo row hidden as the relief row is not comparable / gone
+ok   RET +8: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   RET +9 quarters: rows 8, relief row at index -1 (expected -1) | no previous quarter to compare with: row gone, rlf kept but inert
+ok   RET +9 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden
+ok   RET +9 memo row hidden as the relief row is not comparable / gone
+ok   RET +9: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   RET after the row left the window the record stays ({"d":207,"R":1432.8834564338936}) and no visible row takes it
+
+-- TC-CF01-SV saves: a relief waiting for its close, and a confirmed relief, through autosave (full) and export (packS(1)) (SYNTHETIC)
+pre  SV autosave (full) (a) saved on day 117 with ncq 1406.50 waiting
+ok   SV autosave (full) (a) after loading ncq 1406.5030389927308 = 1406.5030389927308 (nothing lost), rlf undefined
+ok   SV autosave (full) (a) histories: kept, 8 rows
+ok   SV autosave (full) (a) the close after the load confirms it: rlf {"d":207,"R":1406.5030389927308}, ncq 0, row nc 1406.50
+ok   SV autosave (full) (a) the row follows the SPEC: cff -725.50, other 274.50
+ok   SV autosave (full) (a) and matches the true cash financing -725.82 (rows kept, so the previous quarter is the real one)
+ok   SV autosave (full) (a) UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+ok   SV autosave (full) (b) rlf {"d":207,"R":1406.5030389927308} kept, relief row still corrected
+ok   SV autosave (full) (b) UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+ok   SV autosave (full) 100 more days ran without an exception; ncq 0
+pre  SV export (packS(1), histories left out) (a) saved on day 117 with ncq 1406.50 waiting
+ok   SV export (packS(1), histories left out) (a) after loading ncq 1406.5030389927308 = 1406.5030389927308 (nothing lost), rlf undefined
+ok   SV export (packS(1), histories left out) (a) histories: left out of the file, rebuilt as 8 rows
+ok   SV export (packS(1), histories left out) (a) the close after the load confirms it: rlf {"d":207,"R":1406.5030389927308}, ncq 0, row nc 1406.50
+ok   SV export (packS(1), histories left out) (a) the row follows the SPEC: cff 688.50, other -1298.50
+ok   SV export (packS(1), histories left out) (a) UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+ok   SV export (packS(1), histories left out) (b) export: the rebuilt past quarters are not legacy rows (cfd -513 = load day - 720): no 미확인 cell, no chapter-11-history warning
+ok   SV export (packS(1), histories left out) (b) export: the confirmed record is dropped together with the real rows it described (qBack builds new past quarters): rlf undefined
+ok   SV export (packS(1), histories left out) (b) UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden
+ok   SV export (packS(1), histories left out) 100 more days ran without an exception; ncq 0
+
+-- TC-CF01-LG saves written before the ledger (SYNTHETIC reliefs, then the new fields removed from the save)
+pre  LG world: relief R 1432.88 booked in the quarter 27.3Q, one quiet quarter after it
+ok   LG: after loading every company has ncq 0, cfd = the load day 297, no rlf; and (FIN-CF-02) eqq 0, isd = the load day, no isq (522 companies)
+ok   LG: the quarter rows are exactly as saved (8 rows, 22/24 numbers each; nothing is rewritten on load)
+ok   LG: operating cash flow, capex, FCF, depreciation and cash change are the same as before the fields were removed (all rows)
+ok   LG: exactly the relief quarter 27.3Q is flagged unconfirmed (flagged: 27.3Q)
+ok   LG: no R is estimated: the number kept behind the label is the old formula (nc 0, cff -1847.00 = dD - dv + iss)
+ok   LG: nothing is claimed as a confirmed relief (rlf undefined, memo row condition false)
+ok   LG UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden; 미확인 in 27.3Q
+ok   LG UI: the footnote states the basis (chapter-11 history + equity ~15% of assets), that it is not a confirmation, and that quarters can be missed; no memo row
+ok   LG: a quarter whose previous row is inside the ledger (cfd 297 <= previous row 387) is never flagged: unk false
+ok   LG: even with the 15% signature planted in a post-ledger quarter it is not flagged (bk 1)
+ok   LG: 60 more days ran without an exception
+pre  LG (22-number rows of the oldest saves) world: relief R 1432.88 booked in the quarter 27.3Q, one quiet quarter after it
+ok   LG (22-number rows of the oldest saves): after loading every company has ncq 0, cfd = the load day 297, no rlf; and (FIN-CF-02) eqq 0, isd = the load day, no isq (522 companies)
+ok   LG (22-number rows of the oldest saves): the quarter rows are exactly as saved (8 rows, 22 numbers each; nothing is rewritten on load)
+ok   LG (22-number rows of the oldest saves): operating cash flow, capex, FCF, depreciation and cash change are the same as before the fields were removed (all rows)
+ok   LG (22-number rows of the oldest saves): exactly the relief quarter 27.3Q is flagged unconfirmed (flagged: 27.3Q)
+ok   LG (22-number rows of the oldest saves): no R is estimated: the number kept behind the label is the old formula (nc 0, cff -1847.00 = dD - dv + iss)
+ok   LG (22-number rows of the oldest saves): nothing is claimed as a confirmed relief (rlf undefined, memo row condition false)
+ok   LG (22-number rows of the oldest saves) UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden; 미확인 in 27.3Q
+ok   LG (22-number rows of the oldest saves) UI: the footnote states the basis (chapter-11 history + equity ~15% of assets), that it is not a confirmation, and that quarters can be missed; no memo row
+ok   LG (22-number rows of the oldest saves): a quarter whose previous row is inside the ledger (cfd 297 <= previous row 387) is never flagged: unk false
+ok   LG (22-number rows of the oldest saves): even with the 15% signature planted in a post-ledger quarter it is not flagged (bk 1)
+ok   LG (22-number rows of the oldest saves): 60 more days ran without an exception
+pre  LG table: the relief quarter 27.3Q matches the design rule in the loaded world
+ok   LG table: all conditions hold -> unconfirmed
+ok   LG table: bk = 0 (never in chapter 11): the 16 small-company look-alikes found in the investigation -> normal
+ok   LG table: a recorded relief matches this quarter (rlf.d = the row date) -> normal
+ok   LG table: the previous row is not before the ledger start (cfd <= previous row) -> normal
+ok   LG table: the company has no cfd (field missing): nothing is claimed -> normal
+ok   LG table: equity is not about 15% of assets (planted D 400 higher) -> normal
+ok   LG table: equity is 15% +/- 3 at the edge (D 2.9 higher still counts) -> unconfirmed
+ok   LG table: just outside the +/- 3 band (D 3.2 higher) -> normal
+ok   LG table: assets 0 -> normal
+ok   LG table: the oldest row (no previous quarter) is never flagged
+ok   LG look-alike (bk 0) UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden
+ok   LG a bk = 0 company whose last row has the 15% signature (planted) shows plain numbers and no chapter-11 footnote (flagged false)
+pre  LG-FN callLoan-route relief happened (R 1786.57)
+ok   LG-FN relief quarter 27.3Q: NOT detected by the signature (residual -9.50); the company-level warning is shown instead, so it is never silent [documented false negative]
+ok   LG-FN the relief amount is not guessed (nc 0)
+ok   LG-FN UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden
+pre  LG-IF pending relief 1406.50
+ok   LG-IF after loading: ncq 0 (unknown, not estimated), rlf undefined, bk 1
+ok   LG-IF the next close confirms nothing (rlf undefined, nc 0)
+ok   LG-IF the quarter that spans the lost relief is not matched by the signature (residual -29.55) but the company-level warning is shown: never presented as an ordinary quarter
+ok   LG-IF UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden
+
+-- TC-CF01-N natural run: seed 12345, JYNR (chapter 11 inside earn() on its own), 620 days, no injected events
+pre  N target JYNR (kd 0)
+pre  N JYNR had exactly one relief, inside earn(), on day 431: R 848.42 (investigated on main: 848.42)
+ok   N at the close of day 431 rlf = {d 431, R 848.42} = the ledger R, ncq 0
+info N ledger: dD -848.42 | relief R 848.42 | dividend 0.00 | share-count writes 0 | asset-market cash 72.95 | dc 32.07 | cfo-capex(indep.) -40.88
+ok   N the true cash financing of the quarter is 0.00 (the debt fell by exactly the relief; nothing was repaid in cash)
+ok   N game cff 0.42 vs expected 0.00 (main showed -848.42); other 71.58 vs 72.95 (closure vs asset-market cash 72.95)
+ok   N the next quarter (day 521) is ordinary: nc 0, cff -1.10 vs -1.11, other -87.40
+ok   N after 620 days only companies with a chapter-11 history carry an rlf (JYNR), no ncq is left waiting
+ok   N the quarter record is unchanged: 8 rows at most, 24 numbers (22 in back-filled rows) for every company
+ok   N JYNR: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)
+ok   N JYNR UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown
+
+-- TC-CF01-F8 same debt change in the rows, different compositions: a chapter-11 relief (non-cash) vs a cash repayment funded by an asset sale (SYNTHETIC)
+     X relief (non-cash)                           true dD  -1847.76 | relief R  1432.88 | real cash financing   -414.87 | shown 재무활동   -414.12 | shown 기타   164.12
+     Y cash repayment 923.9 (asset sale funds it)  true dD  -1342.71 | relief R     0.00 | real cash financing  -1379.34 | shown 재무활동  -1379.00 | shown 기타  1109.00
+     Y cash repayment 1385.8 (asset sale funds it) true dD  -1931.39 | relief R     0.00 | real cash financing  -1966.00 | shown 재무활동  -1966.00 | shown 기타  1664.00
+     Y cash repayment 1154.8 (asset sale funds it) true dD  -1637.05 | relief R     0.00 | real cash financing  -1672.67 | shown 재무활동  -1673.00 | shown 기타  1386.00
+     Y cash repayment 1270.3 (asset sale funds it) true dD  -1784.22 | relief R     0.00 | real cash financing  -1819.34 | shown 재무활동  -1819.00 | shown 기타  1524.00
+     Y cash repayment 1328.1 (asset sale funds it) true dD  -1857.81 | relief R     0.00 | real cash financing  -1892.67 | shown 재무활동  -1892.00 | shown 기타  1593.00
+     Y cash repayment 1299.2 (asset sale funds it) true dD  -1821.01 | relief R     0.00 | real cash financing  -1856.00 | shown 재무활동  -1856.00 | shown 기타  1559.00
+     Y cash repayment 1313.6 (asset sale funds it) true dD  -1839.41 | relief R     0.00 | real cash financing  -1874.33 | shown 재무활동  -1874.00 | shown 기타  1577.00
+     Y cash repayment 1320.9 (asset sale funds it) true dD  -1848.61 | relief R     0.00 | real cash financing  -1883.50 | shown 재무활동  -1883.00 | shown 기타  1585.00
+pre  F8 fixture: true debt change X -1847.76 vs Y -1848.61; relief X 1432.88, Y 0.00
+ok   F8 each statement matches its own real cash financing: X shows -414.1 (real -414.9), Y shows -1883.0 (real -1883.5)
+ok   F8 the two statements are told apart: financing differs by 1468.9 although the debt rows changed by the same -1847.8 (main showed the same number for both)
+errs 0 fails 0
+PASS t_fincf01_relief.js
+ALL PASS

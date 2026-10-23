@@ -82,8 +82,13 @@ function trapOn(T, log) {
   return () => { for (const k of ['cs', 'D', 'sh']) Object.defineProperty(T, k, { configurable: true, enumerable: true, writable: true, value: v[k] }) };
 }
 // ---- the SPEC of the new rule, on recorded rows (independent of fqDerive) -------------------------------------------------------------
+// the share-issue piece (FIN-CF-02, approved 2026-10-23, written here from the design, independent of fqDerive): a quarter whose previous row is
+// after the company's issue-ledger start (c.isd) takes the recorded cash c.isq[row day] (splits and stock-merger shares add nothing); an older quarter whose
+// share count changed keeps the old estimate (share-count change x close price) and is an estimate (est, shown with ≈); an older quarter whose share count
+// did not change takes the recorded amount or 0. Until FIN-CF-02 this SPEC used 'share-count change x close price' for every row, i.e. it copied that defect.
+const issRule = (c, q, p) => { const led = c.isd != null && p.d > c.isd, dsh = q.sh !== p.sh; return led || !dsh ? { iss: (c.isq && c.isq[q.d]) || 0, est: false } : { iss: (q.sh - p.sh) * q.p / 1e4, est: true } };
 const specCF = (c, q, p, R) => { const fin = c.kd, dep = fin ? 0 : q.A * .02, cfo = q.ni - q.eq + q.ga + dep + (q.imp || 0) + (q.wo || 0), capex = fin ? 0 : q.gr + dep, dD = q.D - p.D,
-  iss = q.sh !== p.sh ? (q.sh - p.sh) * q.p / 1e4 : 0, cff = dD + R - q.dv + iss, dc = q.cs - p.cs; return { cfo, capex, dD, iss, cff, dc, oth: dc - cfo + capex - cff, borrow: dD + R } };
+  ir = issRule(c, q, p), iss = ir.iss, cff = dD + R - q.dv + iss, dc = q.cs - p.cs; return { cfo, capex, dD, iss, est: ir.est, cff, dc, oth: dc - cfo + capex - cff, borrow: dD + R } };
 // R that belongs to each visible row, from the ledger: the relief with idx k happened while the company had closed k times, so it belongs to the (k+1)th close
 function ledgerR(T) { const cl = LED.closes[T.id] || [], map = {}; for (const r of LED.ch11) if (r.id === T.id && !r.killed) { const row = cl[r.idx]; if (row) map[row.d] = (map[row.d] || 0) + r.R } return map }
 function rowCheck(T, label) {
@@ -93,14 +98,15 @@ function rowCheck(T, label) {
     for (const k of ['cfo', 'capex', 'cff', 'dc', 'oth']) if (!(Math.abs(d[k] - s[k]) <= 1e-9 * Math.max(1, Math.abs(s[k])))) bad.push(qLab(q.d) + ' ' + k + ' game ' + f2(d[k]) + ' spec ' + f2(s[k]));
     if (Math.abs(d.cff + q.dv - d.iss - s.borrow) > 1e-9 * Math.max(1, Math.abs(s.borrow))) bad.push(qLab(q.d) + ' 차입 증감 game ' + f2(d.cff + q.dv - d.iss) + ' spec ' + f2(s.borrow));
     if (Math.abs(d.nc - R) > 1e-9) bad.push(qLab(q.d) + ' nc game ' + f2(d.nc) + ' ledger R ' + f2(R));
+    if (Math.abs(d.iss - s.iss) > 1e-9 || d.est !== s.est) bad.push(qLab(q.d) + ' 증자·출자 game ' + f2(d.iss) + (d.est ? ' (est)' : '') + ' spec ' + f2(s.iss) + (s.est ? ' (est)' : ''));
   }
-  ok(!bad.length, label + ': every visible quarter row (' + n + ') = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged)' + (bad.length ? ' | ' + bad.slice(0, 4).join('; ') : ''));
+  ok(!bad.length, label + ': every visible quarter row (' + n + ') = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule)' + (bad.length ? ' | ' + bad.slice(0, 4).join('; ') : ''));
 }
 // the 현금흐름 tab as rendered
 function cfTab(c) {
   sel = -1; pg = ''; tab = 'h'; S.spd = 0; G.pick(c.id); G.stab('f'); G.fseg(3); render();
   const h = document.getElementById('sh').innerHTML, row = lab => { const part = h.split('<td>' + lab + '</td>')[1]; return part == null ? null : [...part.split('</tr>')[0].matchAll(/<td[^>]*>([^<]*)<\/td>/g)].map(m => m[1]) };
-  return { h, clean: !/NaN|undefined|Infinity|\[object/.test(h), row, text: document.getElementById('sh').textContent };
+  return { h, clean: !/NaN|undefined|Infinity|\[object/.test(h), row, text: h.replace(/<[^>]*>/g, '') };   // the stub's textContent is always '': the text is taken from the HTML (until FIN-CF-02 two checks read '' here)
 }
 const cols = c => fqL(c).slice().reverse();     // newest first, the order of the tab's columns
 console.log('-- harness ready');
@@ -125,6 +131,8 @@ function runSeq(label, quarters, seed) {
     const inv = log.filter(l => l.k === 'cs' && has(l.st, 'fsAdd', 'fsTick')).reduce((a, l) => a + l.d, 0);
     const paidLoan = log.filter(l => l.k === 'D' && has(l.st, 'callLoan') && !has(l.st, 'ch11x')).reduce((a, l) => a + l.d, 0);
     const Bnet = ev.Bnet || 0, issCash = ev.issCash || 0, spent = ev.spent || 0;
+    const shW = log.filter(l => l.k === 'sh'), splitOnly = shW.length > 0 && shW.every(l => has(l.st, 'splitDo'));
+    pre(!shW.length || splitOnly || ev.issCash != null, q.name + ': every share-count change in the quarter is known (' + shW.length + ' write(s): ' + (shW.length ? (splitOnly ? 'splits only' : 'an injected real share issue') : 'none') + ')');
     const L = fqL(T), Q = L[L.length - 1], P = L[L.length - 2], d = fqDerive(T, Q, P), er = out.er;
     const dD = out.post.D - S0.D, dc = out.post.cs - S0.cs, dv = er.dv, imp = er.imp || 0, wo = er.wo || 0;
     const cffReal = dD + R - dv + issCash, cm = er.ni - er.eq + er.ga + imp + wo - out.gr, othClean = dc - cm - cffReal;
@@ -134,6 +142,7 @@ function runSeq(label, quarters, seed) {
     console.log('  ledger : relief R ' + f2(R) + ' | asset-market cash ' + f2(inv) + ' | injected borrow ' + f2(Bnet) + ' | injected issue cash ' + f2(issCash) + ' | injected spending ' + f2(spent) + ' | loan-call repayment ' + f2(-paidLoan) + ' | dividend ' + f2(dv));
     console.log('  true   : dD ' + f2(dD) + ' | dc ' + f2(dc) + ' | cfo-capex(indep.) ' + f2(cm) + ' | cff(real cash) ' + f2(cffReal) + ' | oth(clean) ' + f2(othClean));
     console.log('  game   : cff ' + f2(d.cff) + ' | oth ' + f2(d.oth) + ' | 차입 증감 ' + f2(d.cff + Q.dv - d.iss) + ' | nc ' + f2(d.nc) + ' | rlf ' + JSON.stringify(T.rlf) + ' | ncq ' + T.ncq);
+    if (splitOnly && ev.issCash == null) ok(d.iss === 0 && Q.sh !== P.sh && !d.est, q.name + ': the share count changed only by a split (' + P.sh + ' -> ' + Q.sh + ', no cash): 증자·출자 ' + f2(d.iss) + ' (the old rule showed ' + f2((Q.sh - P.sh) * Q.p / 1e4) + ')');
     if (q.check) q.check(r, T, rel, ev);
     rowCheck(T, q.name);
   }
@@ -173,14 +182,18 @@ runSeq('F3', [{ name: 'F3', start: c => { c.D += 250; c.cs += 250; return { Bnet
   info('F3 dD ' + f2(r.dD) + ' = relief -' + f2(r.R) + ' + cash borrowing (netted inside chapter 11, which re-sets D from assets + cash)') } }]);
 
 // ---- F4 relief + regular dividend + share issuance -----------------------------------------------------------------------------------
-console.log('\n-- TC-CF01-F4 relief with a regular dividend and a share issuance (SYNTHETIC; the issue is valued at the close price: FIN-CF-02, out of scope)');
-runSeq('F4', [{ name: 'F4', start: c => { const dsh = c.sh * .1, cash = dsh * c.p / 1e4; c.sh += dsh; c.cs += cash; c.pay = .5; c.edge = (c.edge || 0) + .08;
-    c.A *= .8; const A2 = c.A * (1 + c.g / 4), Y = 1.25 * A2 + c.gw + pfv(c) - c.D + .1 * c.A; c.D += Y; c.cs += Y; const sp = c.cs; c.cs = 0; return { issCash: cash, Bnet: Y, spent: sp } },
-  check: (r, T, rel) => {
+console.log('\n-- TC-CF01-F4 relief with a regular dividend and a real share issue (the game\'s credit-downgrade event, issue 10%; SYNTHETIC timing)');
+// until FIN-CF-02 this case wrote c.sh and c.cs directly (an issue no game path makes) and recorded the close-price mismatch as out of scope; it now uses the
+// real transaction function, measures its cash independently (cash - debt around the call) and requires the statement to match it
+const EVf = t => EV2.find(e => String(e.go).includes(t));
+runSeq('F4', [{ name: 'F4', start: c => { const e = EVf('재무구조 개선'), cs0 = c.cs, D0 = c.D, sh0 = c.sh; e.go(c, e.mk(c), 'iss'); const cash = (c.cs - cs0) - (c.D - D0), dsh = c.sh - sh0; c.pay = .5; c.edge = (c.edge || 0) + .08;
+    c.A *= .8; const A2 = c.A * (1 + c.g / 4), Y = 1.25 * A2 + c.gw + pfv(c) - c.D + .1 * c.A; c.D += Y; c.cs += Y; const sp = c.cs; c.cs = 0; return { issCash: cash, dsh, Bnet: Y, spent: sp } },
+  check: (r, T, rel, ev) => {
     ok(rel.length === 1, 'F4 one relief'); if (rel.length !== 1) return; ok(r.dv > 1, 'F4 regular dividend paid ' + f2(r.dv));
-    const mis = r.iss - r.issCash; info('F4 share issue: cash really raised ' + f2(r.issCash) + ' vs the "증자" figure ' + f2(r.iss) + ' (sh change x close price; the price was reset by chapter 11): mismatch ' + f2(mis) + ' is FIN-CF-02, not touched here');
-    ok(near(r.cffG - r.cffReal, mis), 'F4 cff error ' + f2(r.cffG - r.cffReal) + ' = the issue mismatch ' + f2(mis) + ' only: the relief R ' + f2(r.R) + ' leaves no residual');
-    ok(near(r.othG - r.othClean, -mis), 'F4 other-line error ' + f2(r.othG - r.othClean) + ' = -(issue mismatch) ' + f2(-mis) + ' only');
+    pre(ev.dsh > 0 && r.issCash > 1, 'F4 the event issued ' + f2(ev.dsh) + ' shares for ' + f2(r.issCash) + ' (measured around the call)');
+    const old = (r.Q.sh - r.P.sh) * r.Q.p / 1e4; info('F4 the old rule (share-count change x close price; chapter 11 reset the price) would show ' + f2(old) + ' (error ' + f2(old - r.issCash) + ')');
+    ok(Math.abs(r.iss - r.issCash) <= .01 && !r.d.est, 'F4 증자·출자 ' + f2(r.iss) + ' = the cash really raised ' + f2(r.issCash));
+    cashOk(r, 'F4 (relief R ' + f2(r.R) + ' and the issue both accounted)');
     ok(Math.abs(T.rlf.R - r.R) < 1e-9 && near(r.closure, 0), 'F4 rlf.R = ledger R; independent closure residual ' + f2(r.closure)) } }]);
 
 // ---- F5 second relief = delisting; nothing may be left behind -----------------------------------------------------------------------
@@ -244,9 +257,9 @@ function uiCheck(T, lab, opt) {
   if (!bad.length) L.forEach((q, j) => {
     const p = L[j + 1], lb = qLab(q.d), u = unk.includes(q.d);
     if (!p) { for (const k of ['b', 'f', 'o', 'dc']) if (cellsOf[k][j] !== '–') bad.push(lb + ' oldest quarter ' + k + ' = ' + cellsOf[k][j]); return }
-    const R = Rm[q.d] || 0, dep = fin ? 0 : q.A * .02, cfo = q.ni - q.eq + q.ga + dep + (q.imp || 0) + (q.wo || 0), capex = fin ? 0 : q.gr + dep, iss = q.sh !== p.sh ? (q.sh - p.sh) * q.p / 1e4 : 0;
+    const R = Rm[q.d] || 0, dep = fin ? 0 : q.A * .02, cfo = q.ni - q.eq + q.ga + dep + (q.imp || 0) + (q.wo || 0), capex = fin ? 0 : q.gr + dep, ir = issRule(T, q, p), iss = ir.iss, e = ir.est ? '≈' : '';
     const borrow = q.D - p.D + R, cff = borrow - q.dv + iss, dc = q.cs - p.cs, oth = dc - cfo + capex - cff;
-    const want = { b: u ? '미확인' : fN(borrow), f: u ? '미확인' : fN(cff), o: u ? '미확인' : fN(oth), dc: fN(dc), cfo: fN(cfo), cap: fin ? '–' : fN(-capex), fcf: fin ? '–' : fN(cfo - capex) };
+    const want = { b: u ? '미확인' : fN(borrow), f: u ? '미확인' : e + fN(cff), o: u ? '미확인' : e + fN(oth), dc: fN(dc), cfo: fN(cfo), cap: fin ? '–' : fN(-capex), fcf: fin ? '–' : fN(cfo - capex) };
     for (const k in want) if (cellsOf[k][j] !== want[k]) bad.push(lb + ' ' + k + ' shows ' + cellsOf[k][j] + ' want ' + want[k]);
   });
   const memo = t.row(NOTE_RLF), vis = L.some((q, j) => L[j + 1] && Rm[q.d]);
@@ -296,11 +309,12 @@ console.log('\n-- TC-CF01-SD relief on the same day after the company\'s close (
   const o2 = nextClose(T); untrap();
   const L = fqL(T), Q = L[L.length - 1], P = L[L.length - 2], d = fqDerive(T, Q, P), er = o2.er;
   const dD = o2.post.D - ev.S1.D, dc = o2.post.cs - ev.S1.cs, R = ev.rec.R, dv = er.dv, cm = er.ni - er.eq + er.ga + (er.imp || 0) + (er.wo || 0) - o2.gr;
-  const inv = log.slice(ev.mark).filter(l => l.k === 'cs' && has(l.st, 'fsAdd', 'fsTick')).reduce((a, l) => a + l.d, 0), shch = log.slice(ev.mark).filter(l => l.k === 'sh').length;
-  const cffReal = dD + R - dv + d.iss, othClean = dc - cm - cffReal;
+  const inv = log.slice(ev.mark).filter(l => l.k === 'cs' && has(l.st, 'fsAdd', 'fsTick')).reduce((a, l) => a + l.d, 0), shL = log.slice(ev.mark).filter(l => l.k === 'sh'), shch = shL.length, splitOnly = shch > 0 && shL.every(l => has(l.st, 'splitDo'));
+  pre(!shch || splitOnly, 'SD share-count changes in the quarter: ' + shch + (shch ? (splitOnly ? ' (all by splits: no cash)' : ' NOT all splits') : ''));
+  const cffReal = dD + R - dv + 0, othClean = dc - cm - cffReal;   // no share cash in this quarter (splits only, classified above from the call stacks)
   ok(P.d === ev.day && Q.d === o2.day && P.d === ev.row1.d, 'SD the next row (day ' + Q.d + ') follows the pre-relief row (day ' + P.d + ')');
   ok(T.rlf && T.rlf.d === Q.d && Math.abs(T.rlf.R - R) < 1e-9 && T.ncq === 0 && d.nc === R, 'SD at the next close ncq becomes rlf {d ' + (T.rlf && T.rlf.d) + ', R ' + f2(T.rlf && T.rlf.R) + '} and the next row takes it (nc ' + f2(d.nc) + ')');
-  info('SD share-count writes in the quarter: ' + shch + ' (game 증자 row ' + f2(d.iss) + '; the issue valuation is FIN-CF-02, so the game\'s own figure is used for it here)');
+  if (splitOnly) ok(d.iss === 0 && !d.est, 'SD the split moved no cash: 증자·출자 ' + f2(d.iss) + ' (the old rule showed ' + f2((Q.sh - P.sh) * Q.p / 1e4) + ')');
   ok(near(d.cff, cffReal) && near(d.oth, othClean) && near(othClean, inv), 'SD next-row cff ' + f2(d.cff) + ' vs expected ' + f2(cffReal) + ' (err ' + f2(d.cff - cffReal) + '); other ' + f2(d.oth) + ' vs ' + f2(othClean) + ' (err ' + f2(d.oth - othClean) + '); closure vs asset-market cash ' + f2(inv) + ': ' + f2(othClean - inv));
   rowCheck(T, 'SD'); uiCheck(T, 'SD UI', { R: ledgerR(T) });
 }
@@ -357,7 +371,7 @@ for (const [fmt, strip] of [['autosave (full)', 0], ['export (packS(1), historie
 // saves written BEFORE the ledger: no ncq / rlf / cfd on any company. An unknown R is never estimated and never called confirmed.
 // ================================================================================================================================
 console.log('\n-- TC-CF01-LG saves written before the ledger (SYNTHETIC reliefs, then the new fields removed from the save)');
-const legacy = async (slots) => { const raw = clone(S); for (const x of raw.co) { delete x.ncq; delete x.rlf; delete x.cfd; if (slots && x.fq) x.fq = x.fq.map(r => r.slice(0, slots)) } S = migrate(raw); v8fix(); S.bgs = 0; col(); secUpd(); sel = -1; pg = ''; mdl = null };
+const legacy = async (slots) => { const raw = clone(S); for (const x of raw.co) { delete x.ncq; delete x.rlf; delete x.cfd; delete x.eqq; delete x.isq; delete x.isd; if (slots && x.fq) x.fq = x.fq.map(r => r.slice(0, slots)) } S = migrate(raw); v8fix(); S.bgs = 0; col(); secUpd(); sel = -1; pg = ''; mdl = null };
 const keys5 = ['cfo', 'capex', 'dc', 'fcf', 'dep'];
 for (const slots of [0, 22]) {
   const tag = 'LG' + (slots ? ' (22-number rows of the oldest saves)' : '');
@@ -365,7 +379,7 @@ for (const slots of [0, 22]) {
   const L0 = fqL(T), D0 = L0.map((q, j) => j ? fqDerive(T, q, L0[j - 1]) : null), rd = T.rlf.d, R0 = T.rlf.R;
   pre(T.bk === 1 && !!T.rlf && L0.length === 8 && L0.findIndex(q => q.d === rd) === 6, tag + ' world: relief R ' + f2(R0) + ' booked in the quarter ' + qLab(rd) + ', one quiet quarter after it');
   const rows0 = clone(T.fq); await legacy(slots); T = S.co[id]; const L = fqL(T), Ds = L.map((q, j) => j ? fqDerive(T, q, L[j - 1]) : null);
-  ok(S.co.every(x => x.ncq === 0 && x.cfd === S.day && !('rlf' in x)), tag + ': after loading every company has ncq 0, cfd = the load day ' + S.day + ', no rlf (' + S.co.length + ' companies)');
+  ok(S.co.every(x => x.ncq === 0 && x.cfd === S.day && !('rlf' in x) && x.eqq === 0 && x.isd === S.day && !('isq' in x)), tag + ': after loading every company has ncq 0, cfd = the load day ' + S.day + ', no rlf; and (FIN-CF-02) eqq 0, isd = the load day, no isq (' + S.co.length + ' companies)');
   ok(L.length === 8 && JSON.stringify(T.fq) === JSON.stringify(slots ? rows0.map(r => r.slice(0, slots)) : rows0), tag + ': the quarter rows are exactly as saved (' + T.fq.length + ' rows, ' + [...new Set(T.fq.map(r => r.length))].join('/') + ' numbers each; nothing is rewritten on load)');
   ok(Ds.every((d, j) => !j || keys5.every(k => Math.abs(d[k] - D0[j][k]) < 1e-9)), tag + ': operating cash flow, capex, FCF, depreciation and cash change are the same as before the fields were removed (all rows)');
   const unkDays = L.filter((q, j) => Ds[j] && Ds[j].unk).map(q => q.d);
@@ -404,7 +418,7 @@ for (const slots of [0, 22]) {
   // a company without any chapter-11 history keeps its table untouched even when its last row looks like a reset
   const U2 = S.co.find(x => !x.dead && !x.kd && x.bk === 0 && x.fq && x.fq.length >= 3 && x.id !== id); const lr = U2.fq[U2.fq.length - 1]; lr[17] = lr[14] + lr[13] + lr[15] + lr[16] - .15 * lr[14];
   const Lq = fqL(U2), dq = fqDerive(U2, Lq[Lq.length - 1], Lq[Lq.length - 2]); const tu = uiCheck(U2, 'LG look-alike (bk 0) UI', { R: {} });
-  ok(!dq.unk && cfNote(U2) === '' && !/미확인|법정관리 이력/.test(tu.text), 'LG a bk = 0 company whose last row has the 15% signature (planted) shows plain numbers and no footnote (flagged ' + dq.unk + ')');
+  ok(!dq.unk && cfNoteR(U2) === '' && cfNote(U2) === cfNoteE(U2) && !/미확인|법정관리 이력/.test(tu.text), 'LG a bk = 0 company whose last row has the 15% signature (planted) shows plain numbers and no chapter-11 footnote (flagged ' + dq.unk + (cfNoteE(U2) ? '; only the FIN-CF-02 estimate footnote' : '') + ')');
 }
 {
   // false negative that cannot be closed: a relief reached through callLoan in a save that never recorded it, signature or not

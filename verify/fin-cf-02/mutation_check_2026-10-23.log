@@ -1,0 +1,142 @@
+ok   none (the unmodified game) -> passes
+ok   S1 act2 G.mg rights issue records nothing -> CAUGHT by the new test (33 FAIL = calculation differs, 1 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C1 rights issue 10% (G.mg iss) 증자·출자(자사주) 0.00 = cash really received/paid 433.45
+       FAIL C1 rights issue 10% (G.mg iss) 재무활동 -40.00 = dD + R - dv + real cash = 393.45
+ok   S2 act2 G.mg buyback records nothing -> CAUGHT by the new test (13 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C3 buyback 5% (G.mg bb, company cash) 증자·출자(자사주) 0.00 = cash really received/paid -239.54
+       FAIL C3 buyback 5% (G.mg bb, company cash) 재무활동 -38.00 = dD + R - dv + real cash = -277.54
+ok   S3 act2 G.gm greenmail records nothing -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price) 증자·출자(자사주) 0.00 = cash really received/paid -520.49
+       FAIL C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price) 재무활동 -38.00 = dD + R - dv + real cash = -558.49
+ok   S4 act2 bailout event records nothing -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C6 bailout (event bail): cash A x .15, shares / .7 증자·출자(자사주) 0.00 = cash really received/paid 1002.10
+       FAIL C6 bailout (event bail): cash A x .15, shares / .7 재무활동 -42.00 = dD + R - dv + real cash = 960.10
+ok   S5 act2 G.pp private placement records nothing -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C4 private placement 10% to me (G.pp) 증자·출자(자사주) 0.00 = cash really received/paid 496.82
+       FAIL C4 private placement 10% to me (G.pp) 재무활동 -41.00 = dD + R - dv + real cash = 455.82
+ok   S6 act2 G.wk white knight records nothing -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C11 white knight 10% (G.wk) 증자·출자(자사주) 0.00 = cash really received/paid 481.61
+       FAIL C11 white knight 10% (G.wk) 재무활동 -41.00 = dD + R - dv + real cash = 440.61
+ok   S7 act2 G.mvGo new shares (pp) records nothing -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C12 new shares bought by me (money move "pp") 증자·출자(자사주) 0.00 = cash really received/paid 300.00
+       FAIL C12 new shares bought by me (money move "pp") 재무활동 -40.00 = dD + R - dv + real cash = 260.00
+ok   S8 act2 G.mvGo cash contribution (cap) records nothing -> CAUGHT by the new test (6 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL P2 capital contribution (policy: equity financing from the owner) 증자·출자(자사주) 0.00 = cash really received/paid 250.00
+       FAIL P2 capital contribution (policy: equity financing from the owner) 재무활동 -40.00 = dD + R - dv + real cash = 210.00
+ok   S9 ui2 G.eoX option exercise records nothing -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C5 option exercise 2% at a strike of 60% of the price (G.eoX) 증자·출자(자사주) 0.00 = cash really received/paid 54.15
+       FAIL C5 option exercise 2% at a strike of 60% of the price (G.eoX) 재무활동 -39.00 = dD + R - dv + real cash = 15.15
+ok   S10 ui2 bankQ bank capital raise records nothing -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL NAT seed 12345 BOAX(bank) row 494 [bankQ@1975] 증자 0.00 = real cash 14.56 (error -14.56)
+       FAIL NAT seed 12345 BOAX(bank) row 584 [bankQ@1975] 증자 0.00 = real cash 5.44 (error -5.44)
+ok   S11 ui2 activist event buyback records nothing -> CAUGHT by the new test (6 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C8 event: activist -> buyback 5% 증자·출자(자사주) 0.00 = cash really received/paid -236.93
+       FAIL C8 event: activist -> buyback 5% 재무활동 -3221.00 = dD + R - dv + real cash = -3457.93
+ok   S12 ui2 downgrade event issue records nothing -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL C7 event: credit downgrade -> share issue 10% 증자·출자(자사주) 0.00 = cash really received/paid 428.73
+       FAIL C7 event: credit downgrade -> share issue 10% 재무활동 -633.00 = dD + R - dv + real cash = -204.27
+ok   S13 ui2 buyback event records nothing -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C9 event: buyback 4% 증자·출자(자사주) 0.00 = cash really received/paid -189.55
+       FAIL C9 event: buyback 4% 재무활동 -3222.00 = dD + R - dv + real cash = -3411.55
+ok   S14 ui2 government stake event records nothing -> CAUGHT by the new test (6 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C10 event: government buys a 30% stake 증자·출자(자사주) 0.00 = cash really received/paid 1353.90
+       FAIL C10 event: government buys a 30% stake 재무활동 -1574.00 = dD + R - dv + real cash = -220.10
+ok   S15 ui2 rival activist buyback (persTick) records nothing -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C14 rival activist -> company buyback (persTick, strategy ag) 증자·출자(자사주) 0.00 = cash really received/paid -236.93
+       FAIL C14 rival activist -> company buyback (persTick, strategy ag) 재무활동 -3221.00 = dD + R - dv + real cash = -3457.93
+ok   A1 rights issue recorded at the gross amount (no 5% discount) -> CAUGHT by the new test (30 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C1 rights issue 10% (G.mg iss) 증자·출자(자사주) 456.27 = cash really received/paid 433.45
+       FAIL C1 rights issue 10% (G.mg iss) 재무활동 416.27 = dD + R - dv + real cash = 393.45
+ok   A2 buyback recorded with the wrong sign -> CAUGHT by the new test (12 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C3 buyback 5% (G.mg bb, company cash) 증자·출자(자사주) 239.54 = cash really received/paid -239.54
+       FAIL C3 buyback 5% (G.mg bb, company cash) 재무활동 201.54 = dD + R - dv + real cash = -277.54
+ok   A3 greenmail recorded at 80% of the price paid -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price) 증자·출자(자사주) -416.39 = cash really received/paid -520.49
+       FAIL C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price) 재무활동 -454.39 = dD + R - dv + real cash = -558.49
+ok   A4 bailout recorded as cash / .7 -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C6 bailout (event bail): cash A x .15, shares / .7 증자·출자(자사주) 1431.56 = cash really received/paid 1002.10
+       FAIL C6 bailout (event bail): cash A x .15, shares / .7 재무활동 1389.56 = dD + R - dv + real cash = 960.10
+ok   A5 option exercise recorded at the market price instead of the strike -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C5 option exercise 2% at a strike of 60% of the price (G.eoX) 증자·출자(자사주) 90.26 = cash really received/paid 54.15
+       FAIL C5 option exercise 2% at a strike of 60% of the price (G.eoX) 재무활동 51.26 = dD + R - dv + real cash = 15.15
+ok   A6 bank capital raise recorded gross (before the 10% cost) -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL NAT seed 12345 BOAX(bank) row 494 [bankQ@1975] 증자 16.18 = real cash 14.56 (error 1.62)
+       FAIL NAT seed 12345 BOAX(bank) row 584 [bankQ@1975] 증자 6.05 = real cash 5.44 (error 0.60)
+ok   N1 splitDo records the split as cash at the price -> CAUGHT by the new test (17 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL M2 issue 10% then a 1:10 reverse split in one quarter (the split adds no cash) 증자·출자(자사주) -3948.07 = cash really received/paid 433.45
+       FAIL M2 issue 10% then a 1:10 reverse split in one quarter (the split adds no cash) 재무활동 -3988.07 = dD + R - dv + real cash = 393.45
+ok   N2 the stock merger records the new shares as cash -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL N3 stock merger, acquirer side (G.merge): new shares are the payment, no cash 증자·출자(자사주) 1604.60 = cash really received/paid 0.00
+       FAIL N3 stock merger, acquirer side (G.merge): new shares are the payment, no cash 재무활동 2671.60 = dD + R - dv + real cash = 1067.00
+ok   E1 eqCash records nothing -> CAUGHT by the new test (95 FAIL = calculation differs, 1 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL C1 rights issue 10% (G.mg iss) 증자·출자(자사주) 0.00 = cash really received/paid 433.45
+       FAIL C1 rights issue 10% (G.mg iss) 재무활동 -40.00 = dD + R - dv + real cash = 393.45
+ok   E2 eqCash records with the wrong sign -> CAUGHT by the new test (94 FAIL = calculation differs, 1 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL C1 rights issue 10% (G.mg iss) 증자·출자(자사주) -433.45 = cash really received/paid 433.45
+       FAIL C1 rights issue 10% (G.mg iss) 재무활동 -473.45 = dD + R - dv + real cash = 393.45
+ok   E3 eqCash overwrites instead of adding -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL M1 issue 10% then buyback 5% in one quarter 증자·출자(자사주) -244.72 = cash really received/paid 188.73
+       FAIL M1 issue 10% then buyback 5% in one quarter 재무활동 -284.72 = dD + R - dv + real cash = 148.73
+ok   E4 the close never zeroes eqq -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL SV export (packS(1)): exporting after the close drops the confirmed record {"207":433.45227006693824} together with the real rows (isq undefined); the rebuilt quarters show no issue
+       FAIL RET the close confirms isq[117] = 426.83 (real 426.83), eqq back to 0: 426.82887826507437
+ok   E5 the close records the amount one day late -> CAUGHT by the new test (91 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL C1 rights issue 10% (G.mg iss) 증자·출자(자사주) 0.00 = cash really received/paid 433.45
+       FAIL C1 rights issue 10% (G.mg iss) 재무활동 -40.00 = dD + R - dv + real cash = 393.45
+ok   E6 the close overwrites isq[day] instead of adding (a company closes at most once a day, so the slot is always empty) -> SURVIVES (expected, documented) passes | other cash-flow tests: do not catch it
+ok   E7 the close never confirms (eqq stays pending) -> CAUGHT by the new test (92 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL C1 rights issue 10% (G.mg iss) 증자·출자(자사주) 0.00 = cash really received/paid 433.45
+       FAIL C1 rights issue 10% (G.mg iss) 재무활동 -40.00 = dD + R - dv + real cash = 393.45
+ok   E8 old amounts are never pruned -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL RET after 8 more closes the confirmed amount of a row that left the 8-quarter window is dropped: isq {"117":426.82887826507437}
+ok   E9 pruning keeps only the newest row -> CAUGHT by the new test (6 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL RET one close later the issue row (now second newest) still shows the recorded cash 0.00 (isq undefined)
+       FAIL NAT seed 20261016 BABX row 571 [go@2073] 증자 0.00 = real cash 197.30 (error -197.30)
+ok   E10 kill leaves eqq and isq on the dead company -> CAUGHT by the new test (3 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL ABS absorbed target: dead 1, eqq 426.82887826507437, isq undefined; acquirer eqq 7 isq {"1":3} (planted, untouched)
+       FAIL KILL kill() clears the pending (426.83) and confirmed issue cash: eqq 426.82887826507437, isq undefined
+ok   E11 qBack keeps the old isq when it rebuilds the past quarters -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL SV export (packS(1)): exporting after the close drops the confirmed record {"207":433.45227006693824} together with the real rows (isq {"207":433.45227006693824}); the rebuilt quarters show no issue
+ok   E12 qBack does not move the ledger start (rebuilt rows look legacy) -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL SV export (packS(1)): the rebuilt past rows are not legacy rows (isd 0 = load day 147 - 720 < previous row 57); the next close shows the real cash 433.45: 433.45
+ok   E13 v8prep does not default isd (no ledger start at all) -> CAUGHT by the new test (3 FAIL = calculation differs, 5 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL LG after loading: isd = load day undefined (297), eqq 0
+       FAIL LG the quarter after loading starts ON the ledger start (previous row 297 = isd undefined): an older row, no share-count change, so 0 and not flagged (est false)
+ok   E14 v8prep starts the issue ledger at the FIN-CF-01 day cfd -> CAUGHT by the new test (7 FAIL = calculation differs, 5 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL LG the legacy row keeps the old estimate 466.50 (not re-estimated, not zeroed): 0.00
+       FAIL LG only that row is flagged est (est false)
+ok   E15 v8prep does not default eqq -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL LG after loading: isd = load day 297 (297), eqq undefined
+ok   E16 the export format drops eqq (strip list) -> CAUGHT by the new test (3 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL SV export (packS(1)): the pending issue cash survives the save: eqq 0.00 (before saving 433.45, real 433.45)
+       FAIL SV export (packS(1)): the rebuilt past rows are not legacy rows (isd -573 = load day 147 - 720 < previous row 57); the next close shows the real cash 433.45: 0.00
+ok   F1 a row whose previous row is ON the ledger start counts as recorded (>= instead of >: that close was before the save) -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL LG-SD that quarter is an estimate (≈0.00, real 453.38 not in the old save), not an incomplete ledger shown as recorded (est false)
+ok   F2 legacy rows use the (empty) ledger instead of the estimate -> CAUGHT by the new test (3 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL LG the legacy row keeps the old estimate 466.50 (not re-estimated, not zeroed): 0.00
+       FAIL LG-SD that quarter is an estimate (≈0.00, real 453.38 not in the old save), not an incomplete ledger shown as recorded (est true)
+ok   F3 legacy estimates are never flagged -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL LG only that row is flagged est (est false)
+       FAIL LG the tab: ≈ on 증자·출자(자사주) 466 / 재무활동 426 / 기타 -33.5 of 27.3Q only (차입 증감 0.0 plain); footnote "분기 말 주가 기준 추정(null)" says it is not a recorded amount | 증자·출자(자사주) shows 466 want ≈466; 재무활동 현금흐름 shows 426 want ≈426; 기타·투자 매매 
+ok   F4 the old statement (share-count change x close price everywhere) -> CAUGHT by the new test (106 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL C1 rights issue 10% (G.mg iss) 증자·출자(자사주) 466.50 = cash really received/paid 433.45
+       FAIL C1 rights issue 10% (G.mg iss) 재무활동 426.50 = dD + R - dv + real cash = 393.45
+ok   F5 a legacy row with no share-count change ignores the recorded amount -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL LG-ST contribution after loading, no share-count change: the recorded amount is used: 증자·출자 0.00 = 180.00, not flagged
+ok   F6 every legacy row is flagged, share change or not -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL LG only that row is flagged est (est true)
+       FAIL LG the tab: ≈ on 증자·출자(자사주) ≈466 / 재무활동 ≈426 / 기타 ≈-33.5 of 27.3Q only (차입 증감 0.0 plain); footnote "분기 말 주가 기준 추정(26.1Q, 26.2Q, 26.3Q, 27.1Q, 27.2Q, 27.3Q, 27.4Q)" says it is not a recorded amount | a recorded quarter shows ≈
+ok   U1 no ≈ on the 증자·출자 cell -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL LG the tab: ≈ on 증자·출자(자사주) 466 / 재무활동 ≈426 / 기타 ≈-33.5 of 27.3Q only (차입 증감 0.0 plain); footnote "분기 말 주가 기준 추정(27.3Q)" says it is not a recorded amount | 증자·출자(자사주) shows 466 want ≈466
+ok   U2 no ≈ on 재무활동 -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL LG the tab: ≈ on 증자·출자(자사주) ≈466 / 재무활동 426 / 기타 ≈-33.5 of 27.3Q only (차입 증감 0.0 plain); footnote "분기 말 주가 기준 추정(27.3Q)" says it is not a recorded amount | 재무활동 현금흐름 shows 426 want ≈426
+ok   U3 no ≈ on 기타·투자 매매 -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL LG the tab: ≈ on 증자·출자(자사주) ≈466 / 재무활동 ≈426 / 기타 -33.5 of 27.3Q only (차입 증감 0.0 plain); footnote "분기 말 주가 기준 추정(27.3Q)" says it is not a recorded amount | 기타·투자 매매 shows -33.5 want ≈-33.5
+ok   U4 ≈ also on 차입 증감 (which is exact) -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: t_fincf01_relief.js
+       FAIL LG the tab: ≈ on 증자·출자(자사주) ≈466 / 재무활동 ≈426 / 기타 ≈-33.5 of 27.3Q only (차입 증감 ≈0.0 plain); footnote "분기 말 주가 기준 추정(27.3Q)" says it is not a recorded amount | 차입 증감 shows ≈0.0 want 0.0
+ok   U5 the estimate footnote is removed -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL LG the tab: ≈ on 증자·출자(자사주) ≈466 / 재무활동 ≈426 / 기타 ≈-33.5 of 27.3Q only (차입 증감 0.0 plain); footnote "분기 말 주가 기준 추정(null)" says it is not a recorded amount
+ok   U6 the old line name 증자(자사주) -> CAUGHT by the new test (24 FAIL = calculation differs, 0 ERR = precondition/other) | other cash-flow tests: do not catch it
+       FAIL C1 rights issue 10% (G.mg iss) UI: the newest column shows 증자·출자(자사주) undefined, 재무활동 393, 기타 -0.5 (no ≈, the old label is gone) | 증자·출자(자사주) shows undefined want 433
+       FAIL C2 rights issue 10%, one day before the close UI: the newest column shows 증자·출자(자사주) undefined, 재무활동 412, 기타 0.6 (no ≈, the old label is gone) | 증자·출자(자사주) shows undefined want 453
+51 mutants; ALL MUTANTS CAUGHT (documented survivors aside), unmodified game passes

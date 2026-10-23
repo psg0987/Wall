@@ -1,0 +1,96 @@
+ok   none (the unmodified game) -> passes
+ok   M1 ch11x records nothing -> CAUGHT by the new test (5 FAIL = calculation differs, 1 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F2 rlf = {d: undefined, R: n/a} = the close day 207 and the ledger R 1432.88 exactly; ncq back to 0
+       FAIL F2: cff -1847.0 vs expected -414.9 (err -1432.13); other 1597.0 vs expected 165.0 (err 1431.99)
+ok   M2 R has the wrong sign (debt after - debt before) -> CAUGHT by the new test (61 FAIL = calculation differs, 5 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F2 rlf = {d: 207, R: -1432.88} = the close day 207 and the ledger R 1432.88 exactly; ncq back to 0
+       FAIL F2: cff -3279.9 vs expected -414.9 (err -2865.01); other 3029.9 vs expected 165.0 (err 2864.88)
+ok   M3 R is rounded to a whole number -> CAUGHT by the new test (38 FAIL = calculation differs, 3 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F2 rlf = {d: 207, R: 1433.00} = the close day 207 and the ledger R 1432.88 exactly; ncq back to 0
+       FAIL F2 relief quarter: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule) | 27.3Q cff game -414.00 spec -414.12; 27.3Q oth game 164.00 spec 16
+ok   M4 R is recorded as the forced-sale-adjusted cap instead (R - 0.25 x asset sale) -> CAUGHT by the new test (59 FAIL = calculation differs, 3 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F2 rlf = {d: 207, R: 1377.88} = the close day 207 and the ledger R 1432.88 exactly; ncq back to 0
+       FAIL F2: cff -469.1 vs expected -414.9 (err -54.25); other 219.1 vs expected 165.0 (err 54.11)
+ok   M5 ch11x overwrites ncq instead of adding (a second relief cannot exist: bk >= 2 is a delisting) -> SURVIVES (expected, documented) passes | older cash-flow test: does not catch it
+ok   M6 the close never zeroes ncq (the amount is re-confirmed on every later close) -> CAUGHT by the new test (51 FAIL = calculation differs, 2 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F2 rlf = {d: 207, R: 1432.88} = the close day 207 and the ledger R 1432.88 exactly; ncq back to 1432.8834564338936
+       FAIL F5 first relief: bk 1, rlf {"d":207,"R":1432.8834564338936}, ncq 1432.8834564338936
+ok   M7 the close records rlf.d one day late -> CAUGHT by the new test (28 FAIL = calculation differs, 1 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F2 rlf = {d: 208, R: 1432.88} = the close day 207 and the ledger R 1432.88 exactly; ncq back to 0
+       FAIL F2: cff -1847.0 vs expected -414.9 (err -1432.13); other 1597.0 vs expected 165.0 (err 1431.99)
+ok   M8 the close zeroes ncq before reading it (R = 0) -> CAUGHT by the new test (63 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F2 rlf = {d: 207, R: 0.00} = the close day 207 and the ledger R 1432.88 exactly; ncq back to 0
+       FAIL F2: cff -1847.0 vs expected -414.9 (err -1432.13); other 1597.0 vs expected 165.0 (err 1431.99)
+ok   M9 the close never confirms (ncq stays, rlf never set) -> CAUGHT by the new test (5 FAIL = calculation differs, 1 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F2 rlf = {d: undefined, R: n/a} = the close day 207 and the ledger R 1432.88 exactly; ncq back to 1432.8834564338936
+       FAIL F2: cff -1847.0 vs expected -414.9 (err -1432.13); other 1597.0 vs expected 165.0 (err 1431.99)
+ok   M10 R is applied to every visible row (no date match) -> CAUGHT by the new test (40 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F2 relief quarter: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule) | 25.4Q cff game 1391.88 spec -41.00; 25.4Q oth game -1518.88 spec -
+       FAIL F3: every visible quarter row (7) = the SPEC with the ledger R (cff = dD + R - dv + iss; cfo, capex, dc unchanged; iss by the FIN-CF-02 rule) | 25.4Q cff game 1394.89 spec -41.00; 25.4Q oth game -1521.89 spec -86.00; 25.4Q 차입
+ok   M11 R is applied to the newest row only -> CAUGHT by the new test (32 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F6b the next quarter has no relief and takes no R (nc 1432.8834564338936)
+       FAIL F6b: cff 1183.9 vs expected -248.3 (err 1432.19); other -1355.4 vs expected 76.3 (err -1431.68)
+ok   M12 R is applied with the wrong sign -> CAUGHT by the new test (44 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F2: cff -3279.9 vs expected -414.9 (err -2865.01); other 3029.9 vs expected 165.0 (err 2864.88)
+       FAIL F2 the row takes R out of the borrowing line: cff = dD + R - dv + iss; 차입 증감 = dD + R = -3279.88 (dD -1847.76 + R 1432.88)
+ok   M13 R is not applied (the old statement) -> CAUGHT by the new test (45 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F2: cff -1847.0 vs expected -414.9 (err -1432.13); other 1597.0 vs expected 165.0 (err 1431.99)
+       FAIL F2 the row takes R out of the borrowing line: cff = dD + R - dv + iss; 차입 증감 = dD + R = -1847.00 (dD -1847.76 + R 1432.88)
+ok   M14 R is also taken out of the dividend/issue part (cff = dD + R - dv + iss + R) -> CAUGHT by the new test (44 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F2: cff 1018.8 vs expected -414.9 (err 1433.64); other -1268.8 vs expected 165.0 (err -1433.77)
+       FAIL F2 the row takes R out of the borrowing line: cff = dD + R - dv + iss; 차입 증감 = dD + R = 1018.77 (dD -1847.76 + R 1432.88)
+ok   M15 the 차입 증감 row still shows the raw debt change (R only in 재무활동) -> CAUGHT by the new test (13 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL N1 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown | 27.3Q b shows 2,490 want -469
+       FAIL B1 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown | 27.3Q b shows -2,012 want -152
+ok   M16 the memo row is never shown -> CAUGHT by the new test (20 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL N1 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden | memo row hidden but a relief is visible
+       FAIL N1 UI the memo row shows the negative amount in the relief column: null
+ok   M17 the memo row is always shown -> CAUGHT by the new test (14 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL RET +7 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown | memo row shown but a relief is not visible
+       FAIL RET +7 memo row hidden as the relief row is not comparable / gone
+ok   M18 the memo row is shown for a relief row that has no previous quarter -> CAUGHT by the new test (2 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL RET +7 UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown | memo row shown but a relief is not visible
+       FAIL RET +7 memo row hidden as the relief row is not comparable / gone
+ok   M19 kill leaves ncq and rlf on the dead company -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F5 the dead company keeps no relief fields: ncq 0, rlf {"d":207,"R":1432.8834564338936}, fq rows 0
+       FAIL F5b a pending ncq of 1406.50 is cleared by the delisting: dead 1, ncq 1406.5030389927308, rlf undefined
+ok   M20 qBack keeps the old rlf when it rebuilds the past quarters -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL SV export (packS(1), histories left out) (b) export: the confirmed record is dropped together with the real rows it described (qBack builds new past quarters): rlf {"d":207,"R":1406.5030389927308}
+ok   M21 qBack does not mark the rebuilt rows as post-ledger (cfd not set) -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL SV export (packS(1), histories left out) (b) export: the rebuilt past quarters are not legacy rows (cfd 0 = load day - 720): no 미확인 cell, no chapter-11-history warning
+ok   M22 the export format drops ncq (strip list) -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL SV export (packS(1), histories left out) (a) after loading ncq 0 = 1406.5030389927308 (nothing lost), rlf undefined
+       FAIL SV export (packS(1), histories left out) (a) the close after the load confirms it: rlf undefined, ncq 0, row nc 0.00
+ok   M23 v8prep does not default ncq -> CAUGHT by the new test (10 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL F1a: no relief, nothing pending (nc 0, ncq undefined)
+       FAIL F1b: no relief, nothing pending (nc 0, ncq undefined)
+ok   M24 v8prep does not default cfd (no old-save marking at all) -> CAUGHT by the new test (10 FAIL = calculation differs, 1 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL LG: after loading every company has ncq 0, cfd = the load day 297, no rlf; and (FIN-CF-02) eqq 0, isd = the load day, no isq (522 companies)
+       FAIL LG: exactly the relief quarter 27.3Q is flagged unconfirmed (flagged: )
+ok   M25 unconfirmed without the chapter-11 history condition (bk > 0 removed) -> CAUGHT by the new test (3 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL LG table: bk = 0 (never in chapter 11): the 16 small-company look-alikes found in the investigation -> unconfirmed (expected normal)
+       FAIL LG look-alike (bk 0) UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden | 27.4Q b shows 미확인 want 3,492; 27.4Q f shows 미확인 want 3,432; 27.4Q o shows 미확인 want -3
+ok   M26 unconfirmed without the 15% signature -> CAUGHT by the new test (8 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL LG: exactly the relief quarter 27.3Q is flagged unconfirmed (flagged: 26.1Q,26.2Q,26.3Q,27.1Q,27.2Q,27.3Q,27.4Q)
+       FAIL LG UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden; 미확인 in 27.3Q | 27.4Q b shows 미확인 want -249; 27.4Q f shows 미확인 want ≈-250; 27.4Q o shows 미확인 want ≈78.3; 
+ok   M27 unconfirmed also after the ledger started (cfd condition removed) -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL SV export (packS(1), histories left out) (a) UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row shown | 27.1Q b shows 미확인 want 95.0; 27.1Q f shows 미확인 want 85.0; 27.1
+       FAIL LG: even with the 15% signature planted in a post-ledger quarter it is not flagged (bk 1)
+ok   M28 the signature band is +/-30 instead of +/-3 -> CAUGHT by the new test (2 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL LG table: just outside the +/- 3 band (D 3.2 higher) -> unconfirmed (expected normal)
+       FAIL LG-FN UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden | 27.4Q b shows 미확인 want -38.0; 27.4Q f shows 미확인 want ≈-38.5; 27.4Q o shows 미확인 want ≈39.3; 27.3Q b s
+ok   M29 a quarter with its own recorded relief can still be unconfirmed -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL LG table: a recorded relief matches this quarter (rlf.d = the row date) -> unconfirmed (expected normal)
+ok   M30 only 차입 증감 is marked 미확인 (재무활동 shows the number) -> CAUGHT by the new test (2 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL LG UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden; 미확인 in 27.3Q | 27.3Q f shows -1,847 want 미확인
+       FAIL LG (22-number rows of the oldest saves) UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden; 미확인 in 27.3Q | 27.3Q f shows -1,847 want 미확인
+ok   M31 기타·투자 매매 is not marked 미확인 -> CAUGHT by the new test (2 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL LG UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden; 미확인 in 27.3Q | 27.3Q o shows 1,597 want 미확인
+       FAIL LG (22-number rows of the oldest saves) UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden; 미확인 in 27.3Q | 27.3Q o shows 1,597 want 미확인
+ok   M32 the old-save company warning (second footnote) is removed -> CAUGHT by the new test (2 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL LG-FN relief quarter 27.3Q: NOT detected by the signature (residual -9.50); the company-level warning is shown instead, so it is never silent [documented false negative]
+       FAIL LG-IF the quarter that spans the lost relief is not matched by the signature (residual -29.55) but the company-level warning is shown: never presented as an ordinary quarter
+ok   M33 the unconfirmed footnote is removed -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | older cash-flow test: does not catch it
+       FAIL LG UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden; 미확인 in 27.3Q | unconfirmed footnote absent want quarters 27.3Q
+       FAIL LG UI: the footnote states the basis (chapter-11 history + equity ~15% of assets), that it is not a confirmation, and that quarters can be missed; no memo row
+ALL MUTANTS CAUGHT (documented survivors aside), unmodified game passes

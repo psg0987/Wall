@@ -1,0 +1,101 @@
+
+[C1 player rights issue 10%] PNPL act day 147 close day 207 
+  shares: true change 327.45 (만주), recorded row change 327.00; other share writes before close: 0
+  price: before 13933.90 after 13515.88 effective issue/buy price 13237.20 close price q.p 14266
+  cash really received(+)/paid(-) 433.45  vs  statement 증자(자사주) 466.50  => error 33.05  (기타 line absorbs -33.05)
+
+[C2 player rights issue 30%] PNPL act day 147 close day 207 
+  shares: true change 982.35 (만주), recorded row change 982.00; other share writes before close: 0
+  price: before 13933.90 after 12679.85 effective issue/buy price 13237.20 close price q.p 13642
+  cash really received(+)/paid(-) 1300.36  vs  statement 증자(자사주) 1339.64  => error 39.29  (기타 line absorbs -39.29)
+
+[C1e same, issued 5 days after a close] PNPL act day 122 close day 207 
+  shares: true change 327.45 (만주), recorded row change 327.00; other share writes before close: 0
+  price: before 14806.56 after 14362.36 effective issue/buy price 14066.23 close price q.p 14309
+  cash really received(+)/paid(-) 460.60  vs  statement 증자(자사주) 467.90  => error 7.31  (기타 line absorbs -7.31)
+
+[C1l same, issued 1 day before the close] PNPL act day 206 close day 207 
+  shares: true change 327.45 (만주), recorded row change 327.00; other share writes before close: 0
+  price: before 14574.40 after 14137.16 effective issue/buy price 13845.68 close price q.p 14137
+  cash really received(+)/paid(-) 453.38  vs  statement 증자(자사주) 462.28  => error 8.90  (기타 line absorbs -8.90)
+
+[C3 player buyback 5%] PNPL act day 147 close day 207 
+  shares: true change -163.73 (만주), recorded row change -164.00; other share writes before close: 0
+  price: before 13933.90 after 14351.92 effective issue/buy price 14630.59 close price q.p 15241
+  cash really received(+)/paid(-) -239.54  vs  statement 증자(자사주) -249.95  => error -10.41  (기타 line absorbs 10.41)
+
+[C4 private placement 10% (G.pp)] PNPL act day 147 close day 207 
+  shares: true change 363.83 (만주), recorded row change 363.00; other share writes before close: 0
+  price: before 13933.90 after 13655.22 effective issue/buy price 13655.22 close price q.p 14718
+  cash really received(+)/paid(-) 496.82  vs  statement 증자(자사주) 534.26  => error 37.44  (기타 line absorbs -37.44)
+
+[C5 option exercise 2% at 60% of price] PNPL act day 147 close day 207 
+  shares: true change 65.49 (만주), recorded row change 65.00; other share writes before close: 0
+  price: before 13782.24 after 13674.14 effective issue/buy price 8269.00 close price q.p 14332
+  cash really received(+)/paid(-) 54.15  vs  statement 증자(자사주) 93.16  => error 39.00  (기타 line absorbs -39.00)
+
+[C6 bailout (bail event)] PNPL act day 147 close day 207 
+  shares: true change 1403.36 (만주), recorded row change 1403.00; other share writes before close: 0
+  price: before 13933.90 after 13933.90 effective issue/buy price 7140.70 close price q.p 14574
+  cash really received(+)/paid(-) 1002.10  vs  statement 증자(자사주) 2044.73  => error 1042.64  (기타 line absorbs -1042.64)
+
+[C7 event: credit downgrade -> issue 10%] PNPL act day 147 close day 207 PNPL 유상증자로 재무구조 개선
+  shares: true change 327.45 (만주), recorded row change 327.00; other share writes before close: 0
+  price: before 13782.24 after 13782.24 effective issue/buy price 13093.13 close price q.p 14156
+  cash really received(+)/paid(-) 428.73  vs  statement 증자(자사주) 462.90  => error 34.17  (기타 line absorbs -34.17)
+
+[C8 event: activist -> buyback 5%] PNPL act day 147 close day 207 PNPL 행동주의 요구 수용 — 자사주 매입
+  shares: true change -163.73 (만주), recorded row change -164.00; other share writes before close: 0
+  price: before 13782.24 after 13782.24 effective issue/buy price 14471.35 close price q.p 14978
+  cash really received(+)/paid(-) -236.93  vs  statement 증자(자사주) -245.64  => error -8.71  (기타 line absorbs 8.71)
+
+[C9 event: buyback 4%] PNPL act day 147 close day 207 PNPL 자사주 4% 매입·소각
+  shares: true change -130.98 (만주), recorded row change -131.00; other share writes before close: 0
+  price: before 13782.24 after 13782.24 effective issue/buy price 14471.35 close price q.p 14768
+  cash really received(+)/paid(-) -189.55  vs  statement 증자(자사주) -193.46  => error -3.92  (기타 line absorbs 3.92)
+
+[C10 event: government buys 30% stake] PNPL act day 147 close day 207 PNPL 정부에 지분 30% 매각
+  shares: true change 1403.36 (만주), recorded row change 1403.00; other share writes before close: 0
+  price: before 13782.24 after 12817.49 effective issue/buy price 9647.57 close price q.p 13741
+  cash really received(+)/paid(-) 1353.90  vs  statement 증자(자사주) 1927.86  => error 573.96  (기타 line absorbs -573.96)
+
+[C11 AI 10:1 split] PNPL act day 147 close day 207 
+  shares: true change 29470.50 (만주), recorded row change -5.00; other share writes before close: 0
+  price: before 13782.24 after 1378.22 effective issue/buy price 0.00 close price q.p 1466
+  cash really received(+)/paid(-) 0.00  vs  statement 증자(자사주) -0.73  => error -0.73  (기타 line absorbs 0.73)
+
+[C12 1:10 reverse split] PNPL act day 147 close day 207 
+  shares: true change -2947.05 (만주), recorded row change -1.00; other share writes before close: 0
+  price: before 13782.24 after 137822.42 effective issue/buy price 0.00 close price q.p 141559
+  cash really received(+)/paid(-) 0.00  vs  statement 증자(자사주) -14.16  => error -14.16  (기타 line absorbs 14.16)
+
+[C13 issue 10% then buyback 5% same quarter] PNPL act day 157 close day 207 
+  shares: true change 147.35 (만주), recorded row change 147.00; other share writes before close: 0
+  price: before 13933.90 after 12783.26 effective issue/buy price 13488.65 close price q.p 14982
+  cash really received(+)/paid(-) 198.76  vs  statement 증자(자사주) 220.24  => error 21.48  (기타 line absorbs -21.48)
+
+[C14 stock merger (G.merge), acquirer side] PNPL act day 147 close day 207 merged SNWF cs 0.00 D 0.00
+  shares: true change 1151.58 (만주), recorded row change 1151.00; other share writes before close: 0
+  price: before 13933.90 after 13515.88 effective issue/buy price -8811.95 close price q.p 14266
+  cash really received(+)/paid(-) -1014.77  vs  statement 증자(자사주) 1642.02  => error 2656.78  (기타 line absorbs -2656.78)
+
+==== summary (억원) ====
+case | Δsh | real cash | statement 증자 | error | issue px | close px
+C1 player rights issue 10% | 327.45 | 433.45 | 466.50 | 33.05 | 13237.20 | 14266
+C2 player rights issue 30% | 982.35 | 1300.36 | 1339.64 | 39.29 | 13237.20 | 13642
+C1e same, issued 5 days after a close | 327.45 | 460.60 | 467.90 | 7.31 | 14066.23 | 14309
+C1l same, issued 1 day before the close | 327.45 | 453.38 | 462.28 | 8.90 | 13845.68 | 14137
+C3 player buyback 5% | -163.73 | -239.54 | -249.95 | -10.41 | 14630.59 | 15241
+C4 private placement 10% (G.pp) | 363.83 | 496.82 | 534.26 | 37.44 | 13655.22 | 14718
+C5 option exercise 2% at 60% of price | 65.49 | 54.15 | 93.16 | 39.00 | 8269.00 | 14332
+C6 bailout (bail event) | 1403.36 | 1002.10 | 2044.73 | 1042.64 | 7140.70 | 14574
+C7 event: credit downgrade -> issue 10% | 327.45 | 428.73 | 462.90 | 34.17 | 13093.13 | 14156
+C8 event: activist -> buyback 5% | -163.73 | -236.93 | -245.64 | -8.71 | 14471.35 | 14978
+C9 event: buyback 4% | -130.98 | -189.55 | -193.46 | -3.92 | 14471.35 | 14768
+C10 event: government buys 30% stake | 1403.36 | 1353.90 | 1927.86 | 573.96 | 9647.57 | 13741
+C11 AI 10:1 split | 29470.50 | 0.00 | -0.73 | -0.73 | 0.00 | 1466
+C12 1:10 reverse split | -2947.05 | 0.00 | -14.16 | -14.16 | 0.00 | 141559
+C13 issue 10% then buyback 5% same quarter | 147.35 | 198.76 | 220.24 | 21.48 | 13488.65 | 14982
+C14 stock merger (G.merge), acquirer side | 1151.58 | -1014.77 | 1642.02 | 2656.78 | -8811.95 | 14266
+errs 0 fails 0
+

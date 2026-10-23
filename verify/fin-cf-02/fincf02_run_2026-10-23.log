@@ -1,0 +1,307 @@
+# fin-cf-02 working tree, VERBOSE=1 python3 tests/run.py fincf02, 2026-10-23
+---- t_fincf02_issue.js
+-- harness ready
+
+-- TC-CF02-C cash share transactions
+pre  C1 rights issue 10% (G.mg iss) the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C1 rights issue 10% (G.mg iss) no other share-count change before the close
+pre  C1 cash = market cap x 10% x .95 before the issue: 433.45
+  C1 rights issue 10% (G.mg iss): PNPL row 207 | share count 3275 -> 3602, close price 14266 | real cash 433.45 | statement 증자·출자 433.45 (error 0.00) | true share change 327.45
+ok   C1 rights issue 10% (G.mg iss) 증자·출자(자사주) 433.45 = cash really received/paid 433.45
+ok   C1 rights issue 10% (G.mg iss) 재무활동 393.45 = dD + R - dv + real cash = 393.45
+ok   C1 rights issue 10% (G.mg iss) 기타·투자 매매 -0.45 = -0.45 (does not absorb the share issue)
+ok   C1 rights issue 10% (G.mg iss) 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C1 rights issue 10% (G.mg iss) UI: the newest column shows 증자·출자(자사주) 433, 재무활동 393, 기타 -0.5 (no ≈, the old label is gone)
+pre  C2 rights issue 10%, one day before the close the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C2 rights issue 10%, one day before the close no other share-count change before the close
+  C2 rights issue 10%, one day before the close: PNPL row 207 | share count 3275 -> 3602, close price 14137 | real cash 453.38 | statement 증자·출자 453.38 (error 0.00) | true share change 327.45
+ok   C2 rights issue 10%, one day before the close 증자·출자(자사주) 453.38 = cash really received/paid 453.38
+ok   C2 rights issue 10%, one day before the close 재무활동 412.38 = dD + R - dv + real cash = 412.38
+ok   C2 rights issue 10%, one day before the close 기타·투자 매매 0.62 = 0.62 (does not absorb the share issue)
+ok   C2 rights issue 10%, one day before the close 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C2 rights issue 10%, one day before the close UI: the newest column shows 증자·출자(자사주) 453, 재무활동 412, 기타 0.6 (no ≈, the old label is gone)
+pre  C3 buyback 5% (G.mg bb, company cash) the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C3 buyback 5% (G.mg bb, company cash) no other share-count change before the close
+pre  C3 cash paid -239.54
+  C3 buyback 5% (G.mg bb, company cash): PNPL row 207 | share count 3275 -> 3111, close price 15241 | real cash -239.54 | statement 증자·출자 -239.54 (error 0.00) | true share change -163.73
+ok   C3 buyback 5% (G.mg bb, company cash) 증자·출자(자사주) -239.54 = cash really received/paid -239.54
+ok   C3 buyback 5% (G.mg bb, company cash) 재무활동 -277.54 = dD + R - dv + real cash = -277.54
+ok   C3 buyback 5% (G.mg bb, company cash) 기타·투자 매매 -0.46 = -0.46 (does not absorb the share issue)
+ok   C3 buyback 5% (G.mg bb, company cash) 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C3 buyback 5% (G.mg bb, company cash) UI: the newest column shows 증자·출자(자사주) -240, 재무활동 -278, 기타 -0.5 (no ≈, the old label is gone)
+pre  C3b buyback 5% beyond the cash on hand (the shortfall is borrowed) the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C3b buyback 5% beyond the cash on hand (the shortfall is borrowed) no other share-count change before the close
+pre  C3b the buyback borrowed 238.54; the share cash is still the full price -239.54
+  C3b buyback 5% beyond the cash on hand (the shortfall is borrowed): PNPL row 207 | share count 3275 -> 3111, close price 15241 | real cash -239.54 | statement 증자·출자 -239.54 (error 0.00) | true share change -163.73
+ok   C3b buyback 5% beyond the cash on hand (the shortfall is borrowed) 증자·출자(자사주) -239.54 = cash really received/paid -239.54
+ok   C3b buyback 5% beyond the cash on hand (the shortfall is borrowed) 재무활동 -34.54 = dD + R - dv + real cash = -34.54
+ok   C3b buyback 5% beyond the cash on hand (the shortfall is borrowed) 기타·투자 매매 -539.46 = -539.46 (does not absorb the share issue)
+ok   C3b buyback 5% beyond the cash on hand (the shortfall is borrowed) 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C3b buyback 5% beyond the cash on hand (the shortfall is borrowed) UI: the newest column shows 증자·출자(자사주) -240, 재무활동 -34.5, 기타 -539 (no ≈, the old label is gone)
+pre  C4 private placement 10% to me (G.pp) the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C4 private placement 10% to me (G.pp) no other share-count change before the close
+pre  C4 company cash in 496.82 = my cash out 496.82
+  C4 private placement 10% to me (G.pp): PNPL row 207 | share count 3275 -> 3638, close price 14718 | real cash 496.82 | statement 증자·출자 496.82 (error 0.00) | true share change 363.83
+ok   C4 private placement 10% to me (G.pp) 증자·출자(자사주) 496.82 = cash really received/paid 496.82
+ok   C4 private placement 10% to me (G.pp) 재무활동 455.82 = dD + R - dv + real cash = 455.82
+ok   C4 private placement 10% to me (G.pp) 기타·투자 매매 0.18 = 0.18 (does not absorb the share issue)
+ok   C4 private placement 10% to me (G.pp) 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C4 private placement 10% to me (G.pp) UI: the newest column shows 증자·출자(자사주) 497, 재무활동 456, 기타 0.2 (no ≈, the old label is gone)
+pre  C5 option exercise 2% at a strike of 60% of the price (G.eoX) the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C5 option exercise 2% at a strike of 60% of the price (G.eoX) no other share-count change before the close
+pre  C5 strike cash 54.15 = my cash out 54.15
+  C5 option exercise 2% at a strike of 60% of the price (G.eoX): PNPL row 207 | share count 3275 -> 3340, close price 14332 | real cash 54.15 | statement 증자·출자 54.15 (error 0.00) | true share change 65.49
+ok   C5 option exercise 2% at a strike of 60% of the price (G.eoX) 증자·출자(자사주) 54.15 = cash really received/paid 54.15
+ok   C5 option exercise 2% at a strike of 60% of the price (G.eoX) 재무활동 15.15 = dD + R - dv + real cash = 15.15
+ok   C5 option exercise 2% at a strike of 60% of the price (G.eoX) 기타·투자 매매 -56.15 = -56.15 (does not absorb the share issue)
+ok   C5 option exercise 2% at a strike of 60% of the price (G.eoX) 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C5 option exercise 2% at a strike of 60% of the price (G.eoX) UI: the newest column shows 증자·출자(자사주) 54.2, 재무활동 15.2, 기타 -56.2 (no ≈, the old label is gone)
+pre  C6 bailout (event bail): cash A x .15, shares / .7 the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C6 bailout (event bail): cash A x .15, shares / .7 no other share-count change before the close
+pre  C6 cash = the bailout amount handed to the event 1002.10
+  C6 bailout (event bail): cash A x .15, shares / .7: PNPL row 207 | share count 3275 -> 4678, close price 14574 | real cash 1002.10 | statement 증자·출자 1002.10 (error 0.00) | true share change 1403.36
+ok   C6 bailout (event bail): cash A x .15, shares / .7 증자·출자(자사주) 1002.10 = cash really received/paid 1002.10
+ok   C6 bailout (event bail): cash A x .15, shares / .7 재무활동 960.10 = dD + R - dv + real cash = 960.10
+ok   C6 bailout (event bail): cash A x .15, shares / .7 기타·투자 매매 -0.10 = -0.10 (does not absorb the share issue)
+ok   C6 bailout (event bail): cash A x .15, shares / .7 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C6 bailout (event bail): cash A x .15, shares / .7 UI: the newest column shows 증자·출자(자사주) 1,002, 재무활동 960, 기타 -0.1 (no ≈, the old label is gone)
+pre  C7 event: credit downgrade -> share issue 10% the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C7 event: credit downgrade -> share issue 10% no other share-count change before the close
+  C7 event: credit downgrade -> share issue 10%: PNPL row 207 | share count 3275 -> 3602, close price 14156 | real cash 428.73 | statement 증자·출자 428.73 (error 0.00) | true share change 327.45
+ok   C7 event: credit downgrade -> share issue 10% 증자·출자(자사주) 428.73 = cash really received/paid 428.73
+ok   C7 event: credit downgrade -> share issue 10% 재무활동 -204.27 = dD + R - dv + real cash = -204.27
+ok   C7 event: credit downgrade -> share issue 10% 기타·투자 매매 -0.73 = -0.73 (does not absorb the share issue)
+ok   C7 event: credit downgrade -> share issue 10% 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C7 event: credit downgrade -> share issue 10% UI: the newest column shows 증자·출자(자사주) 429, 재무활동 -204, 기타 -0.7 (no ≈, the old label is gone)
+pre  C8 event: activist -> buyback 5% the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C8 event: activist -> buyback 5% no other share-count change before the close
+  C8 event: activist -> buyback 5%: PNPL row 207 | share count 3275 -> 3111, close price 14978 | real cash -236.93 | statement 증자·출자 -236.93 (error 0.00) | true share change -163.73
+ok   C8 event: activist -> buyback 5% 증자·출자(자사주) -236.93 = cash really received/paid -236.93
+ok   C8 event: activist -> buyback 5% 재무활동 -3457.93 = dD + R - dv + real cash = -3457.93
+ok   C8 event: activist -> buyback 5% 기타·투자 매매 6680.93 = 6680.93 (does not absorb the share issue)
+ok   C8 event: activist -> buyback 5% 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C8 event: activist -> buyback 5% UI: the newest column shows 증자·출자(자사주) -237, 재무활동 -3,458, 기타 6,681 (no ≈, the old label is gone)
+pre  C9 event: buyback 4% the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C9 event: buyback 4% no other share-count change before the close
+  C9 event: buyback 4%: PNPL row 207 | share count 3275 -> 3144, close price 14768 | real cash -189.55 | statement 증자·출자 -189.55 (error 0.00) | true share change -130.98
+ok   C9 event: buyback 4% 증자·출자(자사주) -189.55 = cash really received/paid -189.55
+ok   C9 event: buyback 4% 재무활동 -3411.55 = dD + R - dv + real cash = -3411.55
+ok   C9 event: buyback 4% 기타·투자 매매 6679.55 = 6679.55 (does not absorb the share issue)
+ok   C9 event: buyback 4% 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C9 event: buyback 4% UI: the newest column shows 증자·출자(자사주) -190, 재무활동 -3,412, 기타 6,680 (no ≈, the old label is gone)
+pre  C10 event: government buys a 30% stake the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C10 event: government buys a 30% stake no other share-count change before the close
+  C10 event: government buys a 30% stake: PNPL row 207 | share count 3275 -> 4678, close price 13741 | real cash 1353.90 | statement 증자·출자 1353.90 (error 0.00) | true share change 1403.36
+ok   C10 event: government buys a 30% stake 증자·출자(자사주) 1353.90 = cash really received/paid 1353.90
+ok   C10 event: government buys a 30% stake 재무활동 -220.10 = dD + R - dv + real cash = -220.10
+ok   C10 event: government buys a 30% stake 기타·투자 매매 0.10 = 0.10 (does not absorb the share issue)
+ok   C10 event: government buys a 30% stake 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C10 event: government buys a 30% stake UI: the newest column shows 증자·출자(자사주) 1,354, 재무활동 -220, 기타 0.1 (no ≈, the old label is gone)
+pre  C11 white knight 10% (G.wk) the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C11 white knight 10% (G.wk) no other share-count change before the close
+pre  C11 company cash in 481.61 = the white knight GSCH's cash out 481.61
+  C11 white knight 10% (G.wk): PNPL row 207 | share count 3275 -> 3638, close price 14266 | real cash 481.61 | statement 증자·출자 481.61 (error 0.00) | true share change 363.83
+ok   C11 white knight 10% (G.wk) 증자·출자(자사주) 481.61 = cash really received/paid 481.61
+ok   C11 white knight 10% (G.wk) 재무활동 440.61 = dD + R - dv + real cash = 440.61
+ok   C11 white knight 10% (G.wk) 기타·투자 매매 1.39 = 1.39 (does not absorb the share issue)
+ok   C11 white knight 10% (G.wk) 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C11 white knight 10% (G.wk) UI: the newest column shows 증자·출자(자사주) 482, 재무활동 441, 기타 1.4 (no ≈, the old label is gone)
+pre  C12 new shares bought by me (money move "pp") the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C12 new shares bought by me (money move "pp") no other share-count change before the close
+pre  C12 cash 300 moved from me to the company: 300.00
+  C12 new shares bought by me (money move "pp"): PNPL row 207 | share count 3275 -> 3494, close price 14718 | real cash 300.00 | statement 증자·출자 300.00 (error 0.00) | true share change 219.70
+ok   C12 new shares bought by me (money move "pp") 증자·출자(자사주) 300.00 = cash really received/paid 300.00
+ok   C12 new shares bought by me (money move "pp") 재무활동 260.00 = dD + R - dv + real cash = 260.00
+ok   C12 new shares bought by me (money move "pp") 기타·투자 매매 0.00 = 0.00 (does not absorb the share issue)
+ok   C12 new shares bought by me (money move "pp") 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C12 new shares bought by me (money move "pp") UI: the newest column shows 증자·출자(자사주) 300, 재무활동 260, 기타 0.0 (no ≈, the old label is gone)
+pre  C13 a 9% stake gives no control (greenmail needs that)
+pre  C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price) the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price) no other share-count change before the close
+pre  C13 greenmail succeeded (try 2): company paid -520.49 for 294.70 shares
+  C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price): PNPL row 207 | share count 3275 -> 2980, close price 14713 | real cash -520.49 | statement 증자·출자 -520.49 (error 0.00) | true share change -294.70
+ok   C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price) 증자·출자(자사주) -520.49 = cash really received/paid -520.49
+ok   C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price) 재무활동 -558.49 = dD + R - dv + real cash = -558.49
+ok   C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price) 기타·투자 매매 0.49 = 0.49 (does not absorb the share issue)
+ok   C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price) 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price) UI: the newest column shows 증자·출자(자사주) -520, 재무활동 -558, 기타 0.5 (no ≈, the old label is gone)
+pre  C14 rival activist -> company buyback (persTick, strategy ag) the share count was written by the action only (1 write(s)), none until the close (0)
+pre  C14 rival activist -> company buyback (persTick, strategy ag) no other share-count change before the close
+pre  C14 the rival's demand was accepted (try 2): company paid -236.93 = market cap x 5% x 1.05 = -236.93
+  C14 rival activist -> company buyback (persTick, strategy ag): PNPL row 207 | share count 3275 -> 3111, close price 15341 | real cash -236.93 | statement 증자·출자 -236.93 (error 0.00) | true share change -163.73
+ok   C14 rival activist -> company buyback (persTick, strategy ag) 증자·출자(자사주) -236.93 = cash really received/paid -236.93
+ok   C14 rival activist -> company buyback (persTick, strategy ag) 재무활동 -3457.93 = dD + R - dv + real cash = -3457.93
+ok   C14 rival activist -> company buyback (persTick, strategy ag) 기타·투자 매매 6680.93 = 6680.93 (does not absorb the share issue)
+ok   C14 rival activist -> company buyback (persTick, strategy ag) 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   C14 rival activist -> company buyback (persTick, strategy ag) UI: the newest column shows 증자·출자(자사주) -237, 재무활동 -3,458, 기타 6,681 (no ≈, the old label is gone)
+pre  M1 issue 10% then buyback 5% in one quarter the share count was written by the action only (2 write(s)), none until the close (0)
+pre  M1 issue 10% then buyback 5% in one quarter no other share-count change before the close
+  M1 issue 10% then buyback 5% in one quarter: PNPL row 207 | share count 3275 -> 3422, close price 15105 | real cash 188.73 | statement 증자·출자 188.73 (error 0.00) | true share change 147.35
+ok   M1 issue 10% then buyback 5% in one quarter 증자·출자(자사주) 188.73 = cash really received/paid 188.73
+ok   M1 issue 10% then buyback 5% in one quarter 재무활동 148.73 = dD + R - dv + real cash = 148.73
+ok   M1 issue 10% then buyback 5% in one quarter 기타·투자 매매 1.27 = 1.27 (does not absorb the share issue)
+ok   M1 issue 10% then buyback 5% in one quarter 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   M1 issue 10% then buyback 5% in one quarter UI: the newest column shows 증자·출자(자사주) 189, 재무활동 149, 기타 1.3 (no ≈, the old label is gone)
+pre  M2 issue 10% then a 1:10 reverse split in one quarter (the split adds no cash) the share count was written by the action only (2 write(s)), none until the close (0)
+pre  M2 issue 10% then a 1:10 reverse split in one quarter (the split adds no cash) no other share-count change before the close
+  M2 issue 10% then a 1:10 reverse split in one quarter (the split adds no cash): PNPL row 207 | share count 328 -> 360, close price 139677 | real cash 433.45 | statement 증자·출자 433.45 (error 0.00) | true share change -2914.30
+ok   M2 issue 10% then a 1:10 reverse split in one quarter (the split adds no cash) 증자·출자(자사주) 433.45 = cash really received/paid 433.45
+ok   M2 issue 10% then a 1:10 reverse split in one quarter (the split adds no cash) 재무활동 393.45 = dD + R - dv + real cash = 393.45
+ok   M2 issue 10% then a 1:10 reverse split in one quarter (the split adds no cash) 기타·투자 매매 -0.45 = -0.45 (does not absorb the share issue)
+ok   M2 issue 10% then a 1:10 reverse split in one quarter (the split adds no cash) 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   M2 issue 10% then a 1:10 reverse split in one quarter (the split adds no cash) UI: the newest column shows 증자·출자(자사주) 433, 재무활동 393, 기타 -0.5 (no ≈, the old label is gone)
+
+-- TC-CF02-N share-count changes without cash (expected 0)
+pre  N1 10:1 split (splitDo) the share count was written by the action only (1 write(s)), none until the close (0)
+pre  N1 10:1 split (splitDo) no other share-count change before the close
+pre  N1 split moved no cash
+  N1 10:1 split (splitDo): PNPL row 207 | share count 32750 -> 32745, close price 1466 | real cash 0.00 | statement 증자·출자 0.00 (error 0.00) | NON-CASH share change 29470.50 (expected 0)
+ok   N1 10:1 split (splitDo) 증자·출자(자사주) 0.00 = cash really received/paid 0.00
+ok   N1 10:1 split (splitDo) 재무활동 -39.00 = dD + R - dv + real cash = -39.00
+ok   N1 10:1 split (splitDo) 기타·투자 매매 1.00 = 1.00 (does not absorb the share issue)
+ok   N1 10:1 split (splitDo) 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   N1 10:1 split (splitDo) UI: the newest column shows 증자·출자(자사주) –, 재무활동 -39.0, 기타 1.0 (no ≈, the old label is gone)
+pre  N2 1:10 reverse split (splitDo) the share count was written by the action only (1 write(s)), none until the close (0)
+pre  N2 1:10 reverse split (splitDo) no other share-count change before the close
+pre  N2 reverse split moved no cash
+  N2 1:10 reverse split (splitDo): PNPL row 207 | share count 328 -> 327, close price 141559 | real cash 0.00 | statement 증자·출자 0.00 (error 0.00) | NON-CASH share change -2947.05 (expected 0)
+ok   N2 1:10 reverse split (splitDo) 증자·출자(자사주) 0.00 = cash really received/paid 0.00
+ok   N2 1:10 reverse split (splitDo) 재무활동 -39.00 = dD + R - dv + real cash = -39.00
+ok   N2 1:10 reverse split (splitDo) 기타·투자 매매 1.00 = 1.00 (does not absorb the share issue)
+ok   N2 1:10 reverse split (splitDo) 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   N2 1:10 reverse split (splitDo) UI: the newest column shows 증자·출자(자사주) –, 재무활동 -39.0, 기타 1.0 (no ≈, the old label is gone)
+pre  N3 stock merger, acquirer side (G.merge): new shares are the payment, no cash the share count was written by the action only (1 write(s)), none until the close (0)
+pre  N3 stock merger, acquirer side (G.merge): new shares are the payment, no cash no other share-count change before the close
+pre  N3 merged SNWF (shares +1151.58)
+pre  N3 the acquirer took over the target cash 103.03 and debt 1117.80 (FIN-CF-03, not checked here)
+  N3 stock merger, acquirer side (G.merge): new shares are the payment, no cash: PNPL row 207 | share count 3275 -> 4426, close price 14266 | real cash 0.00 | statement 증자·출자 0.00 (error 0.00) | NON-CASH share change 1151.58 (expected 0)
+ok   N3 stock merger, acquirer side (G.merge): new shares are the payment, no cash 증자·출자(자사주) 0.00 = cash really received/paid 0.00
+ok   N3 stock merger, acquirer side (G.merge): new shares are the payment, no cash 재무활동 1067.00 = dD + R - dv + real cash = 1067.00
+ok   N3 stock merger, acquirer side (G.merge): new shares are the payment, no cash 기타·투자 매매 -1016.00 = -1016.00 (does not absorb the share issue)
+ok   N3 stock merger, acquirer side (G.merge): new shares are the payment, no cash 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   N3 stock merger, acquirer side (G.merge): new shares are the payment, no cash UI: the newest column shows 증자·출자(자사주) –, 재무활동 1,067, 기타 -1,016 (no ≈, the old label is gone)
+
+-- TC-CF02-T timing, saves, retention, death
+pre  SD issued right after the close of day 207
+ok   SD the quarter that just closed shows no issue: 0.00
+  SD next quarter: PNPL row 297 | share count 3275 -> 3602, close price 12084 | real cash 453.38 | statement 증자·출자 453.38 (error 0.00)
+ok   SD next quarter 증자·출자(자사주) 453.38 = cash really received/paid 453.38
+ok   SD next quarter 재무활동 403.38 = dD + R - dv + real cash = 403.38
+ok   SD next quarter 기타·투자 매매 0.62 = 0.62 (does not absorb the share issue)
+ok   SD next quarter 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   SD next quarter UI: the newest column shows 증자·출자(자사주) 453, 재무활동 403, 기타 0.6 (no ≈, the old label is gone)
+ok   SV autosave (full): the pending issue cash survives the save: eqq 433.45 (before saving 433.45, real 433.45)
+  SV autosave (full) next close: PNPL row 207 | share count 3275 -> 3602, close price 14266 | real cash 433.45 | statement 증자·출자 433.45 (error 0.00)
+ok   SV autosave (full) next close 증자·출자(자사주) 433.45 = cash really received/paid 433.45
+ok   SV autosave (full) next close 재무활동 393.45 = dD + R - dv + real cash = 393.45
+ok   SV autosave (full) next close 기타·투자 매매 -0.45 = -0.45 (does not absorb the share issue)
+ok   SV autosave (full) next close 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   SV autosave (full) next close UI: the newest column shows 증자·출자(자사주) 433, 재무활동 393, 기타 -0.5 (no ≈, the old label is gone)
+ok   SV autosave (full): a confirmed quarter survives a second save: isq {"207":433.45227006693824}, row shows 433.45
+ok   SV export (packS(1)): the pending issue cash survives the save: eqq 433.45 (before saving 433.45, real 433.45)
+ok   SV export (packS(1)): the rebuilt past rows are not legacy rows (isd -573 = load day 147 - 720 < previous row 57); the next close shows the real cash 433.45: 433.45
+ok   SV export (packS(1)): no rebuilt quarter is shown as an estimate
+ok   SV export (packS(1)): exporting after the close drops the confirmed record {"207":433.45227006693824} together with the real rows (isq undefined); the rebuilt quarters show no issue
+pre  ABS acquirer MCSF, pending 426.83
+ok   ABS absorbed target: dead 1, eqq 0, isq undefined; acquirer eqq 7 isq {"1":3} (planted, untouched)
+ok   RET the close confirms isq[117] = 426.83 (real 426.83), eqq back to 0: 0
+ok   RET one close later the issue row (now second newest) still shows the recorded cash 426.83 (isq {"117":426.82887826507437})
+ok   RET after 8 more closes the confirmed amount of a row that left the 8-quarter window is dropped: isq undefined
+pre  KILL issued
+ok   KILL kill() clears the pending (426.83) and confirmed issue cash: eqq 0, isq undefined
+ok   KILL 100 days later nothing reappeared on the dead company
+
+-- TC-CF02-P2 capital contribution and a loan (control)
+pre  P2 I own 100% of PNPL, so 현금 출자 is offered
+pre  P2 the contribution is external cash: company +250.00, my cash -250.00, shares unchanged (0.00)
+info P2 today the 250 shows in 증자 250.00 / 기타 0.00 (no share-count change, so the old rule sees no equity financing)
+  P2 capital contribution (policy: equity financing from the owner): PNPL row 207 | share count 3275 -> 3275, close price 14574 | real cash 250.00 | statement 증자·출자 250.00 (error 0.00)
+ok   P2 capital contribution (policy: equity financing from the owner) 증자·출자(자사주) 250.00 = cash really received/paid 250.00
+ok   P2 capital contribution (policy: equity financing from the owner) 재무활동 210.00 = dD + R - dv + real cash = 210.00
+ok   P2 capital contribution (policy: equity financing from the owner) 기타·투자 매매 0.00 = 0.00 (does not absorb the share issue)
+ok   P2 capital contribution (policy: equity financing from the owner) 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est false)
+ok   P2 capital contribution (policy: equity financing from the owner) UI: the newest column shows 증자·출자(자사주) 250, 재무활동 210, 기타 0.0 (no ≈, the old label is gone)
+ok   P2-control a loan from me (adv) is debt: 증자 0.00, 차입 증감 250.00 includes the +250 (real 0.00)
+
+-- TC-CF02-LG old save
+pre  LG the old save has a quarter whose share count changed (27.3Q)
+ok   LG the legacy row keeps the old estimate 466.50 (not re-estimated, not zeroed): 466.50
+ok   LG only that row is flagged est (est true)
+ok   LG after loading: isd = load day 297 (297), eqq 0
+ok   LG the tab: ≈ on 증자·출자(자사주) ≈466 / 재무활동 ≈426 / 기타 ≈-33.5 of 27.3Q only (차입 증감 0.0 plain); footnote "분기 말 주가 기준 추정(27.3Q)" says it is not a recorded amount
+ok   LG the quarter after loading starts ON the ledger start (previous row 297 = isd 297): an older row, no share-count change, so 0 and not flagged (est false)
+ok   LG the next quarter is inside the ledger (previous row 387 > isd 297): recorded, est false, 증자·출자 0.00
+info LG the legacy row moved one column; cash changes of the old rows unchanged: 7 rows
+pre  LG-SD issued 453.38 on close day 207 after the close; the save is written that day
+pre  LG-SD the next row's previous row is ON the ledger start (207 = isd 207) and the share count changed
+ok   LG-SD that quarter is an estimate (≈395.15, real 453.38 not in the old save), not an incomplete ledger shown as recorded (est true)
+pre  LG-ST loaded an old save mid-quarter (day 137, isd 137)
+pre  LG-ST the row straddles the ledger start (117 < 137 <= 207)
+ok   LG-ST contribution after loading, no share-count change: the recorded amount is used: 증자·출자 180.00 = 180.00, not flagged
+pre  LG-ST loaded an old save mid-quarter (day 137, isd 137)
+pre  LG-ST the row straddles the ledger start (117 < 137 <= 207)
+ok   LG-ST share issue after loading: the quarter is still an estimate (the shares changed in a quarter that began before the ledger): est true, 증자·출자 ≈466.50 (recorded cash 433.45 is kept in isq but not shown for this one quarter: documented limit)
+
+-- TC-CF02-NAT natural play (seed 20261016 and 12345, 720 days, every company)
+ok   NAT seed 20261016 BABX row 571 [go@2073] 증자 197.30 = real cash 197.30 (error 0.00)
+ok   NAT seed 20261016 NTRX row 297 [go@2056] 증자 -251.18 = real cash -251.18 (error 0.00)
+pre  NAT seed 20261016: 2 visible quarter row(s) with a share-count change
+ok   NAT seed 12345 BOAX(bank) row 494 [bankQ@1975] 증자 14.56 = real cash 14.56 (error 0.00)
+ok   NAT seed 12345 BOAX(bank) row 584 [bankQ@1975] 증자 5.44 = real cash 5.44 (error 0.00)
+ok   NAT seed 12345 BOAX(bank) row 674 [splitDo@1856,bankQ@1975] 증자 4.16 = real cash 4.16 (error 0.00)
+ok   NAT seed 12345 SHFN(bank) row 616 [bankQ@1975] 증자 10.91 = real cash 10.91 (error 0.00)
+ok   NAT seed 12345 EXYM(bank) row 409 [splitDo@1856] 증자 0.00 = real cash 0.00 (error 0.00)
+ok   NAT seed 12345 TJVY(bank) row 553 [splitDo@1856] 증자 0.00 = real cash 0.00 (error 0.00)
+pre  NAT seed 12345: 6 visible quarter row(s) with a share-count change
+ok   NAT every share-count writer seen in natural play is a known path (go, bankQ, splitDo; known: AI events, bank capital raise, AI splits)
+
+-- TC-CF02-GUARD ledger coverage of the source
+pre  GUARD the source writes a share count in 17 places (17 known on main 151b138; a new one must be classified here)
+ok   GUARD act2.js:10 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD act2.js:12 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD act2.js:31 (a.sh) non-cash (stock merger): no eqCash next to it
+ok   GUARD act2.js:44 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD act2.js:67 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD act2.js:163 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD act2.js:165 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD act2.js:201 (c.sh) non-cash (founding): no eqCash next to it
+ok   GUARD act2.js:230 (T.sh) cash share transaction records its own cash with eqCash(T, ...)
+ok   GUARD ui2.js:474 (c.sh) non-cash (splitDo): no eqCash next to it
+ok   GUARD ui2.js:525 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD ui2.js:593 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD ui2.js:674 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD ui2.js:683 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD ui2.js:688 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD ui2.js:691 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD ui2.js:807 (c.sh) cash share transaction records its own cash with eqCash(c, ...)
+ok   GUARD act2.js money move "cap" (capital contribution) records the cash it puts in T with eqCash(T, x) (policy P2)
+ok   GUARD every eqCash call in the source belongs to exactly one classified cash path (15 calls = 14 share sites + 1 contribution)
+
+-- display error table (억원): case | real cash | statement | shown cell | shown - real
+disp C1 rights issue 10% (G.mg iss) | 433.45 | 433.45 | 433 | -0.45
+disp C2 rights issue 10%, one day before the close | 453.38 | 453.38 | 453 | -0.38
+disp C3 buyback 5% (G.mg bb, company cash) | -239.54 | -239.54 | -240 | -0.46
+disp C3b buyback 5% beyond the cash on hand (the shortfall is borrowed) | -239.54 | -239.54 | -240 | -0.46
+disp C4 private placement 10% to me (G.pp) | 496.82 | 496.82 | 497 | 0.18
+disp C5 option exercise 2% at a strike of 60% of the price (G.eoX) | 54.15 | 54.15 | 54.2 | 0.05
+disp C6 bailout (event bail): cash A x .15, shares / .7 | 1002.10 | 1002.10 | 1,002 | -0.10
+disp C7 event: credit downgrade -> share issue 10% | 428.73 | 428.73 | 429 | 0.27
+disp C8 event: activist -> buyback 5% | -236.93 | -236.93 | -237 | -0.07
+disp C9 event: buyback 4% | -189.55 | -189.55 | -190 | -0.45
+disp C10 event: government buys a 30% stake | 1353.90 | 1353.90 | 1,354 | 0.10
+disp C11 white knight 10% (G.wk) | 481.61 | 481.61 | 482 | 0.39
+disp C12 new shares bought by me (money move "pp") | 300.00 | 300.00 | 300 | 0.00
+disp C13 greenmail of a 9% stake (G.gm, company pays 1.25 x price) | -520.49 | -520.49 | -520 | 0.49
+disp C14 rival activist -> company buyback (persTick, strategy ag) | -236.93 | -236.93 | -237 | -0.07
+disp M1 issue 10% then buyback 5% in one quarter | 188.73 | 188.73 | 189 | 0.27
+disp M2 issue 10% then a 1:10 reverse split in one quarter (the split adds no cash) | 433.45 | 433.45 | 433 | -0.45
+disp N1 10:1 split (splitDo) | 0.00 | 0.00 | – | 0.00
+disp N2 1:10 reverse split (splitDo) | 0.00 | 0.00 | – | 0.00
+disp N3 stock merger, acquirer side (G.merge): new shares are the payment, no cash | 0.00 | 0.00 | – | 0.00
+disp SD next quarter | 453.38 | 453.38 | 453 | -0.38
+disp SV autosave (full) next close | 433.45 | 433.45 | 433 | -0.45
+disp P2 capital contribution (policy: equity financing from the owner) | 250.00 | 250.00 | 250 | 0.00
+
+errs 0 fails 0
+PASS t_fincf02_issue.js
+ALL PASS
