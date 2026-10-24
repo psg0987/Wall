@@ -13,8 +13,10 @@
 //    x the company really received (+) or paid (-) to c.eqq. Non-cash share-count changes (splitDo, stock-merger consideration,
 //    founding) do not call it (policy P3: merger shares are 0; the target's debt and cash coming over are FIN-CF-03, not checked here).
 //  - earn(): right before qPush, c.isq[Math.round(S.day)] = c.eqq (only when non-zero), c.eqq = 0; keys older than the oldest kept
-//    row are dropped. kill() clears eqq and isq. qBack() (export import rebuilds the past rows) drops isq, keeps a pending eqq, and
-//    moves the ledger start c.isd to S.day - 720 (like c.cfd of FIN-CF-01).
+//    row are dropped. kill() clears eqq and isq. qBack() (export import rebuilds the past rows) drops isq, moves the ledger start c.isd to
+//    S.day - 720 (like c.cfd of FIN-CF-01) and, since FIN-CF-02-SAVE-01 (2026-10-24), also drops a pending eqq: the rebuilt rows are made
+//    from the cash and share count at the restore, which already hold it (until then this note said 'keeps a pending eqq', and the SV export
+//    case expected it to show again in the next quarter: counted twice; tests/t_fincf02_save01.js).
 //  - v8prep(): eqq = 0, isd = S.day (the load day) when missing — its own start day, NOT c.cfd: a save made with FIN-CF-01 but
 //    before FIN-CF-02 has cfd and no issue ledger.
 //  - fqDerive(): a row whose previous row is AFTER c.isd uses iss = c.isq[q.d] || 0 (exact). A previous row ON the ledger start closed before the
@@ -171,7 +173,10 @@ for (const [fmt, strip] of [['autosave (full)', 0], ['export (packS(1))', 1]]) {
   startWorld(SEED); let T = pickTarget(); mkMine(T); const id = T.id; nextClose(T); nextClose(T); waitDays(T, 30);
   const m = measure(T, c => G.mg(c.id, 'iss', .1)); const eqq0 = T.eqq;
   await reload(strip); T = S.co[id]; const ld = S.day;
-  ok(T.eqq != null && Math.abs(T.eqq - m.real) <= TOLI && eqq0 != null, 'SV ' + fmt + ': the pending issue cash survives the save: eqq ' + f2(T.eqq) + ' (before saving ' + f2(eqq0) + ', real ' + f2(m.real) + ')');
+  // full save: the real rows are kept, the issue belongs to the next quarter, so the pending cash must survive. Export (FIN-CF-02-SAVE-01): qBack rebuilds
+  // the past rows from the cash and share count at the restore, which already hold this issue (verify/fin-cf-02-save01/old_expectations_proof log:
+  // rebuilt previous cash 931 = 974.44 x 0.95530, not 516.80 without the issue), so nothing may wait for the next close any more.
+  ok(T.eqq != null && Math.abs(T.eqq - (strip ? 0 : m.real)) <= TOLI && eqq0 != null, 'SV ' + fmt + ': ' + (strip ? 'the export restore drops the pending issue cash (the rebuilt quarters hold it)' : 'the pending issue cash survives the save') + ': eqq ' + f2(T.eqq) + ' (before saving ' + f2(eqq0) + ', real ' + f2(m.real) + ')');
   nextClose(T); const { q, p } = lastRows(T);
   if (!strip) {
     rowCheck('SV ' + fmt + ' next close', T, q, p, m.real);
@@ -179,12 +184,17 @@ for (const [fmt, strip] of [['autosave (full)', 0], ['export (packS(1))', 1]]) {
     const isq0 = clone(T.isq); await reload(0); T = S.co[id]; const L = fqL(T), d = fqDerive(T, L[L.length - 1], L[L.length - 2]);
     ok(JSON.stringify(T.isq) === JSON.stringify(isq0) && Math.abs(d.iss - m.real) <= TOLI && d.est === false, 'SV ' + fmt + ': a confirmed quarter survives a second save: isq ' + JSON.stringify(T.isq) + ', row shows ' + f2(d.iss));
   } else {
-    const d = fqDerive(T, q, p);
-    ok(Math.abs(d.iss - m.real) <= TOLI && d.est === false && T.isd === ld - 720 && p.d > T.isd, 'SV ' + fmt + ': the rebuilt past rows are not legacy rows (isd ' + T.isd + ' = load day ' + ld + ' - 720 < previous row ' + p.d + '); the next close shows the real cash ' + f2(m.real) + ': ' + f2(d.iss));
+    // no share trade after the restore (T is the player's company, so no AI share event; the case makes none): the next close shows 0, and 재무활동 /
+    // 기타 follow the measured cash with the rowCheck formula (the issue cash is already inside the rebuilt previous quarter's cash, so it is not in dc)
+    const d = fqDerive(T, q, p), dep = T.kd ? 0 : q.A * .02, cfo = q.ni - q.eq + q.ga + dep + (q.imp || 0) + (q.wo || 0), capex = T.kd ? 0 : q.gr + dep;
+    const cffW = (q.D - p.D) + (d.nc || 0) - q.dv + 0, othW = (q.cs - p.cs) - cfo + capex - cffW;
+    ok(Math.abs(d.iss) <= TOLI && Math.abs(d.cff - cffW) <= TOLI && Math.abs(d.oth - othW) <= TOLI && d.est === false && T.isd === ld - 720 && p.d > T.isd, 'SV ' + fmt + ': the rebuilt past rows are not legacy rows (isd ' + T.isd + ' = load day ' + ld + ' - 720 < previous row ' + p.d + '); the next close shows only cash of share trades after the restore (none): ' + f2(d.iss) + ' (the real cash ' + f2(m.real) + ' is inside the rebuilt previous quarter); 재무활동 ' + f2(d.cff) + ' = ' + f2(cffW) + ', 기타 ' + f2(d.oth) + ' = ' + f2(othW));
     ok(!fqL(T).some((x, j, a) => j && fqDerive(T, x, a[j - 1]).est), 'SV ' + fmt + ': no rebuilt quarter is shown as an estimate');
-    // export again with the amount now CONFIRMED: the rebuilt quarters replace the real ones, so the confirmed record goes with them
+    // export again with an amount now CONFIRMED: an issue after the restore (measured), confirmed by the next close; the rebuilt quarters replace the
+    // real ones, so the confirmed record goes with them (the issue before the first export is no record any more: it is inside the rebuilt quarters)
+    const mz = measure(T, c => G.mg(c.id, 'iss', .1)); nextClose(T); const dz = lastRows(T).q.d;
     const isq1 = clone(T.isq); await reload(1); T = S.co[id]; const L3 = fqL(T);
-    ok(isq1 && Object.keys(isq1).length && T.isq == null && L3.every((x, j) => !j || fqDerive(T, x, L3[j - 1]).iss === 0) && T.eqq === 0, 'SV ' + fmt + ': exporting after the close drops the confirmed record ' + JSON.stringify(isq1) + ' together with the real rows (isq ' + JSON.stringify(T.isq) + '); the rebuilt quarters show no issue');
+    ok(isq1 && Object.keys(isq1).length && Math.abs((isq1[dz] || 0) - mz.real) <= TOLI && T.isq == null && L3.every((x, j) => !j || fqDerive(T, x, L3[j - 1]).iss === 0) && T.eqq === 0, 'SV ' + fmt + ': exporting after the close drops the confirmed record ' + JSON.stringify(isq1) + ' (the issue after the first restore, ' + f2(mz.real) + ') together with the real rows (isq ' + JSON.stringify(T.isq) + '); the rebuilt quarters show no issue');
   }
 }
 { // ABS: a company with a pending issue is absorbed by another (absorb -> kill); the acquirer's own ledger is untouched

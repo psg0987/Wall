@@ -354,14 +354,18 @@ for (const [fmt, strip] of [['autosave (full)', 0], ['export (packS(1), historie
   startWorld(SEED); let T = pickTarget(); const id = T.id; nextClose(T); nextClose(T); const S0 = snap(T); defic(T); ch11(T, 'pending at save'); const rec = LED.ch11[LED.ch11.length - 1], rowsBefore = T.fq.length;
   pre(!rec.killed && rec.R > 100 && Math.abs(T.ncq - rec.R) < 1e-9 && T.rlf == null, tag + ' (a) saved on day ' + S.day + ' with ncq ' + f2(T.ncq) + ' waiting');
   const txt = await reload(strip); let T2 = S.co[id];
-  ok(T2 !== T && T2.ncq === rec.R && T2.rlf == null, tag + ' (a) after loading ncq ' + T2.ncq + ' = ' + rec.R + ' (nothing lost), rlf ' + JSON.stringify(T2.rlf));
+  // full save: the real rows are kept and the relief belongs to the next quarter, so it must still wait. Export (FIN-CF-02-SAVE-01, A1): qBack rebuilds
+  // the past rows from the debt at the restore, which is already the debt after the cut (verify/fin-cf-02-save01/old_expectations_proof log: rebuilt
+  // previous debt 1746 = 1753.98 x 0.99559, not 3146.54 before the cut), so the relief is inside the previous quarter and nothing may wait any more.
+  const Rw = strip ? 0 : rec.R;
+  ok(T2 !== T && T2.ncq === Rw && T2.rlf == null, tag + ' (a) after loading ncq ' + T2.ncq + ' = ' + Rw + (strip ? ' (the relief ' + f2(rec.R) + ' is inside the rebuilt quarters)' : ' (nothing lost)') + ', rlf ' + JSON.stringify(T2.rlf));
   ok(strip ? T2.fq.length === 8 && !/"fq"/.test(txt) : T2.fq.length === rowsBefore, tag + ' (a) histories: ' + (strip ? 'left out of the file, rebuilt as ' : 'kept, ') + T2.fq.length + ' rows');
   const o = nextClose(T2);
   const L = fqL(T2), Q = L[L.length - 1], P = L[L.length - 2], d = fqDerive(T2, Q, P);
-  ok(T2.rlf && T2.rlf.d === Q.d && T2.rlf.R === rec.R && T2.ncq === 0 && d.nc === rec.R, tag + ' (a) the close after the load confirms it: rlf ' + JSON.stringify(T2.rlf) + ', ncq ' + T2.ncq + ', row nc ' + f2(d.nc));
-  const s = specCF(T2, Q, P, rec.R); ok(Math.abs(d.cff - s.cff) < 1e-9 && Math.abs(d.oth - s.oth) < 1e-9, tag + ' (a) the row follows the SPEC: cff ' + f2(d.cff) + ', other ' + f2(d.oth));
+  ok(strip ? (T2.rlf == null && T2.ncq === 0 && d.nc === 0) : (T2.rlf && T2.rlf.d === Q.d && T2.rlf.R === rec.R && T2.ncq === 0 && d.nc === rec.R), tag + ' (a) ' + (strip ? 'the close after the load has no relief to confirm (it is inside the rebuilt previous quarter)' : 'the close after the load confirms it') + ': rlf ' + JSON.stringify(T2.rlf) + ', ncq ' + T2.ncq + ', row nc ' + f2(d.nc));
+  const s = specCF(T2, Q, P, Rw); ok(Math.abs(d.cff - s.cff) < 1e-9 && Math.abs(d.oth - s.oth) < 1e-9, tag + ' (a) the row follows the SPEC with R ' + f2(Rw) + ': cff ' + f2(d.cff) + ', other ' + f2(d.oth));
   if (!strip) { const cffReal = (o.post.D - S0.D) + rec.R - o.er.dv; ok(near(d.cff - d.iss, cffReal), tag + ' (a) and matches the true cash financing ' + f2(cffReal) + ' (rows kept, so the previous quarter is the real one)') }
-  uiCheck(T2, tag + ' (a) UI', { R: { [Q.d]: rec.R } });
+  uiCheck(T2, tag + ' (a) UI', strip ? {} : { R: { [Q.d]: rec.R } });
   // (b) saved after the confirmation
   const rl = clone(T2.rlf); await reload(strip); T2 = S.co[id];
   if (strip) { { const tx = cfTab(T2).text; ok(!tx.includes('미확인') && !/법정관리 이력/.test(tx) && T2.cfd === S.day - 720, tag + ' (b) export: the rebuilt past quarters are not legacy rows (cfd ' + T2.cfd + ' = load day - 720): no 미확인 cell, no chapter-11-history warning'); } ok(T2.rlf == null && !fqL(T2).some((q, j, a) => j && fqDerive(T2, q, a[j - 1]).nc), tag + ' (b) export: the confirmed record is dropped together with the real rows it described (qBack builds new past quarters): rlf ' + JSON.stringify(T2.rlf)); uiCheck(T2, tag + ' (b) UI', {}) }
