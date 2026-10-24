@@ -1,0 +1,30 @@
+current: game sha256 6930de85162a9dbf | counterfactual.js | VARIANT=current
+current: player issue 10% mid-quarter, export | pending companies eqq/ncq 1/0
+current: player buyback 5%, export | pending companies eqq/ncq 1/0
+current: natural play to day 540, export | pending companies eqq/ncq 1/0
+current: natural play to day 555, export | pending companies eqq/ncq 2/0
+current: natural play to day 225, export | pending companies eqq/ncq 1/0
+current: chapter-11 relief waiting for its close through the loan-call path callLoan (as test F2b), export | pending companies eqq/ncq 0/1
+fixA: game sha256 6930de85162a9dbf | counterfactual.js | VARIANT=fixA
+fixA: player issue 10% mid-quarter, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA: player buyback 5%, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA: natural play to day 540, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA: natural play to day 555, export | pending companies eqq/ncq 2/0 | cleared 2
+fixA: natural play to day 225, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA: chapter-11 relief waiting for its close through the loan-call path callLoan (as test F2b), export | pending companies eqq/ncq 0/1 | cleared 0
+fixA1: game sha256 6930de85162a9dbf | counterfactual.js | VARIANT=fixA1
+fixA1: player issue 10% mid-quarter, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA1: player buyback 5%, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA1: natural play to day 540, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA1: natural play to day 555, export | pending companies eqq/ncq 2/0 | cleared 2
+fixA1: natural play to day 225, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA1: chapter-11 relief waiting for its close through the loan-call path callLoan (as test F2b), export | pending companies eqq/ncq 0/1 | cleared 1
+fixA vs current: 2166 lines compared (daily state hashes + end-of-scenario random draws), ALL IDENTICAL
+fixA1 vs current: 2166 lines compared (daily state hashes + end-of-scenario random draws), ALL IDENTICAL
+   player issue 10% mid-quarter, export END game rng (_R) 0.365757682826,0.021516637644,0.063071213430 | day-keyed wR(4) 0.066435173620
+   player buyback 5%, export END game rng (_R) 0.365757682826,0.021516637644,0.063071213430 | day-keyed wR(4) 0.066435173620
+   natural play to day 540, export END game rng (_R) 0.215354622807,0.060185929760,0.097945491550 | day-keyed wR(4) 0.170735284220
+   natural play to day 555, export END game rng (_R) 0.897626588121,0.403840200044,0.859315528302 | day-keyed wR(4) 0.646905489964
+   natural play to day 225, export END game rng (_R) 0.878529421519,0.420057426207,0.703647843795 | day-keyed wR(4) 0.378824443324
+   chapter-11 relief waiting for its close through the loan-call path callLoan (as test F2b), export END game rng (_R) 0.365757682826,0.021516637644,0.063071213430 | day-keyed wR(4) 0.066435173620
+output files in /tmp/claude-0/-home-claude/4c4f3d49-6d45-5f50-93f9-783fbad41798/scratchpad/save01/cf_committed

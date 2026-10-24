@@ -251,7 +251,7 @@ repro.js [E5]·[E9], boundary.js [E10]·[E11]·[E14]. "잘못 놓인 금액" = �
 **A — `qBack`에서 대기 증자 현금을 비움.** 위치는 `delete c.isq;c.isd=S.day-720;` 바로 뒤(sim.js:293). `priv&&fo` 조기 반환 뒤이므로 직접 세운 비상장사는 지금과 같다. `v11prep`이나 `v8prep`이 아니라 `qBack`에 두는 이유: 행을 실제로 다시 만드는 회사에만 적용되고(일반 저장 복원·직접 세운 비상장사는 제외), 03A의 같은 처리(`acq=null`)와 한곳에 모인다.
 
 - 의미: 내보내기 복원은 복원 시점 상태로 과거를 다시 만든다. 그때까지 대기하던 거래는 그 기준선 안에 있다. 03A의 `acq=null`과 같은 규칙.
-- 게임 상태: `eqq`·`isq`·`isd`는 기록 전용이다(sim.js:281 주석; 시뮬레이션이 읽지 않음). 대조 실험(counterfactual.py 방식; 이 커밋의 수치는 Claude 작업 공간 사본 실행이고, 저장소 스크립트 재실행 로그는 다음 커밋에서 부록 A-5로 추가): 6개 시나리오(플레이어 증자, 자사주, 자연 실행 3개 시점, 법정관리 감면 대기)에서 내보내기 복원 직후 대기 금액을 비운 세계와 그대로 둔 세계를 별도 프로세스로 360일 돌려, 기록 전용 필드(`eqq`·`isq`·`ncq`·`rlf`)를 뺀 게임 상태 전체 해시가 **매일 같았고**, 끝난 뒤 게임 자체 난수(`_R`)와 날짜별 난수(`wR(4)`)의 다음 값도 같았다(2,166줄 모두 동일, A·A1 둘 다).
+- 게임 상태: `eqq`·`isq`·`isd`는 기록 전용이다(sim.js:281 주석; 시뮬레이션이 읽지 않음). 대조 실험(counterfactual.py, 부록 A-5): 6개 시나리오(플레이어 증자, 자사주, 자연 실행 3개 시점, 대출 회수 경로로 생긴 법정관리 감면 대기)에서 내보내기 복원 직후 대기 금액을 비운 세계와 그대로 둔 세계를 별도 프로세스로 360일 돌려, 기록 전용 필드(`eqq`·`isq`·`ncq`·`rlf`)를 뺀 게임 상태 전체 해시가 **매일 같았고**, 끝난 뒤 게임 자체 난수(`_R`)와 날짜별 난수(`wR(4)`)의 다음 값도 같았다(2,166줄 모두 동일, A·A1 둘 다).
 - 난수: A는 대입 한 번이고 난수를 꺼내지 않는다. 게임은 날마다 난수를 다시 만들므로(2-2절) 복원 때 난수 사용이 바뀌더라도 다음 날에는 영향이 없지만, A는 그 사용도 바꾸지 않는다.
 - 옛 저장: 5-3절.
 - 비용: FIN-CF-02 설계 문구(테스트 머리 주석, MODEL.md)와 기존 테스트 기대값 3곳이 바뀐다(8-4절). 저장 전 거래 금액은 첫 실제 분기 어디에도 따로 보이지 않게 된다. 하지만 그 금액은 다시 만든 직전 행 현금 안에 있고, 같은 분기의 다른 거래(영업 현금 등)도 모두 그렇다.
@@ -398,7 +398,7 @@ R1(수정 전 빌드가 쓴 일반 저장)은 "기록된 한계"로 정보 줄�
 
 `verify/fin-cf-02-save01/hook_tests.py`: 소스를 바꾸지 않고, 테스트를 조립할 때 게임 코드와 테스트 사이에 `qBack`을 감싸는 훅만 넣어 A·A1을 흉내 낸 실행 결과다.
 
-결과(Claude 작업 공간에서 같은 훅 문자열·같은 게임 코드로 실행; 저장소 hook_tests.py 재실행 로그는 다음 커밋에서 부록 A-6~A-8로 추가): 훅 없음 17/17 통과. **A: 16/17 — t_fincf02_issue.js만 3건 실패. A1: 15/17 — t_fincf02_issue.js 3건 + t_fincf01_relief.js 4건 실패.** 나머지 파일(t_fincf03_acq.js, t_golden.js 포함)은 A·A1에서도 통과했다. 실패한 검사는 모두 "내보내기 복원 뒤 대기 금액이 다음 분기에 나온다"는 지금 동작을 기대값으로 둔 곳이다.
+결과(부록 A-6~A-9): 훅 없음 17/17 통과. **A: 16/17 — t_fincf02_issue.js만 3건 실패. A1: t_fincf02_issue.js 3건 + t_fincf01_relief.js 4건 실패(15/17).** 나머지 파일(t_fincf03_acq.js, t_golden.js 포함)은 A·A1에서도 통과했다. A1 실행 로그에는 t14_advisor.js의 응답 시간 검사(`ms < 80`) 1건 실패(84ms)도 찍혔는데, 이 실행은 다른 실행 5개와 CPU 2개를 나눠 쓰던 중이었다. 같은 파일을 A1 훅으로 단독 재실행하면 두 번 모두 통과했고(부록 A-9), 먼저 돌린 작업 공간 사본 실행에서도 통과했다. 부하 때문에 시간 검사가 흔들린 것이고 A1과는 관계없다. 실패한 검사는 모두 "내보내기 복원 뒤 대기 금액이 다음 분기에 나온다"는 지금 동작을 기대값으로 둔 곳이다.
 
 | 파일:줄 | 지금 기대 | A(A1) 뒤 결과 | 바꿀 기대 (승인 뒤) |
 |--------|----------|-------------|------------------|
@@ -415,7 +415,7 @@ R1(수정 전 빌드가 쓴 일반 저장)은 "기록된 한계"로 정보 줄�
 - main과 수정 브랜치를 같은 시드로 나란히 돌려 기록 전용 필드(`eqq`·`isq`·`isd`, A1이면 `ncq`·`rlf`·`cfd`)를 뺀 게임 상태 전체 해시를 **매일** 비교한다. 사례: 자연 실행 3시드×720일, 이번 문서의 내보내기 사례(플레이어 증자·자사주, 자연 실행 3개 시점, 대출 회수 감면), 03A 검증의 9개 사례.
 - 각 사례 끝에서 게임 자체 난수 `_R`과 날짜별 난수 `wR(k)`의 다음 값을 비교한다. 참고: 게임은 새 게임과 진행 중에 `Math.random`을 쓰지 않는다(probes.js [P1]). 그래서 기존 FIN-CF-02·03A 검증 스크립트의 "끝난 뒤 `Math.random()` 3개 비교"로는 게임 난수 위치를 확인할 수 없다(브랜치가 `Math.random`을 새로 쓰는 경우만 잡는다). 그 검증의 결론은 매일 비교한 게임 상태 전체 해시로 뒷받침되므로 결론은 바뀌지 않는다. 이번 검증에서는 `_R`을 비교한다.
 - 세계마다 별도 프로세스(7-3 R6).
-- 이번 조사에서 같은 방식의 대조 실험을 이미 돌렸다(작업 공간 실행: A·A1 모두 2,166줄 동일; 부록 A-5는 다음 커밋).
+- 이번 조사에서 같은 방식의 대조 실험을 이미 돌렸다(counterfactual.py, 부록 A-5: A·A1 모두 2,166줄 동일).
 
 ### 8-6. 변이 검사 (각 변이는 새 테스트에서 실패해야 함)
 
@@ -462,8 +462,8 @@ python3 verify/fin-cf-02-save01/hook_tests.py none|A|A1                       # 
 |------|----|
 | 기준 main | `d82f84764fdf242de4956ed9d53521a479cc80a9` (원격 `origin/main`과 같음을 작업 시작·커밋 전 `git ls-remote`로 확인) |
 | 게임 소스 | main `d82f847` = `d9600e9` (src 차이 0줄), 조립한 game.js sha256 앞자리 `6930de85162a9dbf` |
-| 작업 브랜치 | `fin-cf-02-save01-design` (main `d82f847`에서 생성, 문서·조사 스크립트 전용 커밋: 이 문서와 스크립트 커밋, 이어서 재실행 로그를 더하는 커밋) |
-| 바뀐 파일 | `docs/FIN-CF-02-SAVE-01-DESIGN.md`(새 파일), `verify/fin-cf-02-save01/`(새 폴더: 스크립트 9개와 실행 로그 — 이 커밋 5개, 다음 커밋에서 4개 추가) |
+| 작업 브랜치 | `fin-cf-02-save01-design` (main `d82f847`에서 생성, 문서·조사 스크립트 전용 커밋 2개: 설계서·스크립트 `82a3c7a`, 재실행 로그 추가) |
+| 바뀐 파일 | `docs/FIN-CF-02-SAVE-01-DESIGN.md`(새 파일), `verify/fin-cf-02-save01/`(새 폴더: 스크립트 9개와 실행 로그 10개) |
 | 바꾸지 않은 것 | `src/`, `tests/`, `build/`, `index.html`, 기존 `docs/` 파일 |
 | main 병합·배포 | 하지 않음. 이 브랜치의 병합 여부는 GPT-6 검토와 사용자 결정에 따름 |
 
@@ -657,7 +657,36 @@ game sha256 6930de85162a9dbf | probes.js
 `verify/fin-cf-02-save01/counterfactual_d82f847_2026-10-24.log`
 
 ```
-(저장소 스크립트로 재실행 중 — 다음 커밋에서 추가)
+current: game sha256 6930de85162a9dbf | counterfactual.js | VARIANT=current
+current: player issue 10% mid-quarter, export | pending companies eqq/ncq 1/0
+current: player buyback 5%, export | pending companies eqq/ncq 1/0
+current: natural play to day 540, export | pending companies eqq/ncq 1/0
+current: natural play to day 555, export | pending companies eqq/ncq 2/0
+current: natural play to day 225, export | pending companies eqq/ncq 1/0
+current: chapter-11 relief waiting for its close through the loan-call path callLoan (as test F2b), export | pending companies eqq/ncq 0/1
+fixA: game sha256 6930de85162a9dbf | counterfactual.js | VARIANT=fixA
+fixA: player issue 10% mid-quarter, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA: player buyback 5%, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA: natural play to day 540, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA: natural play to day 555, export | pending companies eqq/ncq 2/0 | cleared 2
+fixA: natural play to day 225, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA: chapter-11 relief waiting for its close through the loan-call path callLoan (as test F2b), export | pending companies eqq/ncq 0/1 | cleared 0
+fixA1: game sha256 6930de85162a9dbf | counterfactual.js | VARIANT=fixA1
+fixA1: player issue 10% mid-quarter, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA1: player buyback 5%, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA1: natural play to day 540, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA1: natural play to day 555, export | pending companies eqq/ncq 2/0 | cleared 2
+fixA1: natural play to day 225, export | pending companies eqq/ncq 1/0 | cleared 1
+fixA1: chapter-11 relief waiting for its close through the loan-call path callLoan (as test F2b), export | pending companies eqq/ncq 0/1 | cleared 1
+fixA vs current: 2166 lines compared (daily state hashes + end-of-scenario random draws), ALL IDENTICAL
+fixA1 vs current: 2166 lines compared (daily state hashes + end-of-scenario random draws), ALL IDENTICAL
+   player issue 10% mid-quarter, export END game rng (_R) 0.365757682826,0.021516637644,0.063071213430 | day-keyed wR(4) 0.066435173620
+   player buyback 5%, export END game rng (_R) 0.365757682826,0.021516637644,0.063071213430 | day-keyed wR(4) 0.066435173620
+   natural play to day 540, export END game rng (_R) 0.215354622807,0.060185929760,0.097945491550 | day-keyed wR(4) 0.170735284220
+   natural play to day 555, export END game rng (_R) 0.897626588121,0.403840200044,0.859315528302 | day-keyed wR(4) 0.646905489964
+   natural play to day 225, export END game rng (_R) 0.878529421519,0.420057426207,0.703647843795 | day-keyed wR(4) 0.378824443324
+   chapter-11 relief waiting for its close through the loan-call path callLoan (as test F2b), export END game rng (_R) 0.365757682826,0.021516637644,0.063071213430 | day-keyed wR(4) 0.066435173620
+output files in /tmp/claude-0/-home-claude/4c4f3d49-6d45-5f50-93f9-783fbad41798/scratchpad/save01/cf_committed
 ```
 
 ### A-6. hook_tests.py none (훅 없음)
@@ -665,7 +694,25 @@ game sha256 6930de85162a9dbf | probes.js
 `verify/fin-cf-02-save01/hook_tests_none_d82f847_2026-10-24.log`
 
 ```
-(저장소 스크립트로 재실행 중 — 다음 커밋에서 추가)
+game sha256 6930de85162a9dbf | hook none | 17 test files
+PASS t12_sim.js (errs 0 fails 0)
+PASS t13_ui.js (errs 0 fails 0)
+PASS t14_advisor.js (errs 0 fails 0)
+PASS t18_ai_native.js (errs 0 fails 0)
+PASS t18_ai_web.js (errs 0 fails 0)
+PASS t_clean_surplus.js (errs 0 fails 0)
+PASS t_close_spec.js (errs 0 fails 0)
+PASS t_impair_ui.js (errs 0 fails 0)
+PASS t_bank_writeoff.js (errs 0 fails 0)
+PASS t_bank_writeoff_cases.js (errs 0 fails 0)
+PASS t_bank_writeoff_cashflow.js (errs 0 fails 0)
+PASS t_reg01_bank_imp_wo.js (errs 0 fails 0)
+PASS t_r4c_bank_tg.js (errs 0 fails 0)
+PASS t_fincf01_relief.js (errs 0 fails 0)
+PASS t_fincf02_issue.js (errs 0 fails 0)
+PASS t_fincf03_acq.js (errs 0 fails 0)
+PASS t_golden.js (errs 0 fails 0)
+ALL PASS
 ```
 
 ### A-7. hook_tests.py A
@@ -673,7 +720,28 @@ game sha256 6930de85162a9dbf | probes.js
 `verify/fin-cf-02-save01/hook_tests_A_d82f847_2026-10-24.log`
 
 ```
-(저장소 스크립트로 재실행 중 — 다음 커밋에서 추가)
+game sha256 6930de85162a9dbf | hook A | 17 test files
+PASS t12_sim.js (errs 0 fails 0)
+PASS t13_ui.js (errs 0 fails 0)
+PASS t14_advisor.js (errs 0 fails 0)
+PASS t18_ai_native.js (errs 0 fails 0)
+PASS t18_ai_web.js (errs 0 fails 0)
+PASS t_clean_surplus.js (errs 0 fails 0)
+PASS t_close_spec.js (errs 0 fails 0)
+PASS t_impair_ui.js (errs 0 fails 0)
+PASS t_bank_writeoff.js (errs 0 fails 0)
+PASS t_bank_writeoff_cases.js (errs 0 fails 0)
+PASS t_bank_writeoff_cashflow.js (errs 0 fails 0)
+PASS t_reg01_bank_imp_wo.js (errs 0 fails 0)
+PASS t_r4c_bank_tg.js (errs 0 fails 0)
+PASS t_fincf01_relief.js (errs 0 fails 0)
+FAIL t_fincf02_issue.js (errs 0 fails 3)
+   FAIL SV export (packS(1)): the pending issue cash survives the save: eqq 0.00 (before saving 433.45, real 433.45)
+   FAIL SV export (packS(1)): the rebuilt past rows are not legacy rows (isd -573 = load day 147 - 720 < previous row 57); the next close shows the real cash 433.45: 0.00
+   FAIL SV export (packS(1)): exporting after the close drops the confirmed record undefined together with the real rows (isq undefined); the rebuilt quarters show no issue
+PASS t_fincf03_acq.js (errs 0 fails 0)
+PASS t_golden.js (errs 0 fails 0)
+1 test file(s) failed
 ```
 
 ### A-8. hook_tests.py A1
@@ -681,5 +749,45 @@ game sha256 6930de85162a9dbf | probes.js
 `verify/fin-cf-02-save01/hook_tests_A1_d82f847_2026-10-24.log`
 
 ```
-(저장소 스크립트로 재실행 중 — 다음 커밋에서 추가)
+game sha256 6930de85162a9dbf | hook A1 | 17 test files
+PASS t12_sim.js (errs 0 fails 0)
+PASS t13_ui.js (errs 0 fails 0)
+FAIL t14_advisor.js (errs 0 fails 1)
+   FAIL 남는 현금 어떻게 굴릴까? slow 84
+PASS t18_ai_native.js (errs 0 fails 0)
+PASS t18_ai_web.js (errs 0 fails 0)
+PASS t_clean_surplus.js (errs 0 fails 0)
+PASS t_close_spec.js (errs 0 fails 0)
+PASS t_impair_ui.js (errs 0 fails 0)
+PASS t_bank_writeoff.js (errs 0 fails 0)
+PASS t_bank_writeoff_cases.js (errs 0 fails 0)
+PASS t_bank_writeoff_cashflow.js (errs 0 fails 0)
+PASS t_reg01_bank_imp_wo.js (errs 0 fails 0)
+PASS t_r4c_bank_tg.js (errs 0 fails 0)
+FAIL t_fincf01_relief.js (errs 0 fails 4)
+   FAIL SV export (packS(1), histories left out) (a) after loading ncq 0 = 1406.5030389927308 (nothing lost), rlf undefined
+   FAIL SV export (packS(1), histories left out) (a) the close after the load confirms it: rlf undefined, ncq 0, row nc 0.00
+   FAIL SV export (packS(1), histories left out) (a) the row follows the SPEC: cff -718.00, other 108.00
+   FAIL SV export (packS(1), histories left out) (a) UI: the 현금흐름 tab (8 quarters) shows 차입 증감 / 재무활동 / 기타 / 현금 증감 / 영업 / 설비투자 / FCF exactly as the SPEC; memo row hidden | 27.3Q b shows ◐-718 want ◐689; 27.3Q f shows ◐-718 want ◐689; 27.3Q o shows ◐108 want ◐-1,299; memo row hidden but a relief is visible
+FAIL t_fincf02_issue.js (errs 0 fails 3)
+   FAIL SV export (packS(1)): the pending issue cash survives the save: eqq 0.00 (before saving 433.45, real 433.45)
+   FAIL SV export (packS(1)): the rebuilt past rows are not legacy rows (isd -573 = load day 147 - 720 < previous row 57); the next close shows the real cash 433.45: 0.00
+   FAIL SV export (packS(1)): exporting after the close drops the confirmed record undefined together with the real rows (isq undefined); the rebuilt quarters show no issue
+PASS t_fincf03_acq.js (errs 0 fails 0)
+PASS t_golden.js (errs 0 fails 0)
+3 test file(s) failed
+```
+
+### A-9. hook_tests.py A1 t14_advisor 단독 재실행 (부하 없이)
+
+`verify/fin-cf-02-save01/hook_tests_A1_t14_rerun_d82f847_2026-10-24.log`
+
+```
+game sha256 6930de85162a9dbf | hook A1 | 17 test files
+PASS t14_advisor.js (errs 0 fails 0)
+ALL PASS
+--- second run
+game sha256 6930de85162a9dbf | hook A1 | 17 test files
+PASS t14_advisor.js (errs 0 fails 0)
+ALL PASS
 ```

@@ -1,0 +1,22 @@
+game sha256 6930de85162a9dbf | hook A | 17 test files
+PASS t12_sim.js (errs 0 fails 0)
+PASS t13_ui.js (errs 0 fails 0)
+PASS t14_advisor.js (errs 0 fails 0)
+PASS t18_ai_native.js (errs 0 fails 0)
+PASS t18_ai_web.js (errs 0 fails 0)
+PASS t_clean_surplus.js (errs 0 fails 0)
+PASS t_close_spec.js (errs 0 fails 0)
+PASS t_impair_ui.js (errs 0 fails 0)
+PASS t_bank_writeoff.js (errs 0 fails 0)
+PASS t_bank_writeoff_cases.js (errs 0 fails 0)
+PASS t_bank_writeoff_cashflow.js (errs 0 fails 0)
+PASS t_reg01_bank_imp_wo.js (errs 0 fails 0)
+PASS t_r4c_bank_tg.js (errs 0 fails 0)
+PASS t_fincf01_relief.js (errs 0 fails 0)
+FAIL t_fincf02_issue.js (errs 0 fails 3)
+   FAIL SV export (packS(1)): the pending issue cash survives the save: eqq 0.00 (before saving 433.45, real 433.45)
+   FAIL SV export (packS(1)): the rebuilt past rows are not legacy rows (isd -573 = load day 147 - 720 < previous row 57); the next close shows the real cash 433.45: 0.00
+   FAIL SV export (packS(1)): exporting after the close drops the confirmed record undefined together with the real rows (isq undefined); the rebuilt quarters show no issue
+PASS t_fincf03_acq.js (errs 0 fails 0)
+PASS t_golden.js (errs 0 fails 0)
+1 test file(s) failed

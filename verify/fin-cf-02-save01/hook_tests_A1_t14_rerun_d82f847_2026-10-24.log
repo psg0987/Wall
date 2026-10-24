@@ -1,0 +1,7 @@
+game sha256 6930de85162a9dbf | hook A1 | 17 test files
+PASS t14_advisor.js (errs 0 fails 0)
+ALL PASS
+--- second run
+game sha256 6930de85162a9dbf | hook A1 | 17 test files
+PASS t14_advisor.js (errs 0 fails 0)
+ALL PASS
