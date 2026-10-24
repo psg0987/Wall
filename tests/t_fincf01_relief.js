@@ -259,7 +259,11 @@ function uiCheck(T, lab, opt) {
     if (!p) { for (const k of ['b', 'f', 'o', 'dc']) if (cellsOf[k][j] !== '–') bad.push(lb + ' oldest quarter ' + k + ' = ' + cellsOf[k][j]); return }
     const R = Rm[q.d] || 0, dep = fin ? 0 : q.A * .02, cfo = q.ni - q.eq + q.ga + dep + (q.imp || 0) + (q.wo || 0), capex = fin ? 0 : q.gr + dep, ir = issRule(T, q, p), iss = ir.iss, e = ir.est ? '≈' : '';
     const borrow = q.D - p.D + R, cff = borrow - q.dv + iss, dc = q.cs - p.cs, oth = dc - cfo + capex - cff;
-    const want = { b: u ? '미확인' : fN(borrow), f: u ? '미확인' : e + fN(cff), o: u ? '미확인' : e + fN(oth), dc: fN(dc), cfo: fN(cfo), cap: fin ? '–' : fN(-capex), fcf: fin ? '–' : fN(cfo - capex) };
+    // FIN-CF-03A (added 2026-10-24): a quarter that began on or before the acquisition-ledger start (T.acd, the load day of a restored save) and
+    // ended after it is 'partly recorded' and its 차입 / 재무활동 / 기타 cells carry '◐' (design R2 4-1); this SPEC has no acquisition term, so
+    // a visible quarter with an acquisition record is reported as outside it (none of these cases has one)
+    const half = T.acd != null && p.d <= T.acd && q.d > T.acd ? '◐' : ''; if (T.acr && T.acr[q.d]) bad.push(lb + ' has a FIN-CF-03A acquisition record, which this SPEC does not cover');
+    const want = { b: u ? '미확인' : half + fN(borrow), f: u ? '미확인' : e + half + fN(cff), o: u ? '미확인' : e + half + fN(oth), dc: fN(dc), cfo: fN(cfo), cap: fin ? '–' : fN(-capex), fcf: fin ? '–' : fN(cfo - capex) };
     for (const k in want) if (cellsOf[k][j] !== want[k]) bad.push(lb + ' ' + k + ' shows ' + cellsOf[k][j] + ' want ' + want[k]);
   });
   const memo = t.row(NOTE_RLF), vis = L.some((q, j) => L[j + 1] && Rm[q.d]);

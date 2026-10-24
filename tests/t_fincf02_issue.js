@@ -69,14 +69,17 @@ const LINE = '증자·출자(자사주)';
 const cellNum = s => s == null ? NaN : s === '–' ? 0 : /조$/.test(s) ? parseFloat(s.replace(/[≈,]/g, '')) * 1e4 : parseFloat(s.replace(/[≈,]/g, ''));
 const DISP = [];   // display error table for the report: label, real cash, statement value, shown cell, shown - real
 // the row check: statement vs the independent cash; ui: the newest column of the rendered tab (q must be the newest row)
-function rowCheck(label, T, q, p, real, extra, ui) {
+// acq (FIN-CF-03A, added 2026-10-24): the measured debt that came over without cash (ncA) and the measured acquisition cash (maN external,
+// inN internal) of the quarter; they leave 재무활동 / move to their own rows by design, so they enter the expected values here as measured.
+function rowCheck(label, T, q, p, real, extra, ui, acq) {
   const d = fqDerive(T, q, p), dep = T.kd ? 0 : q.A * .02, cfo = q.ni - q.eq + q.ga + dep + (q.imp || 0) + (q.wo || 0), capex = T.kd ? 0 : q.gr + dep;
-  const dD = q.D - p.D, R = d.nc || 0, cffW = dD + R - q.dv + real, othW = (q.cs - p.cs) - cfo + capex - cffW;
+  const A = Object.assign({ ncA: 0, maN: 0, inN: 0 }, acq || {});
+  const dD = q.D - p.D, R = d.nc || 0, cffW = dD + R - A.ncA - q.dv + real, othW = (q.cs - p.cs) - cfo + capex - cffW - A.maN - A.inN;
   console.log(`  ${label}: ${T.tk} row ${q.d} | share count ${p.sh} -> ${q.sh}, close price ${q.p} | real cash ${f2(real)} | statement 증자·출자 ${f2(d.iss)} (error ${f2(d.iss - real)})${extra ? ' | ' + extra : ''}`);
   ok(Math.abs(d.iss - real) <= TOLI, label + ' 증자·출자(자사주) ' + f2(d.iss) + ' = cash really received/paid ' + f2(real));
-  ok(Math.abs(d.cff - cffW) <= TOLI, label + ' 재무활동 ' + f2(d.cff) + ' = dD + R - dv + real cash = ' + f2(cffW));
+  ok(Math.abs(d.cff - cffW) <= TOLI, label + ' 재무활동 ' + f2(d.cff) + ' = dD + R' + (A.ncA ? ' - debt taken over without cash ' + f2(A.ncA) : '') + ' - dv + real cash = ' + f2(cffW));
   ok(Math.abs(d.oth - othW) <= TOLI, label + ' 기타·투자 매매 ' + f2(d.oth) + ' = ' + f2(othW) + ' (does not absorb the share issue)');
-  ok(Math.abs((d.cff + q.dv - d.iss) - (dD + R)) <= 1e-9 && Math.abs(d.dc - (q.cs - p.cs)) <= 1e-9 && d.est === false, label + ' 차입 증감 (= dD + R) and 현금 증감 untouched; a recorded row is not flagged as an estimate (est ' + d.est + ')');
+  ok(Math.abs((d.cff + q.dv - d.iss) - (dD + R - A.ncA)) <= 1e-9 && Math.abs(d.dc - (q.cs - p.cs)) <= 1e-9 && d.est === false, label + ' 차입 증감 (= dD + R' + (A.ncA ? ' - ' + f2(A.ncA) : '') + ') and 현금 증감 untouched; a recorded row is not flagged as an estimate (est ' + d.est + ')');
   if (ui !== false && !T.dead && !T.priv) {
     const t = cfTab(T), L = fqL(T), j = L.length - 1 - L.findIndex(x => x.d === q.d), ce = n => (t.row(n) || [])[j];
     const want = { [LINE]: real === 0 || Math.abs(real) < 1e-12 ? '–' : fN(real), '재무활동 현금흐름': fN(cffW), '기타·투자 매매': fN(othW) }, bad = [];
@@ -97,7 +100,7 @@ function runCase(label, o) {
   pre(n0 === ms.length * 1 || o.anyWrites, label + ' the share count was written by the action only (' + n0 + ' write(s)), none until the close (' + (tr.n.length - n0) + ')');
   pre(tr.n.length === n0, label + ' no other share-count change before the close');
   if (o.pre) o.pre(T, ms);
-  const { q, p } = lastRows(T); const d = rowCheck(label, T, q, p, real, o.cash0 ? 'NON-CASH share change ' + f2(dsh) + ' (expected 0)' : 'true share change ' + f2(dsh));
+  const { q, p } = lastRows(T); const d = rowCheck(label, T, q, p, real, o.cash0 ? 'NON-CASH share change ' + f2(dsh) + ' (expected 0)' : 'true share change ' + f2(dsh), undefined, o.acq ? o.acq(T, ms) : null);
   if (o.post) o.post(T, ms, q, p, d);
   return { T, ms, q, p, d, real };
 }
@@ -149,7 +152,8 @@ runCase('N2 1:10 reverse split (splitDo)', { act: T => { splitDo(T, .1, 1) }, ca
 { let x = null, x0 = null;
   runCase('N3 stock merger, acquirer side (G.merge): new shares are the payment, no cash', { mine: 1, cash0: 1,
     act: T => { x = S.co.find(c => !c.dead && !c.priv && !c.kd && c !== T && !mine(c) && mc(c) < mc(T) * .3 && c.i !== HOLD); setOwn(x, 'P', 55); ctlAll(); x0 = { cs: x.cs, D: x.D }; S.te = T.id; const m0 = S.st.ma; G.merge(x.id, 40); T._m = S.st.ma > m0 },
-    pre: (T, [m]) => { pre(T._m && m.dsh > 0, 'N3 merged ' + (x && x.tk) + ' (shares +' + f2(m.dsh) + ')'); pre(Math.abs(m.s1.cs - m.s0.cs - x0.cs) < 1e-6 && Math.abs(m.s1.D - m.s0.D - x0.D) < 1e-6, 'N3 the acquirer took over the target cash ' + f2(x0.cs) + ' and debt ' + f2(x0.D) + ' (FIN-CF-03, not checked here)'); delete T._m } });
+    pre: (T, [m]) => { pre(T._m && m.dsh > 0, 'N3 merged ' + (x && x.tk) + ' (shares +' + f2(m.dsh) + ')'); pre(Math.abs(m.s1.cs - m.s0.cs - x0.cs) < 1e-6 && Math.abs(m.s1.D - m.s0.D - x0.D) < 1e-6, 'N3 the acquirer took over the target cash ' + f2(x0.cs) + ' and debt ' + f2(x0.D) + ' (FIN-CF-03A: no cash paid, so 재무활동 leaves out the debt and 인수 순현금 shows the cash)'); delete T._m },
+    acq: () => ({ ncA: x0.D, maN: x0.cs }) });
 }
 
 // ================================================================================================================================
