@@ -42,7 +42,7 @@ const shR = r => r ? KEYS.filter(k => Math.abs(r[k] || 0) > 1e-12).map(k => k + 
 
 // ---- harness ---------------------------------------------------------------------------------------------------------------------------
 let ADD = [];   // every acqAdd call of the current world (see below)
-function startWorld(seed) { Math.random = mulb(seed); init(Object.assign(defCfg(), { tut: 0, seed })); mdl = null; ADD = [] }
+function startWorld(seed) { Math.random = mulb(seed); init(Object.assign(defCfg(), { tut: 0, seed })); mdl = null; ADD = []; resetOracle() }
 const pickTarget = skip => S.co.find(c => !c.dead && !c.kd && !c.priv && !mine(c) && !c.own.P && c.bk === 0 && c.A > 3000 && !(skip || []).includes(c.id));
 function nextClose(T) { const l0 = T.fq[T.fq.length - 1]; for (let i = 0; i < 400 && !T.dead; i++) { step(); if (T.fq[T.fq.length - 1] !== l0) return true } return false }
 const daysToClose = T => 90 - ((S.day - T.fq[T.fq.length - 1][0]) % 90);
@@ -55,6 +55,62 @@ const legacy = async strip => { const raw = clone(S); for (const x of raw.co) { 
 // every acqAdd call (the game's and the test's), so the expected confirmed record of a close is built from the calls, not from acr
 { const a0 = acqAdd; acqAdd = function (c, k, x) { if (c && x && isFinite(x)) ADD.push({ id: c.id, k, x, day: S.day, tk: c.tk }); return a0(c, k, x) } }
 const callsBetween = (id, d0, d1) => { const r = zero(); for (const a of ADD) if (a.id === id && a.day > d0 && a.day <= d1) r[a.k] += a.x; return r };
+
+// ---- the measurement oracle (P2): what each deal really moved, measured around the real game calls; it never reads acq / acr --------------
+// CS: snapshot (cash, debt, stakes of every company) taken when an acquisition caller starts; absorb reads it at entry:
+//   cash paid = (cash at the caller's start - cash at absorb entry) + (debt at absorb entry - debt at the caller's start)  [shortfall borrowed]
+//   internal  = the acquirer's direct stake in the target at the caller's start > 50
+// G.tender: LBO debt = the target's debt change in the call. hqQ: hidden debt = the debt change of a company whose '숨은 부채' bomb went off.
+// earn: at each close the measured amounts of the quarter become OR.rec[id][row day]; the ledger is compared right there (MIS).
+let OR, EVT, MIS, CS = null;
+function resetOracle() { OR = { pend: {}, rec: {} }; EVT = []; MIS = []; CS = null; TR.clear() }
+const oAdd = (id, k, x) => { if (!x) return; const p = OR.pend[id] || (OR.pend[id] = zero()); p[k] += x };
+const snapAll = () => { const m = new Map(); for (const c of S.co) m.set(c.id, { cs: c.cs, D: c.D, own: Object.assign({}, c.own) }); return m };
+const measured = (f0, label) => function () { const o = CS; CS = { m: snapAll(), label }; try { return f0.apply(this, arguments) } finally { CS = o } };
+maTick = measured(maTick, 'maTick'); G.merge = measured(G.merge, 'G.merge'); G.liq = measured(G.liq, 'G.liq');
+const OFFER = EV2.find(z => z.id === 'offer'); OFFER.go = measured(OFFER.go, 'offer');
+{ const f0 = absorb; absorb = function (a, t) {
+    const s = CS, b = s && s.m.get(a.id), st = s ? (((s.m.get(t.id) || {}).own || {})['c' + a.id] || 0) : NaN;
+    const ev = { label: s ? s.label : 'UNMEASURED', day: S.day, a: a.id, t: t.id, atk: a.tk, ttk: t.tk, tctl: t.ctl, tD: t.D, tcs: t.cs, stake: st, int: st > 50, paid: b ? (b.cs - a.cs) + (a.D - b.D) : NaN };
+    const r = f0.apply(this, arguments);
+    oAdd(a.id, ev.int ? 'iD' : 'aD', ev.tD); oAdd(a.id, ev.int ? 'iP' : 'aP', ev.paid); oAdd(a.id, ev.int ? 'iC' : 'aC', ev.tcs); EVT.push(ev); return r } }
+{ const f0 = G.tender; G.tender = function (i, prem, lbo) { const c = S.co[i], D0 = c && c.D, p0 = c && c.priv; const r = f0.apply(this, arguments);
+    if (c && lbo && !p0 && c.priv) { oAdd(c.id, 'lD', c.D - D0); EVT.push({ label: 'LBO', day: S.day, t: c.id, ttk: c.tk, lD: c.D - D0 }) } return r } }
+{ const f0 = hqQ; hqQ = function () { const b = new Map(S.co.map(c => [c.id, { D: c.D, k: c.tb && S.day >= c.tb.d ? c.tb.k : null }])); const r = f0.apply(this, arguments);
+    for (const c of S.co) { const x = b.get(c.id); if (x && x.k === '숨은 부채' && c.D - x.D) { oAdd(c.id, 'hD', c.D - x.D); EVT.push({ label: 'hidden', day: S.day, t: c.id, ttk: c.tk, hD: c.D - x.D }) } } return r } }
+{ const f0 = kill; kill = function (c) { if (c) { delete OR.pend[c.id]; delete OR.rec[c.id] } return f0.apply(this, arguments) } }
+{ const f0 = earn; earn = function (c) { const l0 = c.fq && c.fq.length ? c.fq[c.fq.length - 1] : null; const r = f0.apply(this, arguments);
+    if (!c.dead && c.fq && c.fq.length && c.fq[c.fq.length - 1] !== l0) { const d = c.fq[c.fq.length - 1][0], p = OR.pend[c.id];
+      if (p) { const rec = OR.rec[c.id] || (OR.rec[c.id] = {}), o = rec[d] || (rec[d] = zero()); for (const k of KEYS) o[k] += p[k]; delete OR.pend[c.id] }
+      if (OR.rec[c.id]) { const d0 = c.fq[0][0]; for (const k in OR.rec[c.id]) if (+k < d0) delete OR.rec[c.id][k] }
+      const tt = TR.get(c.id); if (tt && tt.obj === c) tt.log.push({ mark: 1, day: d, raw: { cs: c.cs, D: c.D } });
+      const want = (OR.rec[c.id] || {})[d], got = (c.acr || {})[d];
+      if (!same(got, want) || c.acq != null) MIS.push(c.tk + ' row ' + d + ': ledger ' + shR(got) + (c.acq ? ' (acq not cleared)' : '') + ' vs measured ' + shR(want)) } return r } }
+// after a save round trip the oracle follows the documented policy: an export drops pending and confirmed records (qBack), except companies qBack skips
+const oracleAfterLoad = strip => { if (!strip) return; for (const c of S.co) if (!(c.priv && c.fo)) { delete OR.pend[c.id]; delete OR.rec[c.id] } };
+// the ledger against the oracle for some companies: pending and every confirmed key
+function ledgerCheck(lab, ids) { const bad = [];
+  for (const id of ids) { const c = S.co[id]; if (!same(c.acq, OR.pend[id])) bad.push(c.tk + ' acq ' + shR(c.acq) + ' vs measured ' + shR(OR.pend[id]));
+    for (const k of new Set([...Object.keys(c.acr || {}), ...Object.keys(OR.rec[id] || {})])) if (!same((c.acr || {})[k], (OR.rec[id] || {})[k])) bad.push(c.tk + ' acr[' + k + '] ' + shR((c.acr || {})[k]) + ' vs measured ' + shR((OR.rec[id] || {})[k])) }
+  const m = MIS.filter(x => ids.some(id => x.startsWith(S.co[id].tk + ' ')));
+  ok(!bad.length && !m.length, lab + ': ledger (acq, every acr key) = the measured deals' + (bad.length || m.length ? ' | ' + bad.concat(m).slice(0, 4).join('; ') : '')); return !bad.length && !m.length }
+// write tracer on cs / D of a company (labelled by the innermost game function), with marks at its closes and the raw values there
+const TR = new Map();
+const frame = () => { for (const l of new Error().stack.split('\n').slice(3)) { const m = l.match(/at (?:Object\.|new )?([\w$.]+) \(/); if (m && !/^(set|trace|frame)$/.test(m[1])) return m[1] } return '?' };
+function trace(c) { if (TR.has(c.id)) return TR.get(c.id); const t = { log: [], v: { cs: c.cs, D: c.D }, obj: c }; TR.set(c.id, t);
+  for (const k of ['cs', 'D']) Object.defineProperty(c, k, { configurable: true, enumerable: true, get() { return t.v[k] }, set(x) { const d = x - t.v[k]; t.v[k] = x; if (d) t.log.push({ k, d, fr: frame(), day: S.day }) } });
+  return t }
+// the quarter that ends with row d of company c, from the tracer: raw debt / cash change between the two closes and the writes by function;
+// the non-cash debt writes the design takes out: absorb (debt taken over), G.tender (LBO), hqQ without a cash write of its own (hidden debt;
+// the lawsuit bomb pays cash and borrows the shortfall), ch11x (FIN-CF-01 relief). Everything else is cash borrowing or repayment.
+function quarterOf(c, d) { const t = TR.get(c.id); if (!t) return null; const ms = t.log.map((e, j) => e.mark ? j : -1).filter(j => j >= 0), ib = ms.findIndex(j => t.log[j].day === d);
+  if (ib < 1) return null; const ja = ms[ib - 1], jb = ms[ib], w = t.log.slice(ja + 1, jb), p = t.log[ja].raw, q = t.log[jb].raw, by = {};
+  const hqCash = new Set(w.filter(e => e.k === 'cs' && e.fr === 'hqQ').map(e => e.day));
+  const nc = { absorb: 0, lbo: 0, hidden: 0, relief: 0 };
+  for (const e of w) { by[e.k + ':' + e.fr] = (by[e.k + ':' + e.fr] || 0) + e.d; if (e.k !== 'D') continue;
+    if (e.fr === 'absorb') nc.absorb += e.d; else if (e.fr === 'G.tender') nc.lbo += e.d; else if (e.fr === 'hqQ' && !hqCash.has(e.day)) nc.hidden += e.d; else if (e.fr === 'ch11x') nc.relief += e.d }
+  return { dD: q.D - p.D, dc: q.cs - p.cs, by, nc, cashBorrow: (q.D - p.D) - nc.absorb - nc.lbo - nc.hidden - nc.relief, raw: { p, q } } }
+const evIn = (id, d0, d1, f) => EVT.filter(e => e.a === id && e.day > d0 && e.day <= d1 && (!f || f(e)));
 console.log('-- harness ready');
 
 // ================================================================================================================================
@@ -119,6 +175,179 @@ console.log('\n-- P1 ledger skeleton and lifecycle (SYNTHETIC amounts injected w
   startWorld(SEED); for (let i = 0; i < 150; i++) step(); await legacy(1);
   ok(S.co.filter(c => !c.dead && !(c.priv && c.fo)).every(c => c.acd === S.day && c.fq.length === 8), 'LG an old export (no rows): v8prep and qBack both start the ledger on the load day ' + S.day);
 }
+
+// ================================================================================================================================
+// P2 recording: every deal path through the real game functions, ledger against the measurement oracle
+// ================================================================================================================================
+const mkMine = T => { setOwn(T, 'P', 60); ctlAll(); return mine(T) };
+const smallOf = (T, f, extra) => S.co.find(c => !c.dead && !c.priv && !c.kd && c !== T && !mine(c) && mc(c) < mc(T) * f && c.i !== HOLD && c.D > 50 && (!extra || extra(c)));
+const lastD = T => T.fq[T.fq.length - 1][0];
+const delta = (a, b) => { const r = zero(); for (const k of KEYS) r[k] = ((b || {})[k] || 0) - ((a || {})[k] || 0); return r };
+const SCN = {};   // scenario results kept for the statement checks (P3)
+// the row that closed last: ledger = oracle, and the debt the tracer saw written by each non-cash path = the record of that path
+function rowLedger(lab, T, ids) {
+  const d = lastD(T), rec = (T.acr || {})[d], qo = quarterOf(T, d);
+  ledgerCheck(lab, ids || [T.id]);
+  if (qo) ok(Math.abs(qo.nc.absorb - ((rec || {}).aD || 0) - ((rec || {}).iD || 0)) <= TOLE && Math.abs(qo.nc.lbo - ((rec || {}).lD || 0)) <= TOLE && Math.abs(qo.nc.hidden - ((rec || {}).hD || 0)) <= TOLE,
+    lab + ': debt written by absorb ' + f2(qo.nc.absorb) + ' / LBO ' + f2(qo.nc.lbo) + ' / hidden debt ' + f2(qo.nc.hidden) + ' (tracer) = record aD+iD / lD / hD of row ' + d + ' (' + shR(rec) + ')');
+  return { d, rec, qo } }
+console.log('\n-- P2 deals through the real game functions (seed ' + SEED + '; stakes and cash set with setOwn / fields where a case needs exact numbers)');
+
+// ---- Gemini C1 / C2 (game call level: only the deal's own cash moves are compared, as the case says no other cash moves) ----
+{ startWorld(SEED); const T = pickTarget(); mkMine(T); nextClose(T); nextClose(T); waitDays(T, 20); const x = smallOf(T, .3); setOwn(x, 'P', 55); ctlAll();
+  let ev = null, a0 = null; for (let k = 0; k < 10 && !x.dead; k++) { T.cs = 500; T.D = 200; x.cs = 100; x.D = 100; a0 = clone(T.acq); const n = EVT.length; S.te = T.id; G.merge(x.id, 40); if (EVT.length > n) ev = EVT[n] }
+  pre(ev && x.dead, 'C1-g fixture: stock merger of ' + x.tk + ' into ' + T.tk + ' went through (' + (ev ? 'stake before ' + f2(ev.stake) + '%' : 'refused') + ')');
+  ok(Math.abs(T.cs - 600) <= TOLE && Math.abs(T.D - 300) <= TOLE, 'C1-g acquirer after the deal: cash ' + f2(T.cs) + ' (500 + 100), debt ' + f2(T.D) + ' (200 + 100)');
+  ok(same(delta(a0, T.acq), Object.assign(zero(), { aD: 100, aC: 100 })) && ev && !ev.int && Math.abs(ev.paid) <= TOLE, 'C1-g recorded by the deal: ' + shR(delta(a0, T.acq)) + ' = external, debt taken over 100, cash paid 0, cash brought in 100');
+  nextClose(T); rowLedger('C1-g close', T); SCN.C1 = { id: T.id, d: lastD(T) } }
+{ startWorld(SEED); const big = z => S.co.filter(y => !y.dead && !y.priv && !y.kd && y.i === z.i && y !== z && !mine(y));
+  const c = S.co.find(z => !z.dead && !z.priv && !z.kd && !mine(z) && !z.own.P && z.bk === 0 && z.A > 800 && z.i !== HOLD && big(z).length); mkMine(c); const a = big(c).sort((p, q) => mc(q) - mc(p))[0];
+  nextClose(a); nextClose(a); waitDays(a, 20); setOwn(c, 'c' + a.id, 0); a.cs = 1000; a.D = 500; c.cs = 200; c.D = 300; c.p = 300 * 1e4 / c.sh; ctlAll();
+  const a0 = clone(a.acq), n = EVT.length; const msg = OFFER.go(c, { a: a.id, pr: 0 }, 'yes'); const ev = EVT[n];
+  pre(!!ev && c.dead, 'C2-g fixture: ' + msg + ' (price = market value ' + f2(300) + ', acquirer held 0%)');
+  ok(Math.abs(a.cs - 900) <= 1e-6 && Math.abs(a.D - 800) <= 1e-6, 'C2-g acquirer after the deal: cash ' + f2(a.cs) + ' (1000 - 300 + 200), debt ' + f2(a.D) + ' (500 + 300, nothing borrowed)');
+  ok(same(delta(a0, a.acq), Object.assign(zero(), { aD: 300, aP: ev.paid, aC: 200 })) && Math.abs(ev.paid - 300) <= 1e-6 && !ev.int, 'C2-g recorded: ' + shR(delta(a0, a.acq)) + ' = external, debt 300, cash paid 300 (measured ' + f2(ev.paid) + '), cash in 200');
+  nextClose(a); rowLedger('C2-g close', a); SCN.C2 = { id: a.id, d: lastD(a) } }
+{ startWorld(SEED); const H = pickTarget(); mkMine(H); const C = smallOf(H, .2); H.cs += mc(C) * 3; S.te = H.id; G.tender(C.id, 90, 0);
+  pre(C.priv && (C.own['c' + H.id] || 0) >= 99.9, 'C1-i fixture: ' + H.tk + ' owns 100% of the private ' + C.tk + ' after a tender');
+  nextClose(H); waitDays(H, 20); H.cs = 500; H.D = 200; C.cs = 100; C.D = 100; const a0 = clone(H.acq), n = EVT.length; G.liq(C.id); const ev = EVT[n];
+  ok(C.dead && Math.abs(H.cs - 600) <= TOLE && Math.abs(H.D - 300) <= TOLE, 'C1-i G.liq: parent cash ' + f2(H.cs) + ', debt ' + f2(H.D));
+  ok(ev && ev.int && same(delta(a0, H.acq), Object.assign(zero(), { iD: 100, iC: 100 })), 'C1-i recorded as INTERNAL absorption (stake ' + f2(ev && ev.stake) + '%): ' + shR(delta(a0, H.acq)) + ', nothing in the external keys');
+  nextClose(H); rowLedger('C1-i close', H); SCN.C1i = { id: H.id, d: lastD(H) } }
+
+// ---- audit cases K1 K2 K3 K4 K5 K10 (same scenarios as RT-FIN-CF-03-AUDIT / R2 section 6) ----
+{ startWorld(SEED); const T = pickTarget(); mkMine(T); trace(T); nextClose(T); nextClose(T); waitDays(T, 30);
+  const x = S.co.find(c => !c.dead && !c.priv && !c.kd && c !== T && !mine(c) && mc(c) < mc(T) * .3 && c.i !== HOLD); setOwn(x, 'P', 55); ctlAll(); S.te = T.id;
+  const n = EVT.length; G.merge(x.id, 40); const ev = EVT[n]; nextClose(T);
+  ok(ev && !ev.int && ev.stake === 0 && ev.tctl === 'P', 'K1 sister merger (target controlled by the player, acquirer held ' + f2(ev && ev.stake) + '%): external by the direct-stake rule');
+  const r = rowLedger('K1', T); ok(r.rec && Math.abs(r.rec.aD - 1117.80) < .005 && Math.abs(r.rec.aC - 103.03) < .005 && r.rec.aP === 0, 'K1 record ' + shR(r.rec) + ' (R2: debt 1,117.80, cash in 103.03, paid 0)'); SCN.K1 = { id: T.id, d: r.d } }
+{ startWorld(SEED); const big = z => S.co.filter(y => !y.dead && !y.priv && !y.kd && y.i === z.i && y !== z && mc(y) > mc(z) * 1.5);
+  const c = S.co.find(z => !z.dead && !z.priv && !z.kd && !mine(z) && !z.own.P && z.bk === 0 && z.A > 800 && z.i !== HOLD && z.D > 100 && big(z).length); mkMine(c);
+  let a = big(c).sort((p, q) => mc(q) - mc(p))[0]; a.cs = Math.max(a.cs, mc(c) * 1.6); setOwn(c, 'c' + a.id, 10); ctlAll(); trace(a);
+  nextClose(a); nextClose(a); waitDays(a, 30); const x = OFFER.mk(c); if (x.a !== a.id) { a = S.co[x.a]; trace(a) }
+  const own = c.own['c' + a.id] || 0, P = mc(c) * (1 + x.pr / 100), D0 = a.D, n = EVT.length; OFFER.go(c, x, 'yes'); const ev = EVT[n], borrowed = (a.D - D0) - ev.tD;
+  ok(ev && !ev.int && Math.abs(ev.paid - P * (100 - own) / 100) <= 1e-6, 'K2 offer, acquirer held ' + f2(own) + '%: cash paid measured ' + f2(ev && ev.paid) + ' = price ' + f2(P) + ' x ' + f2(100 - own) + '% (the stake it held is not paid again)');
+  ok(borrowed > 1, 'K2 the acquirer was short of cash: ' + f2(borrowed) + ' borrowed in the deal (real new borrowing; the record keeps only the debt taken over ' + f2(ev.tD) + ')');
+  nextClose(a); const r = rowLedger('K2', a); ok(r.rec && Math.abs(r.rec.aD - ev.tD) <= TOLE && Math.abs(r.rec.aP - ev.paid) <= TOLE && Math.abs(r.rec.aC - ev.tcs) <= TOLE, 'K2 record ' + shR(r.rec)); SCN.K2 = { id: a.id, d: r.d, borrowed } }
+{ startWorld(SEED); for (let i = 0; i < 200; i++) { if (i === 100) for (const c of S.co) if (!c.dead && !c.priv && !mine(c)) trace(c); step() } let ev = null;
+  for (let k = 0; k < 400 && !ev; k++) { const n = EVT.length; maTick(); if (EVT.length > n) ev = EVT[n] }
+  const ac = S.co[ev.a]; pre(!!ev, 'K3 fixture: maTick bought ' + ev.ttk + ' for ' + ac.tk); nextClose(ac);
+  ok(!ev.int && ev.paid > 0, 'K3 maTick: external, cash paid measured ' + f2(ev.paid) + ' (stake before ' + f2(ev.stake) + '%)');
+  const r = rowLedger('K3', ac); SCN.K3 = { id: ac.id, d: r.d } }
+{ startWorld(SEED); const T = pickTarget(); trace(T); nextClose(T); nextClose(T); waitDays(T, 30); S.cash = 1e7; S.te = 'P'; let ok1 = 0, D0 = 0;
+  for (const pr of [60, 90, 140]) { D0 = T.D; G.tender(T.id, pr, 1); if (T.priv) { ok1 = 1; break } }
+  pre(ok1, 'K4 fixture: LBO of ' + T.tk + ' went through'); const lD = T.D - D0; nextClose(T);
+  const r = rowLedger('K4', T); ok(r.rec && Math.abs(r.rec.lD - lD) <= TOLE && r.rec.aD === 0 && r.rec.iD === 0, 'K4 target record lD ' + f2(r.rec && r.rec.lD) + ' = its debt change in G.tender ' + f2(lD) + '; the player (acquirer) has no company record'); SCN.K4 = { id: T.id, d: r.d } }
+{ startWorld(SEED); const H = pickTarget(); mkMine(H); const C = S.co.find(c => !c.dead && !c.priv && !c.kd && c !== H && !mine(c) && mc(c) < mc(H) * .2 && c.i !== HOLD && c.D > 50);
+  H.cs += mc(C) * 3; S.te = H.id; G.tender(C.id, 90, 0); trace(H); nextClose(H); nextClose(H); nextClose(H); waitDays(H, 30); const n = EVT.length; G.liq(C.id); const ev = EVT[n]; nextClose(H);
+  ok(ev && ev.int && ev.stake >= 99.9 && Math.abs(ev.paid) <= TOLE, 'K5 G.liq: internal absorption of the 100% subsidiary, cash paid ' + f2(ev && ev.paid));
+  const r = rowLedger('K5', H); ok(r.rec && r.rec.iD > 0 && r.rec.aD === 0 && r.rec.aC === 0, 'K5 record ' + shR(r.rec) + ' (internal keys only)'); SCN.K5 = { id: H.id, d: r.d } }
+{ startWorld(SEED); const banksL = S.co.filter(c => !c.dead && c.kd === 1 && !c.priv && !mine(c)).sort((p, q) => mc(q) - mc(p)); const T = banksL[0]; mkMine(T);
+  const x = banksL.find(c => c !== T && mc(c) < mc(T) * .3); setOwn(x, 'P', 55); ctlAll(); trace(T); nextClose(T); nextClose(T); waitDays(T, 30);
+  let tries = 0; const n = EVT.length; for (; tries < 12 && EVT.length === n; tries++) { S.te = T.id; G.merge(x.id, 60) } const ev = EVT[n]; nextClose(T);
+  ok(ev && !ev.int, 'K10 bank merger after ' + tries + ' tries (refused tries cost advisory fees, no record): external, deposits taken over ' + f2(ev && ev.tD));
+  const r = rowLedger('K10', T); ok(r.rec && Math.abs(r.rec.aD - ev.tD) <= TOLE && r.qo && r.qo.by['D:earn'] > 0, 'K10 record ' + shR(r.rec) + '; the quarter growth gr written by earn (' + f2(r.qo && r.qo.by['D:earn']) + ') is not in the record (FIN-CF-03B)'); SCN.K10 = { id: T.id, d: r.d } }
+
+// ---- mixed and boundary deals ----
+{ // X1 one quarter: external stock merger + internal absorption of a 100% subsidiary + a bond issue (real borrowing) on the same company
+  startWorld(SEED); const H = pickTarget(); mkMine(H); const C = smallOf(H, .2); H.cs += mc(C) * 3; S.te = H.id; G.tender(C.id, 90, 0); trace(H);
+  nextClose(H); nextClose(H); waitDays(H, 20); const x = smallOf(H, .3, c => c !== C); setOwn(x, 'P', 55); ctlAll();
+  const n = EVT.length; for (let k = 0; k < 10 && !x.dead; k++) { S.te = H.id; G.merge(x.id, 40) } G.liq(C.id); H.bond = 0; const D0 = H.D; G.bissue(H.id, .1); const bond = H.D - D0; nextClose(H);
+  const evs = EVT.slice(n), ext = evs.filter(e => e.a === H.id && !e.int), int = evs.filter(e => e.a === H.id && e.int);
+  ok(ext.length === 1 && int.length === 1 && bond > 0, 'X1 fixture-check: one external (' + (ext[0] && ext[0].ttk) + ') and one internal (' + (int[0] && int[0].ttk) + ') absorption, bond ' + f2(bond) + ' in one quarter');
+  const r = rowLedger('X1', H); ok(r.rec && Math.abs(r.rec.aD - ext[0].tD) <= TOLE && Math.abs(r.rec.iD - int[0].tD) <= TOLE && Math.abs(r.rec.aC - ext[0].tcs) <= TOLE && Math.abs(r.rec.iC - int[0].tcs) <= TOLE, 'X1 each kind in its own keys, each debt once: ' + shR(r.rec));
+  SCN.X1 = { id: H.id, d: r.d, bond } }
+{ // X2 maTick absorbs its own 60% subsidiary (acquirer controlled by a rival, so the filter t.ctl !== "c"+ac.id lets it through) and pays the 40%
+  startWorld(SEED); for (let i = 0; i < 60; i++) step(); const cand = S.co.filter(c => !c.dead && !c.priv && !mine(c) && rating(c) <= 2 && !c.kd).sort((x, y) => mc(y) - mc(x)).slice(0, 30);
+  let ac = null, t = null; for (const a of cand) { const ts = S.co.filter(z => !z.dead && z.i === a.i && z !== a && !z.priv && !mine(z) && mc(z) < mc(a) * .25 && z.pill < S.day); if (ts.length) { ac = a; t = ts[0]; break } }
+  for (const k of Object.keys(ac.own)) setOwn(ac, k, 0); setOwn(ac, 'r0', 60); for (const k of Object.keys(t.own)) setOwn(t, k, 0); setOwn(t, 'c' + ac.id, 60); t.bs['c' + ac.id] = mc(t) * .6; ctlAll(); trace(ac);
+  let ev = null; for (let k = 0; k < 6000 && !ev && !ac.dead && !t.dead; k++) { const n = EVT.length; maTick(); ev = EVT.slice(n).find(e => e.a === ac.id && e.t === t.id) || null }
+  pre(!!ev, 'X2 fixture: maTick made ' + ac.tk + ' absorb its own subsidiary ' + t.tk);
+  ok(ev && ev.int && ev.stake === 60 && ev.paid > 0, 'X2 internal absorption with cash for the other 40%: paid ' + f2(ev && ev.paid) + ' (stake before ' + f2(ev && ev.stake) + '%)');
+  nextClose(ac); const r = rowLedger('X2', ac); ok(r.rec && Math.abs(r.rec.iP - ev.paid) <= TOLE && Math.abs(r.rec.iC - ev.tcs) <= TOLE && Math.abs(r.rec.iD - ev.tD) <= TOLE, 'X2 record ' + shR(r.rec)); SCN.X2 = { id: ac.id, d: r.d } }
+{ // X3 two external stock mergers in one quarter; X4 two more in two later quarters, all inside the 8 kept rows
+  startWorld(SEED); const H = pickTarget(); mkMine(H); trace(H); nextClose(H); nextClose(H); waitDays(H, 20);
+  const merge = f => { const x = smallOf(H, f, c => !c.own['c' + H.id]); setOwn(x, 'P', 55); ctlAll(); for (let k = 0; k < 10 && !x.dead; k++) { S.te = H.id; G.merge(x.id, 40) } return x };
+  const xa = merge(.1), xb = merge(.1); nextClose(H); const r3 = rowLedger('X3', H), e3 = evIn(H.id, r3.d - 90, r3.d);
+  ok(xa.dead && xb.dead && e3.length === 2 && r3.rec && Math.abs(r3.rec.aD - e3[0].tD - e3[1].tD) <= TOLE, 'X3 two deals in one quarter add up in one key: aD ' + f2(r3.rec && r3.rec.aD) + ' = ' + f2(e3[0] && e3[0].tD) + ' + ' + f2(e3[1] && e3[1].tD));
+  waitDays(H, 20); merge(.1); nextClose(H); const d4 = lastD(H); nextClose(H); waitDays(H, 20); merge(.1); nextClose(H); const d5 = lastD(H);
+  for (let k = 0; k < 3; k++) nextClose(H);
+  ok(H.acr && H.acr[r3.d] && H.acr[d4] && H.acr[d5] && rowDays(H).includes(r3.d), 'X4 records of three different quarters (' + r3.d + ', ' + d4 + ', ' + d5 + ') are all kept while their rows are visible');
+  ledgerCheck('X4 all quarters', [H.id]); SCN.X34 = { id: H.id, ds: [r3.d, d4, d5] } }
+{ // X5 / X7 hidden debt found on a company that also absorbs in the quarter (bomb injected: the game's hqQ runs it)
+  startWorld(SEED); const H = pickTarget(); mkMine(H); trace(H); nextClose(H); nextClose(H); waitDays(H, 20); const x = smallOf(H, .3); setOwn(x, 'P', 55); ctlAll();
+  for (let k = 0; k < 10 && !x.dead; k++) { S.te = H.id; G.merge(x.id, 40) } H.tb = { d: S.day, s: .3, k: '숨은 부채' }; const A0 = H.A; hqQ(); H.bond = 0; const D0 = H.D; G.bissue(H.id, .1); const bond = H.D - D0;
+  const hid = EVT.filter(e => e.label === 'hidden' && e.t === H.id).pop(); nextClose(H);
+  ok(hid && Math.abs(hid.hD - A0 * .1) <= 1e-6, 'X5 hidden debt found: debt +' + f2(hid && hid.hD) + ' (= assets x 0.1, ' + f2(A0 * .1) + ')');
+  const r = rowLedger('X5', H); ok(r.rec && Math.abs(r.rec.hD - hid.hD) <= TOLE && r.rec.aD > 0, 'X5 hidden debt and debt taken over in their own keys: ' + shR(r.rec)); SCN.X5 = { id: H.id, d: r.d, bond } }
+{ // X6 LBO of a target by a company, then the 100% LBO target absorbed into it (G.liq) in the same quarter: the LBO debt comes over once
+  startWorld(SEED); const H = pickTarget(); mkMine(H); const C = smallOf(H, .2); H.cs += mc(C) * 5; trace(H); trace(C); nextClose(H); nextClose(H); waitDays(H, 20);
+  let D0 = 0; for (const pr of [60, 90, 140]) { D0 = C.D; S.te = H.id; G.tender(C.id, pr, 1); if (C.priv) break } const lD = C.D - D0;
+  pre(C.priv && (C.own['c' + H.id] || 0) >= 99.9 && lD > 0, 'X6 fixture: LBO of ' + C.tk + ' by ' + H.tk + ' (debt put on the target ' + f2(lD) + ')');
+  ok(C.acq && Math.abs(C.acq.lD - lD) <= TOLE, 'X6 the target records the LBO debt while it lives: lD ' + f2(C.acq && C.acq.lD));
+  const cD = C.D, n = EVT.length; G.liq(C.id); const ev = EVT[n];
+  ok(C.dead && C.acq == null && C.acr == null, 'X6 the absorbed target is killed with its records (acq ' + JSON.stringify(C.acq) + ', acr ' + JSON.stringify(C.acr) + ')');
+  nextClose(H); const r = rowLedger('X6', H);
+  ok(r.rec && ev.int && Math.abs(r.rec.iD - cD) <= TOLE && r.rec.lD === 0 && cD >= lD, 'X6 the parent records the whole target debt ' + f2(cD) + ' (LBO debt ' + f2(lD) + ' inside it) once, as internal, and no lD of its own: ' + shR(r.rec)); SCN.X6 = { id: H.id, d: r.d } }
+{ // CH chain: B absorbs C (C's debt moves to B), then A absorbs B: A takes B's whole debt once; same quarter and across quarters
+  for (const across of [0, 1]) { startWorld(SEED); const A = pickTarget(); mkMine(A); const B = smallOf(A, .4, c => c.D > 100); mkMine(B); const C = smallOf(B, .5, c => c !== A && !c.own['c' + B.id]); setOwn(C, 'P', 55); ctlAll();
+    trace(A); nextClose(A); nextClose(A); waitDays(A, 10); const lab = 'CH ' + (across ? 'across quarters' : 'same quarter');
+    const BD0 = B.D, CD = C.D; for (let k = 0; k < 10 && !C.dead; k++) { S.te = B.id; G.merge(C.id, 40) } pre(C.dead, lab + ' fixture: ' + B.tk + ' absorbed ' + C.tk);
+    if (across) { nextClose(B); nextClose(A) }
+    const bRec = clone(across ? B.acr : B.acq); ok(across ? !!(bRec && Object.keys(bRec).length) : !!(bRec && bRec.aD > 0), lab + ': B holds its own ' + (across ? 'confirmed' : 'pending') + ' record of C (aD ' + f2(across ? Object.values(bRec || {}).reduce((s, r) => s + r.aD, 0) : bRec && bRec.aD) + ')');
+    const BD = B.D, a0 = clone(A.acq); for (let k = 0; k < 10 && !B.dead; k++) { S.te = A.id; G.merge(B.id, 40) } pre(B.dead, lab + ' fixture: ' + A.tk + ' absorbed ' + B.tk);
+    const got = delta(a0, A.acq).aD;
+    ok(Math.abs(got - BD) <= TOLE && Math.abs(got - (BD + CD)) > 1, lab + ': A records B\'s debt at the deal ' + f2(BD) + ' once (B before C ' + f2(BD0) + ' + C ' + f2(CD) + ' are inside it; double counting would give ' + f2(BD + CD) + '): got ' + f2(got));
+    ok(B.acq == null && B.acr == null && C.acq == null && C.acr == null, lab + ': B and C are killed with their pending and confirmed records');
+    nextClose(A); rowLedger(lab, A); SCN['CH' + across] = { id: A.id, d: lastD(A) } } }
+{ // X8 / X9 one quarter: an absorption, a share issue (FIN-CF-02) and a chapter-11 relief (FIN-CF-01) on the same company
+  startWorld(SEED); const H = pickTarget(); mkMine(H); trace(H); nextClose(H); nextClose(H); waitDays(H, 20); const x = smallOf(H, .3); setOwn(x, 'P', 55); ctlAll();
+  for (let k = 0; k < 10 && !x.dead; k++) { S.te = H.id; G.merge(x.id, 40) } const cs0 = H.cs; G.mg(H.id, 'iss', .1); const iss = H.cs - cs0; const D0 = H.D; ch11x(H, 'FIN-CF-03A test'); const R = D0 - H.D;
+  nextClose(H); const d = lastD(H);
+  ok(H.rlf && H.rlf.d === d && Math.abs(H.rlf.R - R) <= TOLE && H.isq && Math.abs(H.isq[d] - iss) <= TOLE, 'X8 FIN-CF-01 relief ' + f2(R) + ' and FIN-CF-02 issue ' + f2(iss) + ' keep their own ledgers (rlf, isq) in the same row ' + d);
+  rowLedger('X8', H); SCN.X8 = { id: H.id, d } }
+{ // F1 refused or rejected deals record nothing
+  startWorld(SEED); const T = pickTarget(); mkMine(T); nextClose(T); waitDays(T, 20); 
+  let refused = 0, kept = true; for (const c of S.co.filter(c => !c.dead && !c.priv && !c.kd && c !== T && !mine(c) && mc(c) < mc(T) * .3).slice(0, 25)) { const n = EVT.length, cs0 = T.cs, a0 = clone(T.acq); S.te = T.id; G.merge(c.id, 0);
+    if (EVT.length === n && !c.dead && T.cs < cs0) { refused++; kept = kept && JSON.stringify(T.acq) === JSON.stringify(a0) } if (refused >= 3) break }
+  const y = pickTarget([T.id]); const D0 = y.D; S.cash = 1e7; S.te = 'P'; G.tender(y.id, 0, 1); const tenderRefused = !y.priv;
+  const big = S.co.find(z => !z.dead && !z.priv && !z.kd && z.i === T.i && z !== T && !mine(z)) || S.co.find(z => !z.dead && !z.priv && !z.kd && z !== T && !mine(z)); if (big) OFFER.go(T, { a: big.id, pr: 30 }, 'no');
+  ok(refused >= 1 && kept, 'F1 ' + refused + ' refused stock merger(s) (advisory fee paid) leave the acquirer\'s record as it was: ' + shR(T.acq));
+  ok(tenderRefused ? y.acq == null && y.D === D0 : true, 'F1 a refused LBO tender (premium 0%) puts no debt and no record on the target' + (tenderRefused ? '' : ' (not refused here: not checked)'));
+  ok(!big || !T.dead, 'F1 a rejected takeover offer absorbs nothing (' + (big ? T.tk + ' alive' : 'no bidder') + ')') }
+
+// ---- natural play: every close of every company, ledger = oracle; nothing absorbed outside the measured callers ----
+console.log('\n-- P2 natural play, 3 seeds x 720 days, no player action: every close of every company compared with the measured deals');
+for (const seed of [20261016, 777, 12345]) { startWorld(seed); for (let d = 0; d < 720; d++) step();
+  const lab = EVT.reduce((o, e) => (o[e.label] = (o[e.label] || 0) + 1, o), {}), alive = S.co.filter(c => !c.dead).map(c => c.id);
+  ok(!MIS.length, 'N' + seed + ' ' + Object.entries(lab).map(([k, v]) => k + ' ' + v).join(', ') + ': every close of every company (' + S.co.length + ' companies) confirmed exactly the measured amounts' + (MIS.length ? ' | ' + MIS.slice(0, 3).join('; ') : ''));
+  ok(!EVT.some(e => e.label === 'UNMEASURED'), 'N' + seed + ' no absorb outside maTick / G.merge / G.liq / offer');
+  ledgerCheck('N' + seed + ' end state (pending and kept records of the ' + alive.length + ' live companies)', alive) }
+
+// ---- GUARD: every debt write in the source is classified; the non-cash ones have their record right there ----
+console.log('\n-- P2 GUARD debt writes in the source');
+{ const fs = require('fs'), path = require('path'), dir = path.join(process.env.TESTS_DIR, '..', 'src');
+  const code = t => t.split('\n').map(l => /^\s*\/\//.test(l) ? ' '.repeat(l.length) : l).join('\n');
+  // [class, signature around the write]; 'cash' = real borrowing / repayment (stays in 차입 증감), 'ledger' = non-cash with its record,
+  // 'gr' = banks' / insurers' growth (FIN-CF-03B, stays), 'norow' = before any row or on a company that is being removed
+  const KNOWN = [['ledger absorb', /a\.D\+=t\.D/, /acqAdd\(a,ki\?"iD":"aD",t\.D\)/], ['ledger LBO', /const lb=P\*\.7;c\.D\+=lb;acqAdd\(c,"lD",lb\)/], ['ledger hidden debt', /const hx=c\.A\*\.1;c\.D\+=hx;acqAdd\(c,"hD",hx\)/],
+    ['ledger FIN-CF-01 relief', /c\.D=Math\.max\(0,c\.A\+c\.cs\+c\.gw\+pfv\(c\)-\.15\*c\.A\);c\.ncq=/], ['gr FIN-CF-03B', /if\(c\.kd\)c\.D\+=gr/],
+    ['cash overflow', /if\((\w+)\.cs<0\)\{\1\.D-=\1\.cs;\1\.cs=0\}/], ['cash borrow', /c\.D\+=x;c\.cs\+=x;L\(c\.tk\+" 은행 차입/], ['cash repay', /c\.cs-=x;c\.D-=x;L\(c\.tk\+" 부채 상환/],
+    ['cash special-dividend borrowing', /c\.D\+=a;payDiv\(c,a\)/], ['cash bond issue', /c\.D\+=x;const r=rating\(c\);c\.cs\+=x\*\.985/], ['cash bond call', /c\.D-=face;/],
+    ['cash advance', /c\.pa=\(c\.pa\|\|0\)\+x;c\.D\+=x;c\.cs\+=x/], ['cash advance repaid', /c\.pa-=x;c\.D-=x;c\.cs-=x/], ['cash advance', /T\.pa=\(T\.pa\|\|0\)\+x;T\.D\+=x;T\.cs\+=x/], ['cash advance repaid', /Fc\.pa-=y;Fc\.D-=y;Fc\.cs-=y/],
+    ['cash close repayment', /c\.cs-=x;c\.D-=x\}\}\}/], ['cash loan called', /x\.D-=paid;b\.cs\+=paid/], ['cash bank run', /c\.cs-=p1;c\.A=Math\.max\(0,c\.A-rest\/\.9\);c\.D-=w/], ['cash asset sale', /c\.D-=p;c\.cs\+=r-p/],
+    ['norow init cross holdings', /if\(a\.cs<x\)\{a\.D\+=x-a\.cs;a\.cs=x\}/], ['norow absorbed target', /t\.A=0;t\.cs=0;t\.D=0/], ['norow founding', /c\.D=c\.A\+c\.cs-E/], ['norow founding', /c\.cs=E-c\.A;c\.D=0|c\.cs=E\*\.15;c\.D=0/]];
+  const sites = [];
+  for (const f of fs.readdirSync(dir).filter(x => x.endsWith('.js'))) { const t = code(fs.readFileSync(path.join(dir, f), 'utf8')); const re = /\b(\w+)\.D\s*(\+=|-=|\*=|\/=|=(?!=))/g; let m;
+    while ((m = re.exec(t))) { const win = t.slice(Math.max(0, m.index - 90), m.index + 70), ln = t.slice(0, m.index).split('\n').length;
+      const hit = KNOWN.filter(([, sig]) => { const r = new RegExp(sig.source, 'g'); let x; while ((x = r.exec(win))) { const at = Math.max(0, m.index - 90) + x.index; if (at <= m.index && m.index < at + x[0].length) return true } return false });
+      sites.push({ f, ln, v: m[1] + '.D' + m[2], cls: hit.length === 1 ? hit[0][0] : hit.length ? 'AMBIGUOUS ' + hit.map(h => h[0]).join('/') : null, rec: hit.length === 1 && hit[0][2] ? hit[0][2].test(t.slice(m.index - 400, m.index + 400)) : true }) } }
+  pre(sites.length === 47, 'GUARD the source writes a company debt D in ' + sites.length + ' places (47 on main d553d3e; a new one must be classified here)');
+  for (const s of sites) ok(s.cls && !/^AMBIGUOUS/.test(s.cls) && s.rec, 'GUARD ' + s.f + ':' + s.ln + ' ' + s.v + ' -> ' + (s.cls || 'UNCLASSIFIED: is it cash? if not, it needs an acqAdd record') + (s.rec ? '' : ' (record missing next to it)'));
+  const cnt = sites.reduce((o, s) => (o[(s.cls || '?').split(' ')[0]] = (o[(s.cls || '?').split(' ')[0]] || 0) + 1, o), {}); info('GUARD classes: ' + JSON.stringify(cnt));
+  const absorbCalls = fs.readdirSync(dir).filter(x => x.endsWith('.js')).reduce((a, f) => a.concat([...code(fs.readFileSync(path.join(dir, f), 'utf8')).matchAll(/(?<!function )\babsorb\(([^)]*\([^)]*\)[^)]*|[^)]*)\)/g)].map(x => f + ' ' + x[0])), []);
+  const WANT = ['absorb(ac,t,pay,pay)', 'absorb(a,x,q.nv,0)', 'absorb(h,c,-hv(c,100),0)', 'absorb(a,c,P,cp)'];
+  ok(absorbCalls.length === 4 && absorbCalls.every(x => WANT.includes(x.split(' ')[1])), 'GUARD absorb is called in 4 places and every call passes the cash paid as its 4th argument: ' + absorbCalls.join(' | ')) }
 
 console.log('\nerrs', errs, 'fails', fails);
 })().catch(e => { console.log('ERR exception ' + (e && e.stack || e)); console.log('errs', 1, 'fails', 0) });

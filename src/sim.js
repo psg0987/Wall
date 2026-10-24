@@ -39,7 +39,9 @@ for(const k of Object.keys(c.own)){if(!paid)payK(c,k,c.own[k]/100*v);setOwn(c,k,
 for(const t of Object.keys(c.pos))setOwn(S.co[t],"c"+c.id,0);
 S.wl=S.wl.filter(x=>x!==c.id);if(S.ceo===c.id)S.ceo=-1;if(S.te===c.id)S.te="P";if(sel===c.id)sel=-1;c.dead=1;S.cd=1;c.hr=null;c.fq=[];c.hm=[];c.eh=[];c.xvd=null;c.w10=null;c.wd=null;c.ncq=0;delete c.rlf;c.eqq=0;delete c.isq;c.acq=null;delete c.acr}
 // move target t's assets & holdings into acquirer a (after holders were settled)
-function absorb(a,t,paidVal){if(a.i===HOLD&&t.i!==HOLD&&t.A>0){a.i=t.i;if(t.kd){a.kd=t.kd;a.ln=-1}if(mine(a))L(a.tk+" 지주회사가 "+t.tk+"를 흡수해 "+SEC[t.i][0]+" 회사가 됐습니다",1)}const va=t.own["c"+a.id]?hv(t,t.own["c"+a.id]):0,et=eq(t);setOwn(t,"c"+a.id,0);
+// FIN-CF-03A: cashPaid = the cash the acquirer really paid for the deal (0 for shares or a 100% subsidiary). Recorded before anything moves:
+// the acquirer's direct stake just before the deal decides external (aD/aP/aC) or internal absorption of its own subsidiary (> 50%, iD/iP/iC).
+function absorb(a,t,paidVal,cashPaid){{const ki=(t.own["c"+a.id]||0)>50;acqAdd(a,ki?"iD":"aD",t.D);acqAdd(a,ki?"iP":"aP",cashPaid||0);acqAdd(a,ki?"iC":"aC",t.cs)}if(a.i===HOLD&&t.i!==HOLD&&t.A>0){a.i=t.i;if(t.kd){a.kd=t.kd;a.ln=-1}if(mine(a))L(a.tk+" 지주회사가 "+t.tk+"를 흡수해 "+SEC[t.i][0]+" 회사가 됐습니다",1)}const va=t.own["c"+a.id]?hv(t,t.own["c"+a.id]):0,et=eq(t);setOwn(t,"c"+a.id,0);
 a.A+=t.A;a.cs+=t.cs;a.D+=t.D;a.gw+=t.gw+Math.max(0,paidVal+va-et);a.nol+=t.nol*.5;
 for(const k of Object.keys(t.pos)){const x=S.co[k],p=x.own["c"+t.id],b=x.bs["c"+t.id]||0;setOwn(x,"c"+t.id,0);if(x!==a){setOwn(x,"c"+a.id,(x.own["c"+a.id]||0)+p);x.bs["c"+a.id]=(x.bs["c"+a.id]||0)+b}}
 t.A=0;t.cs=0;t.D=0;t.gw=0;kill(t,1.3,1)}
@@ -48,7 +50,7 @@ function ipoTick(){if(S.co.length-S.st.del-S.st.ma>560||rnd()>.35)return;const w
 function maTick(){if(rnd()>.5)return;const a=S.co.filter(c=>!c.dead&&!c.priv&&!mine(c)&&rating(c)<=2&&!c.kd).sort((x,y)=>mc(y)-mc(x));if(!a.length)return;const ac=a[rnd()*Math.min(a.length,30)|0];
 const ts=S.co.filter(t=>!t.dead&&t.i===ac.i&&t!==ac&&!t.priv&&!mine(t)&&t.ctl!=="c"+ac.id&&mc(t)<mc(ac)*.25&&t.pill<S.day);if(!ts.length)return;const t=ts[rnd()*ts.length|0],pr=mc(t)*1.3,ao=t.own["c"+ac.id]||0,pay=pr*(100-ao)/100;
 for(const k of Object.keys(t.own)){if(k==="c"+ac.id)continue;const x=payK(t,k,t.own[k]/100*pr);if(k==="P")L("🤝 보유 중인 "+t.tk+" 지분이 인수되어 "+F(x)+" 현금화",1)}
-ac.cs-=pay;if(ac.cs<0){ac.D-=ac.cs;ac.cs=0}S.st.ma++;eco("🤝 "+ac.tk+"가 "+t.tk+" "+t.n+" 인수 (프리미엄 30%, "+F(pay)+")");t.p*=1.3;for(const k of Object.keys(t.own))if(k!=="c"+ac.id)setOwn(t,k,0);absorb(ac,t,pay)}
+ac.cs-=pay;if(ac.cs<0){ac.D-=ac.cs;ac.cs=0}S.st.ma++;eco("🤝 "+ac.tk+"가 "+t.tk+" "+t.n+" 인수 (프리미엄 30%, "+F(pay)+")");t.p*=1.3;for(const k of Object.keys(t.own))if(k!=="c"+ac.id)setOwn(t,k,0);absorb(ac,t,pay,pay)}
 // rival buys b% of c, personally (via<0) or through a company it controls (via = company index)
 function rbuy(r,id,c,b,via){const key=via>=0?"c"+via:"r"+id,x=mc(c)*b/100*(1+b/100*.8);if(pub(c)-c.sp<b+4)return 0;
 if(via>=0){const k=S.co[via];if(k.cs<x)return 0;k.cs-=x}else{if(r.cash<x)return 0;r.cash-=x}

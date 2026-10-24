@@ -30,13 +30,13 @@ settleX(x,1+prem/100);const ns=a.sh+q.N,adds={};
 for(const k in x.own)if(k!=="c"+a.id)adds[k]=[x.own[k]/100*mc(x)*(1+prem/100)*1e4/a.p/ns*100,x.bs[k]||0];
 for(const k of Object.keys(x.own))if(k!=="c"+a.id)setOwn(x,k,0);rescale(a,a.sh/ns);a.sh=ns;
 for(const k in adds){setOwn(a,k,(a.own[k]||0)+adds[k][0]);a.bs[k]=(a.bs[k]||0)+adds[k][1]}
-absorb(a,x,q.nv);a.p*=.97;S.fl.mg=1;S.st.ma++;eco("🧬 "+a.tk+"가 "+x.tk+" "+x.n+" 흡수합병 (프리미엄 "+prem+"%)");ctlAll();rec("합병",x,q.nv);
+absorb(a,x,q.nv,0);a.p*=.97;S.fl.mg=1;S.st.ma++;eco("🧬 "+a.tk+"가 "+x.tk+" "+x.n+" 흡수합병 (프리미엄 "+prem+"%)");ctlAll();rec("합병",x,q.nv);
 L("합병 완료! "+a.tk+" 내 그룹 지분 "+grp(a,"P").toFixed(1)+"%"+(mine(a)?"":" — 경영권을 잃었습니다!"),1);render()};
 function vote(c,prem){if(prem<20+cres(c)&&rnd()<.7)return"주주 거부";if(topRival(c,"P")>=10&&prem<35)return"외부 대주주 반대";if(S.imm<S.day&&!mine(c)&&c.i!==HOLD&&myShare(c.i)+share(c)>.5&&rnd()<.5)return"독점금지 당국 차단";if(c.pill>S.day&&!mine(c))return"포이즌 필";return""}
 G.tender=(i,prem,lbo)=>{const c=S.co[i],e=teOK(),bk=eKey(e);if(c.priv||c.dead)return;if(e===i)return toast("자기 회사는 공개매수할 수 없어요");
 if(lbo&&c.kd)return toast("은행·보험사는 LBO로 인수할 수 없어요");const own=c.own[bk]||0,P=mc(c)*(1+prem/100)*(100-own)/100,need=lbo?P*.3:P;if(eAvail(e)<need)return toast("자금 부족: 필요 "+F(need)+", "+eName(e)+" 가용 "+F(eAvail(e)));
 const why=vote(c,prem);if(why){const f=mc(c)*.01;ePay(e,Math.min(f,eAvail(e)));L(c.tk+(lbo?" LBO":" 공개매수")+" 실패 ("+why+"), 수수료 "+F(f),1);return render()}
-ePay(e,need);if(lbo){c.gw+=Math.max(0,mc(c)*(1+prem/100)-eq(c));c.D+=P*.7}settleX(c,1+prem/100);
+ePay(e,need);if(lbo){c.gw+=Math.max(0,mc(c)*(1+prem/100)-eq(c));const lb=P*.7;c.D+=lb;acqAdd(c,"lD",lb)}settleX(c,1+prem/100);
 for(const k of Object.keys(c.own)){if(k===bk)continue;payK(c,k,c.own[k]/100*mc(c)*(1+prem/100));setOwn(c,k,0)}
 setOwn(c,bk,100);c.bs[bk]=(c.bs[bk]||0)+need;c.priv=1;c.pt=S.day;c.p*=1+prem/100*.6;S.fl.tn=1;if(lbo)S.fl.lb=1;ctlAll();rec(lbo?"LBO":"공개매수",c,need);
 L(c.tk+(lbo?" LBO 성공! 인수가의 70%를 회사 부채로 떠안겼습니다":" 공개매수 성공! 100% 비상장 자회사로 전환")+" ("+eName(e)+" 명의, "+F(need)+")",1);render()};
@@ -47,7 +47,7 @@ G.ipoMy=i=>{const c=S.co[i],k=ownerK(c);if(!c.priv||!k||root(k)!=="P")return toa
 c.p=ipoPx(c);c.tg=c.p;c.priv=0;const net=sellK(c,k,40,mc(c)/100*.93);if(c.fo)S.fl.ip=1;rec("상장",c,net,hName(k));L("🔔 "+c.tk+" 상장! 지분 40%를 팔아 "+F(net)+" 확보 ("+hName(k)+")",1);ctlAll();render()};
 G.liq=i=>{const c=S.co[i],k=ownerK(c);if(!c.priv||!k||root(k)!=="P")return toast("내 그룹이 100% 가진 비상장 회사만 청산할 수 있어요");
 if(k==="P"){const x=c.A*.88+c.cs+pfv(c)*.97-c.D;if(x<0)return toast("부채가 자산보다 많아 청산할 수 없어요");const net=payK(c,"P",x);setOwn(c,"P",0);rec("청산",c,x,"나");kill(c,1,1);S.fl.lq=1;L(c.tk+" 청산: 세후 "+F(net)+" 회수",1)}
-else{const h=S.co[+k.slice(1)],same=h.i===c.i,nol=c.nol;absorb(h,c,-hv(c,100));if(same)h.nol+=nol*.5;S.fl.lq=1;L(c.tk+"를 "+h.tk+"에 흡수 청산했습니다 (비과세"+(same?", 이월결손금 전액 승계":"")+")",1)}sel=-1;render()};
+else{const h=S.co[+k.slice(1)],same=h.i===c.i,nol=c.nol;absorb(h,c,-hv(c,100),0);if(same)h.nol+=nol*.5;S.fl.lq=1;L(c.tk+"를 "+h.tk+"에 흡수 청산했습니다 (비과세"+(same?", 이월결손금 전액 승계":"")+")",1)}sel=-1;render()};
 G.sue=(t,ty)=>{const e=teOK(),x=S.co[t];if(e==="P")return toast("소송은 내 회사를 거래 주체로 골라야 걸 수 있어요");const a=S.co[e];if(x.dead||x===a)return;
 if(x.lit>S.day)return toast("이 회사와는 이미 소송 중입니다 ("+(x.lit-S.day)+"일 남음)");
 if(ty==="at"){if(a.i!==x.i)return toast("독점금지 소송은 같은 업종 회사에만 걸 수 있어요");if(share(x)<.2)return toast("업종 점유율 20% 이상인 회사만 대상이 됩니다");
