@@ -1,0 +1,226 @@
+---- t_fincf02_save01.js
+-- harness ready
+
+-- S1 rights issue 5 days after the close, packS(1) export 10 days after the close, paste restore (G.imp + mcb), first real close
+pre  S1 target PNPL controlled by the player
+pre  S1 issue on day 122: cash X 460.60 (the reported 460.60), waiting in eqq 460.60
+pre  S1 export code written by packS(1) (WSR1:, 279517 chars)
+pre  S1 the paste handler replaced the game with the code (day 127)
+FAIL S1 after the restore the pending issue cash is 0: eqq 460.60 (X 460.60 is inside the rebuilt quarters)
+pre  S1: the 8 rows are rebuilt; the previous quarter (day 37) is made from the state at the restore: shares 3602 = 3601.95, cash 965 = 1001.58 x 0.96353 = 965.06 (without the trade it would be 521.25)
+pre  S1 no share trade after the restore (shares at the close 3602 = at the restore 3601.95), so Z = 0
+  S1: PNPL row 207 vs 37 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 460.60, 차입 증감 115.00, 재무활동 534.60, 기타 -538.60, 현금 증감 64.00, nc 0.00, est false, st part
+FAIL S1: 증자·출자(자사주) 460.60 = cash of share trades after the restore 0.00, not an estimate
+ok   S1: 차입 증감 115.00 = dD 115.00 + R 0.00 = 115.00 (nc 0.00)
+FAIL S1: 재무활동 534.60 = 74.00, 기타·투자 매매 -538.60 = -78.00 (현금 증감 64.00 unchanged)
+FAIL S1 nothing was confirmed for the first real quarter: isq {"207":460.5987288938939}
+FAIL S1/S12 UI: newest column 증자·출자(자사주) 461 | 차입 증감 ◐115 | 재무활동 현금흐름 ◐535 | 기타·투자 매매 ◐-539 | 현금 증감 64.0 | ◐ footnote 27.3Q | 증자·출자(자사주) shows 461 want –; 재무활동 현금흐름 shows ◐535 want ◐74.0; 기타·투자 매매 shows ◐-539 want ◐-78.0
+
+-- S2 buyback 5%, export, restore
+pre  S2 buyback cash -312.52 waiting in eqq
+FAIL S2 after the export restore eqq -312.52 (the buyback is inside the rebuilt quarters)
+pre  S2: the 8 rows are rebuilt; the previous quarter (day 57) is made from the state at the restore: shares 3111 = 3110.77, cash 6572 = 6878.79 x 0.95530 = 6571.30 (without the trade it would be 6869.85)
+pre  S2 no share trade after the restore (Z = 0)
+  S2: PNPL row 207 vs 57 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 -312.52, 차입 증감 141.00, 재무활동 -231.52, 기타 478.52, 현금 증감 381.00, nc 0.00, est false, st part
+FAIL S2: 증자·출자(자사주) -312.52 = cash of share trades after the restore 0.00, not an estimate
+ok   S2: 차입 증감 141.00 = dD 141.00 + R 0.00 = 141.00 (nc 0.00)
+FAIL S2: 재무활동 -231.52 = 81.00, 기타·투자 매매 478.52 = 166.00 (현금 증감 381.00 unchanged)
+
+-- S3 issue X before the export, issue Z 10 days after the restore
+pre  S3 X 463.80
+pre  S3: the 8 rows are rebuilt; the previous quarter (day 47) is made from the state at the restore: shares 3602 = 3601.95, cash 996 = 1004.78 x 0.99122 = 995.96 (without the trade it would be 536.24)
+pre  S3 Z 453.66 on day 147, before the close
+FAIL S3 waiting after the restore: only Z 917.45 (X 463.80 is not)
+pre  S3 no other share trade (shares 3962 = after Z 3962.15)
+  S3: PNPL row 207 vs 47 | measured: share cash after the restore Z 453.66, relief in the row R 0.00 | statement 증자·출자 917.45, 차입 증감 27.00, 재무활동 902.45, 기타 -482.45, 현금 증감 493.00, nc 0.00, est false, st part
+FAIL S3: 증자·출자(자사주) 917.45 = cash of share trades after the restore 453.66, not an estimate
+ok   S3: 차입 증감 27.00 = dD 27.00 + R 0.00 = 27.00 (nc 0.00)
+FAIL S3: 재무활동 902.45 = 438.66, 기타·투자 매매 -482.45 = -18.66 (현금 증감 493.00 unchanged)
+
+-- S4 issue X before the export, issue Z on the restore day right after the restore (no day passes)
+pre  S4: the 8 rows are rebuilt; the previous quarter (day 57) is made from the state at the restore: shares 3602 = 3601.95, cash 931 = 974.44 x 0.95530 = 930.88 (without the trade it would be 516.80)
+pre  S4 Z 462.49 on the restore day 147 (X 433.45)
+pre  S4 no other share trade
+  S4: PNPL row 207 vs 57 | measured: share cash after the restore Z 462.49, relief in the row R 0.00 | statement 증자·출자 895.95, 차입 증감 141.00, 재무활동 994.95, 기타 -530.95, 현금 증감 537.00, nc 0.00, est false, st part
+FAIL S4: 증자·출자(자사주) 895.95 = cash of share trades after the restore 462.49, not an estimate
+ok   S4: 차입 증감 141.00 = dD 141.00 + R 0.00 = 141.00 (nc 0.00)
+FAIL S4: 재무활동 994.95 = 561.49, 기타·투자 매매 -530.95 = -97.49 (현금 증감 537.00 unchanged)
+FAIL S4 UI: newest column 증자·출자(자사주) 896 | 차입 증감 ◐141 | 재무활동 현금흐름 ◐995 | 기타·투자 매매 ◐-531 | 현금 증감 537 | ◐ footnote 27.3Q | 증자·출자(자사주) shows 896 want 462; 재무활동 현금흐름 shows ◐995 want ◐561; 기타·투자 매매 shows ◐-531 want ◐-97.5
+
+-- S5 boundaries with a trade waiting at the export (a: one day before the close, c: same day right after the close, d: two exports)
+pre  S5a issue and export on day 206, the day before the close
+pre  S5a X 453.38
+FAIL S5a after the export restore eqq 453.38
+pre  S5a: the 8 rows are rebuilt; the previous quarter (day 116) is made from the state at the restore: shares 3602 = 3601.95, cash 922 = 994.36 x 0.92746 = 922.23 (without the trade it would be 501.74)
+pre  S5a no share trade after the restore (Z = 0)
+  S5a: PNPL row 207 vs 116 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 453.38, 차입 증감 229.00, 재무활동 642.38, 기타 -610.38, 현금 증감 100.00, nc 0.00, est false, st part
+FAIL S5a: 증자·출자(자사주) 453.38 = cash of share trades after the restore 0.00, not an estimate
+ok   S5a: 차입 증감 229.00 = dD 229.00 + R 0.00 = 229.00 (nc 0.00)
+FAIL S5a: 재무활동 642.38 = 189.00, 기타·투자 매매 -610.38 = -157.00 (현금 증감 100.00 unchanged)
+pre  S5c the close of day 207 ran, then the issue, then the export the same day
+pre  S5c X 454.92
+FAIL S5c after the export restore eqq 454.92
+pre  S5c: the 8 rows are rebuilt; the previous quarter (day 117) is made from the state at the restore: shares 3602 = 3601.95, cash 1032 = 1020.38 x 1.01105 = 1031.65 (without the trade it would be 571.71)
+pre  S5c no share trade after the restore (Z = 0)
+  S5c: PNPL row 297 vs 117 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 454.92, 차입 증감 -36.00, 재무활동 368.92, 기타 -429.92, 현금 증감 37.00, nc 0.00, est false, st part
+FAIL S5c: 증자·출자(자사주) 454.92 = cash of share trades after the restore 0.00, not an estimate
+ok   S5c: 차입 증감 -36.00 = dD -36.00 + R 0.00 = -36.00 (nc 0.00)
+FAIL S5c: 재무활동 368.92 = -86.00, 기타·투자 매매 -429.92 = 25.00 (현금 증감 37.00 unchanged)
+pre  S5d first export and restore done (eqq 463.80)
+pre  S5d X 463.80
+FAIL S5d after the export restore eqq 463.80
+pre  S5d: the 8 rows are rebuilt; the previous quarter (day 47) is made from the state at the restore: shares 3602 = 3601.95, cash 1004 = 1004.78 x 0.99886 = 1003.63 (without the trade it would be 540.37)
+pre  S5d no share trade after the restore (Z = 0)
+  S5d: PNPL row 207 vs 47 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 463.80, 차입 증감 3.00, 재무활동 425.80, 기타 -464.80, 현금 증감 29.00, nc 0.00, est false, st part
+FAIL S5d: 증자·출자(자사주) 463.80 = cash of share trades after the restore 0.00, not an estimate
+ok   S5d: 차입 증감 3.00 = dD 3.00 + R 0.00 = 3.00 (nc 0.00)
+FAIL S5d: 재무활동 425.80 = -38.00, 기타·투자 매매 -464.80 = -1.00 (현금 증감 29.00 unchanged)
+
+-- S6 boundaries with nothing waiting (controls: b no trade, export right after the close; e the close confirmed the trade before the export)
+pre  S6b nothing waiting at the export (eqq 0.00)
+ok   S6b after the restore: eqq 0.00, confirmed records dropped with the real rows (isq undefined)
+pre  S6b no share trade after the restore
+  S6b: PNPL row 297 vs 117 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 0.00, 차입 증감 -36.00, 재무활동 -84.00, 기타 29.00, 현금 증감 38.00, nc 0.00, est false, st part
+ok   S6b: 증자·출자(자사주) 0.00 = cash of share trades after the restore 0.00, not an estimate
+ok   S6b: 차입 증감 -36.00 = dD -36.00 + R 0.00 = -36.00 (nc 0.00)
+ok   S6b: 재무활동 -84.00 = -84.00, 기타·투자 매매 29.00 = 29.00 (현금 증감 38.00 unchanged)
+pre  S6e nothing waiting at the export (eqq 0.00)
+ok   S6e after the restore: eqq 0.00, confirmed records dropped with the real rows (isq undefined)
+pre  S6e no share trade after the restore
+  S6e: PNPL row 297 vs 117 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 0.00, 차입 증감 -36.00, 재무활동 -86.00, 기타 24.00, 현금 증감 37.00, nc 0.00, est false, st part
+ok   S6e: 증자·출자(자사주) 0.00 = cash of share trades after the restore 0.00, not an estimate
+ok   S6e: 차입 증감 -36.00 = dD -36.00 + R 0.00 = -36.00 (nc 0.00)
+ok   S6e: 재무활동 -86.00 = -86.00, 기타·투자 매매 24.00 = 24.00 (현금 증감 37.00 unchanged)
+
+-- S7 control: the same trade through a FULL save (packS(), autosave and slots)
+ok   S7 after the full restore the pending cash is kept: eqq 433.45 = X 433.45, real rows kept (last 117)
+pre  S7 the previous row is the real close 117 (before the trade); no other share trade
+  S7: PNPL row 207 vs 117 | measured: share cash after the restore Z 433.45, relief in the row R 0.00 | statement 증자·출자 433.45, 차입 증감 0.00, 재무활동 393.45, 기타 -0.45, 현금 증감 461.00, nc 0.00, est false, st full
+ok   S7: 증자·출자(자사주) 433.45 = cash of share trades after the restore 433.45, not an estimate
+ok   S7: 차입 증감 0.00 = dD 0.00 + R 0.00 = 0.00 (nc 0.00)
+ok   S7: 재무활동 393.45 = 393.45, 기타·투자 매매 -0.45 = -0.45 (현금 증감 461.00 unchanged)
+ok   S7 the close confirmed X: isq {"207":433.45227006693824}
+
+-- S8 natural play (no player action), export at a day with AI companies waiting
+pre  S8 seed 20261016 day 540: AI companies waiting BABX 197.30
+FAIL S8 seed 20261016 after the export restore nothing waits: BABX 197.30
+pre  S8 BABX: first real row 571 after the rebuilt 450; share-count changes after the restore 0 (splits 0, no cash), no chapter 11 (bk 0) -> Z = 0, R = 0
+  S8 seed 20261016 BABX: BABX row 571 vs 450 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 197.30, 차입 증감 -178.00, 재무활동 10.30, 기타 -218.30, 현금 증감 -196.00, nc 0.00, est false, st part
+FAIL S8 seed 20261016 BABX: 증자·출자(자사주) 197.30 = cash of share trades after the restore 0.00, not an estimate
+ok   S8 seed 20261016 BABX: 차입 증감 -178.00 = dD -178.00 + R 0.00 = -178.00 (nc 0.00)
+FAIL S8 seed 20261016 BABX: 재무활동 10.30 = -187.00, 기타·투자 매매 -218.30 = -21.00 (현금 증감 -196.00 unchanged)
+pre  S8 seed 12345 day 555: AI companies waiting BOAX 5.44, SHFN 10.91
+FAIL S8 seed 12345 after the export restore nothing waits: BOAX 5.44, SHFN 10.91
+pre  S8 BOAX: first real row 584 after the rebuilt 465; share-count changes after the restore 1 (splits 1, no cash), no chapter 11 (bk 0) -> Z = 0, R = 0
+  S8 seed 12345 BOAX (financial): BOAX row 584 vs 465 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 5.44, 차입 증감 88.00, 재무활동 93.44, 기타 -92.44, 현금 증감 14.00, nc 0.00, est false, st part
+FAIL S8 seed 12345 BOAX (financial): 증자·출자(자사주) 5.44 = cash of share trades after the restore 0.00, not an estimate
+ok   S8 seed 12345 BOAX (financial): 차입 증감 88.00 = dD 88.00 + R 0.00 = 88.00 (nc 0.00)
+FAIL S8 seed 12345 BOAX (financial): 재무활동 93.44 = 88.00, 기타·투자 매매 -92.44 = -87.00 (현금 증감 14.00 unchanged)
+pre  S8 SHFN: first real row 616 after the rebuilt 465; share-count changes after the restore 0 (splits 0, no cash), no chapter 11 (bk 0) -> Z = 0, R = 0
+  S8 seed 12345 SHFN (financial): SHFN row 616 vs 465 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 10.91, 차입 증감 37.00, 재무활동 47.91, 기타 -47.01, 현금 증감 9.00, nc 0.00, est false, st part
+FAIL S8 seed 12345 SHFN (financial): 증자·출자(자사주) 10.91 = cash of share trades after the restore 0.00, not an estimate
+ok   S8 seed 12345 SHFN (financial): 차입 증감 37.00 = dD 37.00 + R 0.00 = 37.00 (nc 0.00)
+FAIL S8 seed 12345 SHFN (financial): 재무활동 47.91 = 37.00, 기타·투자 매매 -47.01 = -36.10 (현금 증감 9.00 unchanged)
+
+-- S9 founded private company with a cash contribution waiting at the export (qBack does not touch it)
+pre  S9 founded MVGZ (priv 1, fo 1)
+pre  S9 contribution 50 waiting
+ok   S9 qBack skipped it: eqq 50.00 kept, rows not rebuilt (0)
+ok   S9 first close: one row without a previous row (no cash-flow column), the contribution recorded under it: isq {"255":50}
+ok   S9 second close: 증자·출자 0.00
+
+-- S10 export restore -> trade Z -> full save -> full restore (the autosave chain)
+pre  S10: the 8 rows are rebuilt; the previous quarter (day 57) is made from the state at the restore: shares 3602 = 3601.95, cash 931 = 974.44 x 0.95530 = 930.88 (without the trade it would be 516.80)
+FAIL S10 the full save keeps what waits after the export restore: eqq 895.95 = Z 462.49 (X 433.45 is not waiting)
+pre  S10 no other share trade
+  S10: PNPL row 207 vs 57 | measured: share cash after the restore Z 462.49, relief in the row R 0.00 | statement 증자·출자 895.95, 차입 증감 141.00, 재무활동 994.95, 기타 -530.95, 현금 증감 537.00, nc 0.00, est false, st part
+FAIL S10: 증자·출자(자사주) 895.95 = cash of share trades after the restore 462.49, not an estimate
+ok   S10: 차입 증감 141.00 = dD 141.00 + R 0.00 = 141.00 (nc 0.00)
+FAIL S10: 재무활동 994.95 = 561.49, 기타·투자 매매 -530.95 = -97.49 (현금 증감 537.00 unchanged)
+
+-- S11 issue on day 0, export and restore on day 0 (qBack keeps the FIN-CF-03A start on day 0)
+pre  S11 issue on day 0: X 401.54
+FAIL S11 after the restore eqq 401.54, FIN-CF-03A start unchanged on day 0 (acd -721)
+pre  S11: the 8 rows are rebuilt; the previous quarter (day -90) is made from the state at the restore: shares 3602 = 3601.95, cash 860 = 859.20 x 1.00092 = 859.99 (without the trade it would be 458.08)
+pre  S11 no share trade after the restore
+  S11: PNPL row 27 vs -90 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 401.54, 차입 증감 -3.00, 재무활동 353.54, 기타 -399.54, 현금 증감 40.00, nc 0.00, est false, st full
+FAIL S11: 증자·출자(자사주) 401.54 = cash of share trades after the restore 0.00, not an estimate
+ok   S11: 차입 증감 -3.00 = dD -3.00 + R 0.00 = -3.00 (nc 0.00)
+FAIL S11: 재무활동 353.54 = -48.00, 기타·투자 매매 -399.54 = 2.00 (현금 증감 40.00 unchanged)
+ok   S11 the first real row is fully recorded (st full): no ◐ on day 0
+FAIL S11 UI: newest column 증자·출자(자사주) 402 | 차입 증감 -3.0 | 재무활동 현금흐름 354 | 기타·투자 매매 -400 | 현금 증감 40.0 | 증자·출자(자사주) shows 402 want –; 재무활동 현금흐름 shows 354 want -48.0; 기타·투자 매매 shows -400 want 2.0
+
+-- S13 stock merger (FIN-CF-03A record waiting) and a rights issue in the same quarter, export, restore
+pre  S13 PNPL absorbed SNWF: acquisition record waiting {"aD":1117.8,"iD":0}
+pre  S13 issue X 568.31
+ok   S13 FIN-CF-03A as before: acquisition record dropped (acq null), ledger start = restore day (acd 147)
+FAIL S13 eqq 568.31 after the restore
+pre  S13: the 8 rows are rebuilt; the previous quarter (day 57) is made from the state at the restore: shares 4869 = 4868.69, cash 1195 = 1212.33 x 0.98569 = 1194.98 (without the trade it would be 634.80)
+pre  S13 no share trade after the restore
+  S13: PNPL row 207 vs 57 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 568.31, 차입 증감 61.00, 재무활동 576.31, 기타 -613.31, 현금 증감 54.00, nc 0.00, est false, st part
+FAIL S13: 증자·출자(자사주) 568.31 = cash of share trades after the restore 0.00, not an estimate
+ok   S13: 차입 증감 61.00 = dD 61.00 + R 0.00 = 61.00 (nc 0.00)
+FAIL S13: 재무활동 576.31 = 8.00, 기타·투자 매매 -613.31 = -45.00 (현금 증감 54.00 unchanged)
+ok   S13 FIN-CF-03A row as before: partly recorded (st part), no acquisition amounts (ncA 0.00, maN 0.00, inN 0.00)
+FAIL S13 UI: newest column 증자·출자(자사주) 568 | 차입 증감 ◐61.0 | 재무활동 현금흐름 ◐576 | 기타·투자 매매 ◐-613 | 현금 증감 54.0 | ◐ footnote 27.3Q | 증자·출자(자사주) shows 568 want –; 재무활동 현금흐름 shows ◐576 want ◐8.0; 기타·투자 매매 shows ◐-613 want ◐-45.0
+
+-- S14 loan call -> chapter 11 outside the close (relief waiting), export, restore (the 1,786.57 case)
+pre  S14 export target PNPL with bank lender KNYA
+pre  S14 export: loan call paid 788.60, chapter 11 on day 147: relief R 1786.57 (measured around ch11x; debt 3160.48 -> 585.31), waiting in ncq
+FAIL S14 export: after the export restore ncq 1786.57, no relief record (rlf undefined)
+pre  S14 export: the 8 rows are rebuilt; the previous quarter (day 57) is made from the state at the restore: shares 3275 = 3274.50, debt 559 = 585.31 x 0.95497 = 558.96 (without the relief it would be 2265.08)
+pre  S14 export: no share trade and no further chapter 11 after the restore
+FAIL S14 export: relief record after the close {"d":207,"R":1786.5681394430985} (none: the relief is inside the rebuilt quarters)
+  S14 export: PNPL row 207 vs 57 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 0.00, 차입 증감 1719.57, 재무활동 1719.57, 기타 -1755.27, 현금 증감 -43.00, nc 1786.57, est false, st part
+ok   S14 export: 증자·출자(자사주) 0.00 = cash of share trades after the restore 0.00, not an estimate
+FAIL S14 export: 차입 증감 1719.57 = dD -67.00 + R 0.00 = -67.00 (nc 1786.57)
+FAIL S14 export: 재무활동 1719.57 = -67.00, 기타·투자 매매 -1755.27 = 31.30 (현금 증감 -43.00 unchanged)
+FAIL S14 export UI: newest column 증자·출자(자사주) – | 차입 증감 ◐1,720 | 재무활동 현금흐름 ◐1,720 | 기타·투자 매매 ◐-1,755 | 현금 증감 -43.0 | ◐ footnote 27.3Q | 차입 증감 shows ◐1,720 want ◐-67.0; 재무활동 현금흐름 shows ◐1,720 want ◐-67.0; 기타·투자 매매 shows ◐-1,755 want ◐31.3
+pre  S15 full save (control) target PNPL with bank lender KNYA
+pre  S15 full save (control): loan call paid 788.60, chapter 11 on day 147: relief R 1786.57 (measured around ch11x; debt 3160.48 -> 585.31), waiting in ncq
+ok   S15 full save (control): after the full restore the relief still waits: ncq 1786.57, real rows kept
+pre  S15 full save (control): no share trade and no further chapter 11 after the restore
+ok   S15 full save (control): relief record after the close {"d":207,"R":1786.5681394430985} (the relief belongs to this quarter)
+  S15 full save (control): PNPL row 207 vs 117 | measured: share cash after the restore Z 0.00, relief in the row R 1786.57 | statement 증자·출자 0.00, 차입 증감 -881.43, 재무활동 -881.43, 기타 379.73, 현금 증감 -509.00, nc 1786.57, est false, st full
+ok   S15 full save (control): 증자·출자(자사주) 0.00 = cash of share trades after the restore 0.00, not an estimate
+ok   S15 full save (control): 차입 증감 -881.43 = dD -2668.00 + R 1786.57 = -881.43 (nc 1786.57)
+ok   S15 full save (control): 재무활동 -881.43 = -881.43, 기타·투자 매매 379.73 = 379.73 (현금 증감 -509.00 unchanged)
+
+-- FIX-OLD export code written before the fix (pending issue cash on PNPL, pending relief on MCSF), paste restore, first closes
+pre  FIX-OLD the file: day 127, export format (no quarter rows, no indexes), PNPL eqq 460.60, MCSF ncq 1558.02 waiting
+pre  FIX-OLD pasted through the import dialog (day 127)
+FAIL FIX-OLD after the restore nothing waits: PNPL eqq 460.60, MCSF ncq 1558.02
+pre  FIX-OLD PNPL: the 8 rows are rebuilt; the previous quarter (day 37) is made from the state at the restore: shares 3602 = 3601.95, cash 926 = 1001.58 x 0.92401 = 925.48 (without the trade it would be 499.88)
+pre  FIX-OLD MCSF: the 8 rows are rebuilt; the previous quarter (day 37) is made from the state at the restore: shares 3296 = 3296.00, debt 805 = 815.78 x 0.98743 = 805.52 (without the relief it would be 2343.95)
+pre  FIX-OLD MCSF: no share trade and no further chapter 11 after the restore
+FAIL FIX-OLD MCSF: no relief record after its first close (rlf {"d":185,"R":1558.0184578858007})
+  FIX-OLD MCSF: MCSF row 185 vs 37 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 0.00, 차입 증감 1492.02, 재무활동 1492.02, 기타 -1520.62, 현금 증감 -40.00, nc 1558.02, est false, st part
+ok   FIX-OLD MCSF: 증자·출자(자사주) 0.00 = cash of share trades after the restore 0.00, not an estimate
+FAIL FIX-OLD MCSF: 차입 증감 1492.02 = dD -66.00 + R 0.00 = -66.00 (nc 1558.02)
+FAIL FIX-OLD MCSF: 재무활동 1492.02 = -66.00, 기타·투자 매매 -1520.62 = 37.40 (현금 증감 -40.00 unchanged)
+pre  FIX-OLD PNPL: no share trade and no further chapter 11 after the restore
+ok   FIX-OLD PNPL: no relief record after its first close (rlf undefined)
+  FIX-OLD PNPL: PNPL row 207 vs 37 | measured: share cash after the restore Z 0.00, relief in the row R 0.00 | statement 증자·출자 460.60, 차입 증감 239.00, 재무활동 658.60, 기타 -623.60, 현금 증감 103.00, nc 0.00, est false, st part
+FAIL FIX-OLD PNPL: 증자·출자(자사주) 460.60 = cash of share trades after the restore 0.00, not an estimate
+ok   FIX-OLD PNPL: 차입 증감 239.00 = dD 239.00 + R 0.00 = 239.00 (nc 0.00)
+FAIL FIX-OLD PNPL: 재무활동 658.60 = 198.00, 기타·투자 매매 -623.60 = -163.00 (현금 증감 103.00 unchanged)
+
+errs 0 fails 53
+FAIL t_fincf02_save01.js
+FAIL S1 after the restore the pending issue cash is 0: eqq 460.60 (X 460.60 is inside the rebuilt quarters)
+FAIL S1: 증자·출자(자사주) 460.60 = cash of share trades after the restore 0.00, not an estimate
+FAIL S1: 재무활동 534.60 = 74.00, 기타·투자 매매 -538.60 = -78.00 (현금 증감 64.00 unchanged)
+FAIL S1 nothing was confirmed for the first real quarter: isq {"207":460.5987288938939}
+FAIL S1/S12 UI: newest column 증자·출자(자사주) 461 | 차입 증감 ◐115 | 재무활동 현금흐름 ◐535 | 기타·투자 매매 ◐-539 | 현금 증감 64.0 | ◐ footnote 27.3Q | 증자·출자(자사주) shows 461 want –; 재무활동 현금흐름 shows ◐535 want ◐74.0; 기타·투자 매매 shows ◐-539 want ◐-78.0
+FAIL S2 after the export restore eqq -312.52 (the buyback is inside the rebuilt quarters)
+FAIL S2: 증자·출자(자사주) -312.52 = cash of share trades after the restore 0.00, not an estimate
+FAIL S2: 재무활동 -231.52 = 81.00, 기타·투자 매매 478.52 = 166.00 (현금 증감 381.00 unchanged)
+FAIL S3 waiting after the restore: only Z 917.45 (X 463.80 is not)
+FAIL S3: 증자·출자(자사주) 917.45 = cash of share trades after the restore 453.66, not an estimate
+FAIL S3: 재무활동 902.45 = 438.66, 기타·투자 매매 -482.45 = -18.66 (현금 증감 493.00 unchanged)
+FAIL S4: 증자·출자(자사주) 895.95 = cash of share trades after the restore 462.49, not an estimate
+FAIL S4: 재무활동 994.95 = 561.49, 기타·투자 매매 -530.95 = -97.49 (현금 증감 537.00 unchanged)
+FAIL S4 UI: newest column 증자·출자(자사주) 896 | 차입 증감 ◐141 | 재무활동 현금흐름 ◐995 | 기타·투자 매매 ◐-531 | 현금 증감 537 | ◐ footnote 27.3Q | 증자·출자(자사주) shows 896 want 462; 재무활동 현금흐름 shows ◐995 want ◐561; 기타·투자 매매 shows ◐-531 want ◐-97.5
+FAIL S5a after the 
+1 test file(s) failed
+exit code 1

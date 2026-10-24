@@ -1,0 +1,21 @@
+game sha256 6930de85162a9dbf | old_expectations_proof.js
+
+[P-02] tests/t_fincf02_issue.js SV export (packS(1)): PNPL, 10% rights issue 30 days after the close, export, restore the same day
+  issue on day 147: cash 540.98 -> 974.44, debt 3160.48 -> 3160.48: X = 433.45 | shares 3274.50 -> 3601.95 | eqq 433.45
+  restored on day 147: cash 974.44, shares 3601.95, assets 6680.63 (the state saved after the issue) | eqq 433.45 (line 174 expects 433.45 here)
+  rebuilt previous quarter (day 57): shares 3602 = round(shares after the issue 3601.95) YES; before the issue it would be 3275
+    scale from assets sc = 6382 / 6680.63 = 0.95530 | cash 931 vs cash after the issue x sc = 930.88 (diff 0.12) | vs cash before the issue x sc = 516.80 (diff 414.20)
+    -> the rebuilt previous quarter already holds the issue cash (X x sc = 414.08); it is not cash of the next quarter
+  first real close day 207 (previous 57): share-count writes on PNPL after the restore 0 (no trade after the restore, so Z = 0) | statement 증자 433.45 (line 183 expects X 433.45)
+    cash change dc = 71.00 | with 증자 = Z: 재무활동 101.00, 기타 -98.00 | with 증자 = X (the old expectation): 재무활동 534.45, 기타 -531.45 = the issue cash counted again in 재무활동 and taken back out of 기타
+  line 187 (export again): needs a record confirmed by the first close; isq after that close {"207":433.45227006693824} = the pre-save X counted again, not a trade of the quarter
+
+[P-01] tests/t_fincf01_relief.js SV (a) export (packS(1), histories left out): chapter 11 right after the close, export, restore the same day
+  PNPL chapter 11 on day 117: debt 3160.48 -> 1753.98: R = 1406.50 | ncq 1406.50
+  restored on day 117: debt 1753.98 (after the relief), assets 1234.44 | ncq 1406.50 (line 357 expects 1406.50 here)
+  rebuilt previous quarter (day 27): scale from assets sc = 1229 / 1234.44 = 0.99559 | debt 1746 vs debt after the relief x sc = 1746.24 (diff -0.24) | vs debt before the relief x sc = 3146.54 (diff -1400.54)
+    -> the rebuilt previous quarter already holds the relief (R x sc = 1400.30): its debt is the debt after the cut
+  first real close day 207 (previous 27): debt change dD = -718.00 (no relief inside it: both rows are after the cut) | statement nc 1406.50, rlf {"d":207,"R":1406.5030389927308} (line 361 expects nc = R)
+    차입 증감 with R added back (old SPEC, line 362 / UI line 364): 688.50 | without: -718.00 | the relief is counted as borrowing of a quarter whose debt change does not contain it
+
+done
