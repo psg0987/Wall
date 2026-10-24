@@ -15,7 +15,9 @@ function mk(tk,n,i,A,ipo){const kd=i===12?1:i===13?2:0,E=A*(kd?.09+rnd()*.03:ipo
 const c={tk,n,i,kd,A,cs,D:A+cs-E,gw:0,sh:A/2,own:{},bs:{},pos:{},g:kd?.05:ipo?.15:.04,pay:ipo?0:kd?.4:.3,mg:ipo?nz()*3:0,nol:ipo?A*.05:0,sp:0,sb:0,bh:0,pill:0,priv:0,dead:0,off:rnd()*90|0,
 ni:A*(kd?.0035:ipo?.005:.016),eqi:0,dr:0,rm:-99,bk:0,ds:0,edge:ipo?(rnd()<.45?.01:-.05):0,cnt:0,vol:kd?.022:ipo?.08:.03+rnd()*.025+(i===1?.01:0),ctl:null,surp:0,cook:0,lit:0,pt:0,fo:0,sweep:1};
 c.pni=c.ni;c.p=E*1e4/c.sh*(kd?1.3:ipo?1.6:1.1+nz()*.4);c.tg=c.p;c.hist=[Math.round(c.p)];c.hl=[[c.hist[0],c.hist[0]]];c.dh=c.dl=c.p;return c}
-function addCo(c){c.id=S.co.length;S.co.push(c);S.cd=1;if(S.v>=8)v8prep(c);return c}
+// FIN-CF-03A: a new company has no deal before it was made, so its acquisition ledger covers every row it will have, including the
+// rebuilt rows of a new game (S.day - 720 at the earliest): the start is put one day before those.
+function addCo(c){c.id=S.co.length;S.co.push(c);S.cd=1;if(c.acd==null)c.acd=S.day-721;if(S.v>=8)v8prep(c);return c}
 // ---- ownership: c.own[holderKey]=pct, holderKey: "P" player, "rN" rival, "cK" company K ----
 function setOwn(c,k,v){if(v<=1e-6){delete c.own[k];delete c.bs[k];if(k[0]==="c")delete S.co[+k.slice(1)].pos[c.id]}else{c.own[k]=v;if(k[0]==="c")S.co[+k.slice(1)].pos[c.id]=1}S.cd=1;c.oc=1}
 const held=c=>{let t=0;for(const k in c.own)t+=c.own[k];return t};
@@ -91,7 +93,7 @@ ctlAll();secUpd();v8fix();for(const c of S.co)dscScan(c,1)}
 // ---- v8: lenders (c.ln), bonds (c.bond/cpn/bmat), player advances (c.pa), productivity (c.ps/q), autopilot (c.ap) ----
 const banks=()=>S.co.filter(c=>c.kd===1&&!c.dead);
 function pickBank(){const b=banks();if(!b.length)return -1;let t=0;for(const x of b)t+=x.A;let r=rnd()*t;for(const x of b){r-=x.A;if(r<=0)return x.id}return b[0].id}
-function v8prep(c){if(c.bond==null){c.bond=0;c.cpn=0;c.bmat=0;c.pa=0;c.frz=0;c.lc=0;c.ps=0;c.q=0;c.ap=0;c.er=null}if(c.ln==null)c.ln=c.kd?-1:pickBank();if(c.woq==null)c.woq=0;if(c.ncq==null)c.ncq=0;if(c.cfd==null)c.cfd=S.day;if(c.eqq==null)c.eqq=0;if(c.isd==null)c.isd=S.day}
+function v8prep(c){if(c.bond==null){c.bond=0;c.cpn=0;c.bmat=0;c.pa=0;c.frz=0;c.lc=0;c.ps=0;c.q=0;c.ap=0;c.er=null}if(c.ln==null)c.ln=c.kd?-1:pickBank();if(c.woq==null)c.woq=0;if(c.ncq==null)c.ncq=0;if(c.cfd==null)c.cfd=S.day;if(c.eqq==null)c.eqq=0;if(c.isd==null)c.isd=S.day;if(c.acd==null)c.acd=S.day}
 function bankFix(){for(const c of S.co){v8prep(c);if(!c.kd&&!c.dead&&(c.ln<0||!S.co[c.ln]||S.co[c.ln].dead)){c.ln=pickBank();c.frz=0}}}
 const loanOf=c=>c.kd?0:Math.max(0,c.D-c.bond-(c.pa||0));
 const bondSpace=c=>Math.max(0,c.bond-c.bh);
