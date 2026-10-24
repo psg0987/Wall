@@ -1,0 +1,22 @@
+case 0 (seed 20261016, 720 days): the whole game state (without acq/acr/acd) and the RNG position are identical on every day (main == branch), 721 lines
+case 1 (seed 777, 720 days): the whole game state (without acq/acr/acd) and the RNG position are identical on every day (main == branch), 721 lines
+case 2 (seed 12345, 720 days): the whole game state (without acq/acr/acd) and the RNG position are identical on every day (main == branch), 721 lines
+case 3 (seed 20261016, 400 days + scripted merge-ext on day 147, reload-full on day 250): the whole game state (without acq/acr/acd) and the RNG position are identical on every day (main == branch), 403 lines
+case 4 (seed 20261016, 400 days + scripted merge-sister on day 147, reload-strip on day 180): the whole game state (without acq/acr/acd) and the RNG position are identical on every day (main == branch), 403 lines
+case 5 (seed 777, 400 days + scripted tender-liq on day 60, liq on day 200, reload-full on day 260): the whole game state (without acq/acr/acd) and the RNG position are identical on every day (main == branch), 404 lines
+case 6 (seed 12345, 400 days + scripted lbo on day 120, reload-strip on day 150): the whole game state (without acq/acr/acd) and the RNG position are identical on every day (main == branch), 403 lines
+case 7 (seed 20261016, 400 days + scripted offer on day 150): the whole game state (without acq/acr/acd) and the RNG position are identical on every day (main == branch), 402 lines
+case 8 (seed 20261016, 500 days + scripted matick-own on day 60): the whole game state (without acq/acr/acd) and the RNG position are identical on every day (main == branch), 502 lines
+   scripted action: 3 147 ACT merge-ext PNPL <- SNWF dead 1 after 1
+   scripted action: 3 250 ACT reload-full full save round trip
+   scripted action: 4 147 ACT merge-sister PNPL <- SNWF (ctl P) dead 1
+   scripted action: 4 180 ACT reload-strip export round trip (qBack)
+   scripted action: 5 60 ACT tender-liq PNPL tender CRWS priv 1
+   scripted action: 5 200 ACT liq liq CRWS dead 1
+   scripted action: 5 260 ACT reload-full full save round trip
+   scripted action: 6 120 ACT lbo LBO PNPL priv 1
+   scripted action: 6 150 ACT reload-strip export round trip (qBack)
+   scripted action: 7 150 ACT offer ALPB를 PNPL에 프리미엄 26%로 매각했습니다
+   scripted action: 8 60 ACT matick-own PFZR (r0) holds 60% of RSHE
+ALL IDENTICAL
+exit code 0

@@ -1,0 +1,230 @@
+---- t_fincf03_acq.js
+-- harness ready
+
+-- P1 ledger skeleton and lifecycle (SYNTHETIC amounts injected with acqAdd on a real simulated company, seed 20261016)
+ok   L0 new game (day 0): every company (515) has acd = -721 and no acq / acr
+ok   L0 the rebuilt rows of a new game reach day -720 (> acd), so none of them is before the ledger
+pre  L fixture company PNPL
+ok   L1 pending acq holds the unrounded sums of the quarter: aD 12.35, aC 3.20, hD 7.75
+ok   L2 the close moves it to acr[207] (the row day) = the sum of the calls of the quarter (aD 12.35, aC 3.20, hD 7.75), acq cleared, 8 keys
+ok   L2 every key of acr is the day of a kept quarter row
+ok   L3 two quarters, two keys: acr[297] = iD 5.00, iC 1.50, lD 2.00; acr[207] unchanged = aD 12.35, aC 3.20, hD 7.75
+ok   L4 a quarter without any record adds no key (acr[387] undefined)
+ok   SV10 acr[207] is dropped when its row leaves the 8 kept rows (oldest row now 297), never earlier, no key older than the oldest row
+ok   SV10 what is left in acr after the injected quarters are gone is only what the game recorded (1 key(s))
+pre  SV8 fixture: pending and confirmed records exist before kill
+ok   SV8 kill: acq null, acr deleted (acd kept: -721)
+ok   SV7 newCo on day 100: acd = -621 (day - 721), no records
+ok   SV7 its rows (first 164) all lie after acd, the second row is a fully recorded quarter even when the first close is on the day it was made
+ok   SV1 autosave (full): acq iC 9.50, hD 1.25, acr (1 key) and acd -721 come back exactly
+ok   SV1 autosave (full): the next close confirms the pending record carried through the save: iC 9.50, hD 1.25
+ok   SV5 export (packS(1)): the rows are rebuilt (qBack), the pending record is dropped (it is inside the rebuilt starting debt), acr deleted, acd = load day 137 (got 137)
+ok   SV5 export (packS(1)): the next close holds only what was recorded after loading (none)
+ok   LG a save made before FIN-CF-03A (no acq / acr / acd) gets acd = the load day 150 for every company (v8prep)
+ok   LG an old export (no rows): v8prep and qBack both start the ledger on the load day 150
+
+-- P2 deals through the real game functions (seed 20261016; stakes and cash set with setOwn / fields where a case needs exact numbers)
+pre  C1-g fixture: stock merger of SNWF into PNPL went through (stake before 0.00%)
+ok   C1-g acquirer after the deal: cash 600.00 (500 + 100), debt 300.00 (200 + 100)
+ok   C1-g recorded by the deal: aD 100.00, aC 100.00 = external, debt taken over 100, cash paid 0, cash brought in 100
+ok   C1-g close: ledger (acq, every acr key) = the measured deals
+ok   C1 statement row 207 [full]: 차입 -2960.00, 재무 -3031.00, 인수 순현금 100.00, 자회사 흡수 0.00, 기타 2919.00, 비현금 부채 100.00 = measured | tab: 차입 증감 -2,960, 재무활동 현금흐름 -3,031, 기타·투자 매매 2,919, 인수 순현금 100, 비현금 부채 100
+pre  C2-g fixture: PNPL를 MCSF에 프리미엄 0%로 매각했습니다 (price = market value 300.00, acquirer held 0%)
+ok   C2-g acquirer after the deal: cash 900.00 (1000 - 300 + 200), debt 800.00 (500 + 300, nothing borrowed)
+ok   C2-g recorded: aD 300.00, aP 300.00, aC 200.00 = external, debt 300, cash paid 300 (measured 300.00), cash in 200
+ok   C2-g close: ledger (acq, every acr key) = the measured deals
+ok   C2 statement row 185 [full]: 차입 -2561.00, 재무 -2694.00, 인수 순현금 -100.00, 자회사 흡수 0.00, 기타 3219.00, 비현금 부채 300.00 = measured | tab: 차입 증감 -2,561, 재무활동 현금흐름 -2,694, 기타·투자 매매 3,219, 인수 순현금 -100, 비현금 부채 300
+pre  C1-i fixture: PNPL owns 100% of the private CRWS after a tender
+ok   C1-i G.liq: parent cash 600.00, debt 300.00
+ok   C1-i recorded as INTERNAL absorption (stake 100.00%): iD 100.00, iC 100.00, nothing in the external keys
+ok   C1-i close: ledger (acq, every acr key) = the measured deals
+ok   C1i statement row 117 [full]: 차입 -2960.00, 재무 -3034.00, 인수 순현금 0.00, 자회사 흡수 100.00, 기타 2240.00, 비현금 부채 100.00 = measured | tab: 차입 증감 -2,960, 재무활동 현금흐름 -3,034, 기타·투자 매매 2,240, 자회사 흡수·투자회수 100, 비현금 부채 100
+ok   K1 sister merger (target controlled by the player, acquirer held 0.00%): external by the direct-stake rule
+ok   K1: ledger (acq, every acr key) = the measured deals
+ok   K1: debt written by absorb 1117.80 / LBO 0.00 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 207 (aD 1117.80, aC 103.03)
+ok   K1 record aD 1117.80, aC 103.03 (R2: debt 1,117.80, cash in 103.03, paid 0)
+ok   K1 statement row 207 [full]: 차입 0.20, 재무 -50.80, 인수 순현금 103.03, 자회사 흡수 0.00, 기타 -1.23, 비현금 부채 1117.80 = measured; raw real borrowing 0.00 | tab: 차입 증감 0.2, 재무활동 현금흐름 -50.8, 기타·투자 매매 -1.2, 인수 순현금 103, 비현금 부채 1,118
+ok   K2 offer, acquirer held 10.00%: cash paid measured 2317.55 = price 2575.06 x 90.00% (the stake it held is not paid again)
+ok   K2 the acquirer was short of cash: 1361.49 borrowed in the deal (real new borrowing; the record keeps only the debt taken over 2149.48)
+ok   K2: ledger (acq, every acr key) = the measured deals
+ok   K2: debt written by absorb 2149.48 / LBO 0.00 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 207 (aD 2149.48, aP 2317.55, aC 358.32)
+ok   K2 record aD 2149.48, aP 2317.55, aC 358.32
+ok   K2 statement row 207 [full]: 차입 1361.52, 재무 1285.52, 인수 순현금 -1959.23, 자회사 흡수 0.00, 기타 -0.38, 비현금 부채 2149.48 = measured; raw real borrowing 1361.49 | tab: 차입 증감 1,362, 재무활동 현금흐름 1,286, 기타·투자 매매 -0.4, 인수 순현금 -1,959, 비현금 부채 2,149
+pre  K3 fixture: maTick bought IRKN for ISRG
+ok   K3 maTick: external, cash paid measured 235.05 (stake before 0.00%)
+ok   K3: ledger (acq, every acr key) = the measured deals
+ok   K3: debt written by absorb 73.14 / LBO 0.00 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 286 (aD 73.14, aP 235.05, aC 43.88)
+ok   K3 statement row 286 [full]: 차입 -0.14, 재무 -69.14, 인수 순현금 -191.17, 자회사 흡수 0.00, 기타 0.30, 비현금 부채 73.14 = measured; raw real borrowing 0.00 | tab: 차입 증감 -0.1, 재무활동 현금흐름 -69.1, 기타·투자 매매 0.3, 인수 순현금 -191, 비현금 부채 73.1
+pre  K4 fixture: LBO of PNPL went through
+ok   K4: ledger (acq, every acr key) = the measured deals
+ok   K4: debt written by absorb 0.00 / LBO 5054.55 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 207 (lD 5054.55)
+ok   K4 target record lD 5054.55 = its debt change in G.tender 5054.55; the player (acquirer) has no company record
+ok   K4 statement row 207 [full]: 차입 0.45, 재무 0.45, 인수 순현금 0.00, 자회사 흡수 0.00, 기타 -0.45, 비현금 부채 5054.55 = measured; raw real borrowing 0.00 | tab: 차입 증감 0.4, 재무활동 현금흐름 0.4, 기타·투자 매매 -0.4, 비현금 부채 5,055
+ok   K5 G.liq: internal absorption of the 100% subsidiary, cash paid 0.00
+ok   K5: ledger (acq, every acr key) = the measured deals
+ok   K5: debt written by absorb 653.44 / LBO 0.00 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 297 (iD 653.44, iC 74.92)
+ok   K5 record iD 653.44, iC 74.92 (internal keys only)
+ok   K5 statement row 297 [full]: 차입 0.56, 재무 -58.44, 인수 순현금 0.00, 자회사 흡수 74.92, 기타 -0.48, 비현금 부채 653.44 = measured; raw real borrowing 0.00 | tab: 차입 증감 0.6, 재무활동 현금흐름 -58.4, 기타·투자 매매 -0.5, 자회사 흡수·투자회수 74.9, 비현금 부채 653
+ok   K10 bank merger after 5 tries (refused tries cost advisory fees, no record): external, deposits taken over 1294.95
+ok   K10: ledger (acq, every acr key) = the measured deals
+ok   K10: debt written by absorb 1294.95 / LBO 0.00 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 254 (aD 1294.95, aC 109.71)
+ok   K10 record aD 1294.95, aC 109.71; the quarter growth gr written by earn (66.01) is not in the record (FIN-CF-03B)
+ok   K10 statement row 254 [full]: 차입 66.05, 재무 58.65, 인수 순현금 109.71, 자회사 흡수 0.00, 기타 -69.46, 비현금 부채 1294.95 = measured; raw real borrowing 66.01 | tab: 차입 증감 66.0, 재무활동 현금흐름 58.6, 기타·투자 매매 -69.5, 인수 순현금 110, 비현금 부채 1,295
+ok   X1 fixture-check: one external (SNWF) and one internal (CRWS) absorption, bond 718.48 in one quarter
+ok   X1: ledger (acq, every acr key) = the measured deals
+ok   X1: debt written by absorb 1771.24 / LBO 0.00 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 207 (aD 1117.80, aC 103.03, iD 653.44, iC 75.43)
+ok   X1 each kind in its own keys, each debt once: aD 1117.80, aC 103.03, iD 653.44, iC 75.43
+ok   X1 statement row 207 [full]: 차입 718.76, 재무 659.76, 인수 순현금 103.03, 자회사 흡수 75.43, 기타 -11.23, 비현금 부채 1771.24 = measured; raw real borrowing 718.48 | tab: 차입 증감 719, 재무활동 현금흐름 660, 기타·투자 매매 -11.2, 인수 순현금 103, 자회사 흡수·투자회수 75.4, 비현금 부채 1,771
+pre  X2 fixture: maTick made PFZR absorb its own subsidiary RSHE
+ok   X2 internal absorption with cash for the other 40%: paid 705.82 (stake before 60.00%)
+ok   X2: ledger (acq, every acr key) = the measured deals
+ok   X2 record aD 569.44, aP 1147.69, aC 66.86, iD 737.63, iP 705.82, iC 129.40
+ok   X2 statement row 134 [full]: 차입 1193.93, 재무 1095.93, 인수 순현금 -1080.84, 자회사 흡수 -576.42, 기타 -31.67, 비현금 부채 1307.07 = measured | tab: 차입 증감 1,194, 재무활동 현금흐름 1,096, 기타·투자 매매 -31.7, 인수 순현금 -1,081, 자회사 흡수·투자회수 -576, 비현금 부채 1,307
+ok   X3: ledger (acq, every acr key) = the measured deals
+ok   X3: debt written by absorb 894.08 / LBO 0.00 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 207 (aD 894.08, aC 68.34)
+ok   X3 two deals in one quarter add up in one key: aD 894.08 = 559.45 + 334.63
+ok   X4 records of three different quarters (207, 297, 477) are all kept while their rows are visible
+ok   X4 all quarters: ledger (acq, every acr key) = the measured deals
+ok   X34 statement row 207 [full]: 차입 0.92, 재무 -48.08, 인수 순현금 68.34, 자회사 흡수 0.00, 기타 -0.76, 비현금 부채 894.08 = measured; raw real borrowing 0.00 | tab: 차입 증감 0.9, 재무활동 현금흐름 -48.1, 기타·투자 매매 -0.8, 인수 순현금 68.3, 비현금 부채 894
+ok   X34 statement row 297 [full]: 차입 -0.92, 재무 -67.92, 인수 순현금 13.28, 자회사 흡수 0.00, 기타 1.94, 비현금 부채 593.92 = measured; raw real borrowing 0.00 | tab: 차입 증감 -0.9, 재무활동 현금흐름 -67.9, 기타·투자 매매 1.9, 인수 순현금 13.3, 비현금 부채 594
+ok   X34 statement row 477 [full]: 차입 0.49, 재무 -75.51, 인수 순현금 61.63, 자회사 흡수 0.00, 기타 0.58, 비현금 부채 258.51 = measured; raw real borrowing 0.00 | tab: 차입 증감 0.5, 재무활동 현금흐름 -75.5, 기타·투자 매매 0.6, 인수 순현금 61.6, 비현금 부채 259
+ok   X5 hidden debt found: debt +873.91 (= assets x 0.1, 873.91)
+ok   X5: ledger (acq, every acr key) = the measured deals
+ok   X5: debt written by absorb 1117.80 / LBO 0.00 / hidden debt 873.91 (tracer) = record aD+iD / lD / hD of row 207 (aD 1117.80, aC 103.03, hD 873.91)
+ok   X5 hidden debt and debt taken over in their own keys: aD 1117.80, aC 103.03, hD 873.91
+ok   X5 statement row 207 [full]: 차입 494.29, 재무 452.29, 인수 순현금 103.03, 자회사 흡수 0.00, 기타 -8.33, 비현금 부채 1991.71 = measured; raw real borrowing 493.59 | tab: 차입 증감 494, 재무활동 현금흐름 452, 기타·투자 매매 -8.3, 인수 순현금 103, 비현금 부채 1,992
+pre  X6 fixture: LBO of CRWS by PNPL (debt put on the target 752.66)
+ok   X6 the target records the LBO debt while it lives: lD 752.66
+ok   X6 the absorbed target is killed with its records (acq null, acr undefined)
+ok   X6: ledger (acq, every acr key) = the measured deals
+ok   X6: debt written by absorb 1406.10 / LBO 0.00 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 207 (iD 1406.10, iC 74.85)
+ok   X6 the parent records the whole target debt 1406.10 (LBO debt 752.66 inside it) once, as internal, and no lD of its own: iD 1406.10, iC 74.85
+ok   X6 statement row 207 [full]: 차입 0.90, 재무 -51.10, 인수 순현금 0.00, 자회사 흡수 74.85, 기타 -323.75, 비현금 부채 1406.10 = measured; raw real borrowing 0.00 | tab: 차입 증감 0.9, 재무활동 현금흐름 -51.1, 기타·투자 매매 -324, 자회사 흡수·투자회수 74.8, 비현금 부채 1,406
+pre  CH same quarter fixture: SNWF absorbed SKHX
+ok   CH same quarter: B holds its own pending record of C (aD 559.45)
+pre  CH same quarter fixture: PNPL absorbed SNWF
+ok   CH same quarter: A records B's debt at the deal 1677.24 once (B before C 1117.80 + C 559.45 are inside it; double counting would give 2236.69): got 1677.24
+ok   CH same quarter: B and C are killed with their pending and confirmed records
+ok   CH same quarter: ledger (acq, every acr key) = the measured deals
+ok   CH same quarter: debt written by absorb 1677.24 / LBO 0.00 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 207 (aD 1677.24, aC 144.57)
+ok   CH0 statement row 207 [full]: 차입 0.76, 재무 -57.24, 인수 순현금 144.57, 자회사 흡수 0.00, 기타 -0.33, 비현금 부채 1677.24 = measured; raw real borrowing 0.00 | tab: 차입 증감 0.8, 재무활동 현금흐름 -57.2, 기타·투자 매매 -0.3, 인수 순현금 145, 비현금 부채 1,677
+pre  CH across quarters fixture: SNWF absorbed SKHX
+ok   CH across quarters: B holds its own confirmed record of C (aD 559.45)
+pre  CH across quarters fixture: PNPL absorbed SNWF
+ok   CH across quarters: A records B's debt at the deal 1677.24 once (B before C 1117.80 + C 559.45 are inside it; double counting would give 2236.69): got 1677.24
+ok   CH across quarters: B and C are killed with their pending and confirmed records
+ok   CH across quarters: ledger (acq, every acr key) = the measured deals
+ok   CH across quarters: debt written by absorb 1677.24 / LBO 0.00 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 297 (aD 1677.24, aC 149.25)
+ok   CH1 statement row 297 [full]: 차입 0.76, 재무 -69.24, 인수 순현금 149.25, 자회사 흡수 0.00, 기타 -1.01, 비현금 부채 1677.24 = measured; raw real borrowing 0.00 | tab: 차입 증감 0.8, 재무활동 현금흐름 -69.2, 기타·투자 매매 -1.0, 인수 순현금 149, 비현금 부채 1,677
+ok   X8 FIN-CF-01 relief -4978.83 and FIN-CF-02 issue 611.02 keep their own ledgers (rlf, isq) in the same row 207
+ok   X8: ledger (acq, every acr key) = the measured deals
+ok   X8: debt written by absorb 1117.80 / LBO 0.00 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 207 (aD 1117.80, aC 103.03)
+ok   X8 statement row 207 [full]: 차입 -1120.63, 재무 -509.61, 인수 순현금 103.03, 자회사 흡수 0.00, 기타 471.58, 비현금 부채 1117.80 = measured; raw real borrowing -1120.62 | tab: 차입 증감 -1,121, 재무활동 현금흐름 -510, 기타·투자 매매 472, 인수 순현금 103, 비현금 부채 1,118
+ok   F1 3 refused stock merger(s) (advisory fee paid) leave the acquirer's record as it was: none
+ok   F1 a refused LBO tender (premium 0%) puts no debt and no record on the target
+ok   F1 a rejected takeover offer absorbs nothing (PNPL alive)
+
+-- P3 Gemini cases on the statement formula (hand-made rows, no other cash; a fake company carrying only the record)
+ok   C1-u Gemini C1 (cash 500 / debt 200 + target cash 100 / debt 100, shares 300, cash 0): b 0.00 (want 0.00), f 0.00 (want 0.00), m 100.00 (want 100.00), o 0.00 (want 0.00), dc 100.00 (want 100.00), ncA 100.00 (want 100.00)
+ok   C2-u Gemini C2 (cash 1000 / debt 500 + target cash 200 / debt 300, cash 300): b 0.00 (want 0.00), f 0.00 (want 0.00), m -100.00 (want -100.00), o 0.00 (want 0.00), dc -100.00 (want -100.00), ncA 300.00 (want 300.00)
+ok   C3-u cash short (cash 100 / debt 0 + target cash 50 / debt 200, cash 300: 200 borrowed): b 200.00 (want 200.00), f 200.00 (want 200.00), m -250.00 (want -250.00), o 0.00 (want 0.00), dc -50.00 (want -50.00), ncA 200.00 (want 200.00)
+ok   C1-i-u internal absorption with the C1 numbers: b 0.00 (want 0.00), f 0.00 (want 0.00), m 0.00 (want 0.00), i 100.00 (want 100.00), o 0.00 (want 0.00), dc 100.00 (want 100.00)
+ok   C4-u LBO debt only on the target (debt +700, no cash): b 0.00 (want 0.00), f 0.00 (want 0.00), m 0.00 (want 0.00), o 0.00 (want 0.00), dc 0.00 (want 0.00), ncA 700.00 (want 700.00)
+ok   C5-u hidden debt only (debt +80, no cash): the corrected 차입 증감 can go negative when debt was also repaid (repay 30): b -30.00 (want -30.00), f -30.00 (want -30.00), o 0.00 (want 0.00), dc -30.00 (want -30.00), ncA 80.00 (want 80.00)
+ok   C3-g offer with cash 100 for a price 300: cash 50.00 (0 + 50), debt 400.00 (200 borrowed + 200 taken over); recorded aD 200.00, aP 300.00, aC 50.00 (the 200 borrowed is not in the record)
+ok   C3-g close: ledger (acq, every acr key) = the measured deals
+ok   C3 statement row 185 [full]: 차입 -2861.00, 재무 -2993.00, 인수 순현금 -250.00, 자회사 흡수 0.00, 기타 2819.00, 비현금 부채 200.00 = measured | tab: 차입 증감 -2,861, 재무활동 현금흐름 -2,993, 기타·투자 매매 2,819, 인수 순현금 -250, 비현금 부채 200
+ok   K6 JPMX (kd 1) row 164: no record, 재무활동 42.80 = the old formula exactly (gr 49.00 stays in 차입 증감 49.00)
+ok   K6 JPMX statement [full]: 차입 49.00, 재무 42.80, 인수 순현금 0.00, 자회사 흡수 0.00, 기타 -48.80, 비현금 부채 0.00 = measured; raw real borrowing 48.95 | tab: 차입 증감 49.0, 재무활동 현금흐름 42.8, 기타·투자 매매 -48.8
+ok   K6 AIGX (kd 2) row 320: no record, 재무활동 22.60 = the old formula exactly (gr 28.00 stays in 차입 증감 28.00)
+ok   K6 AIGX statement [full]: 차입 28.00, 재무 22.60, 인수 순현금 0.00, 자회사 흡수 0.00, 기타 -28.60, 비현금 부채 0.00 = measured; raw real borrowing 27.53 | tab: 차입 증감 28.0, 재무활동 현금흐름 22.6, 기타·투자 매매 -28.6
+
+-- P3 save boundaries on the statement and the tab (an old save is a save without acq / acr / acd)
+pre  SV2 deal after loading an old save (the GPT-6 example): loaded on day 127, ledger starts there (acd 127)
+ok   SV2 deal after loading an old save (the GPT-6 example) [part]: 차입 0.20, 재무 -50.80, 인수 순현금 103.03, 자회사 흡수 0.00, 기타 -1.23, 비현금 부채 1117.80 = measured | tab: 차입 증감 ◐0.2, 재무활동 현금흐름 ◐-50.8, 기타·투자 매매 ◐-1.2, 인수 순현금 ◐103, 비현금 부채 ◐1,118
+ok   SV2 deal after loading an old save (the GPT-6 example): footnotes name 27.3Q as partly recorded and the quarters closed before loading as not recorded
+pre  SV3 deal before the save only (not recorded): loaded on day 127, ledger starts there (acd 127)
+ok   SV3 deal before the save only (not recorded) [part]: 차입 1118.00, 재무 1066.00, 인수 순현금 0.00, 자회사 흡수 0.00, 기타 -1015.00, 비현금 부채 0.00 = measured | tab: 차입 증감 ◐1,118, 재무활동 현금흐름 ◐1,066, 기타·투자 매매 ◐-1,015
+ok   SV3 deal before the save only (not recorded): footnotes name 27.3Q as partly recorded and the quarters closed before loading as not recorded
+pre  SV4 one deal before the save, one after loading: loaded on day 127, ledger starts there (acd 127)
+ok   SV4 one deal before the save, one after loading [part]: 차입 1118.56, 재무 1058.56, 인수 순현금 74.85, 자회사 흡수 0.00, 기타 -1015.41, 비현금 부채 653.44 = measured | tab: 차입 증감 ◐1,119, 재무활동 현금흐름 ◐1,059, 기타·투자 매매 ◐-1,015, 인수 순현금 ◐74.8, 비현금 부채 ◐653
+ok   SV4 one deal before the save, one after loading: footnotes name 27.3Q as partly recorded and the quarters closed before loading as not recorded
+pre  SV11 fixture: saved on the close day 207
+ok   SV11 old save written on a close day: the next quarter (previous row on the load day) is partly recorded [part]: 차입 0.20, 재무 -62.80, 인수 순현금 106.58, 자회사 흡수 0.00, 기타 -0.78, 비현금 부채 1117.80 = measured | tab: 차입 증감 ◐0.2, 재무활동 현금흐름 ◐-62.8, 기타·투자 매매 ◐-0.8, 인수 순현금 ◐107, 비현금 부채 ◐1,118
+ok   SV5 export with a deal waiting (aD 1117.80): dropped on loading, ledger starts on day 137
+ok   SV5 the first real quarter after an export is partly recorded (only the deal after loading is used) [part]: 차입 183.56, 재무 124.56, 인수 순현금 74.85, 자회사 흡수 0.00, 기타 -155.41, 비현금 부채 653.44 = measured | tab: 차입 증감 ◐184, 재무활동 현금흐름 ◐125, 기타·투자 매매 ◐-155, 인수 순현금 ◐74.8, 비현금 부채 ◐653
+ok   SV5 the rebuilt quarters are listed as not recorded, the real one as partly recorded
+ok   SV6 new game: no ◐ and no ledger footnote in a fresh company's tab
+ok   SV1 autosave keeps the deal waiting for the close: aD 1117.80, aC 103.03
+ok   SV1 the quarter of a deal saved before its close is fully recorded [full]: 차입 0.20, 재무 -51.80, 인수 순현금 103.03, 자회사 흡수 0.00, 기타 -0.23, 비현금 부채 1117.80 = measured | tab: 차입 증감 0.2, 재무활동 현금흐름 -51.8, 기타·투자 매매 -0.2, 인수 순현금 103, 비현금 부채 1,118
+
+-- P2 natural play, 3 seeds x 720 days, no player action: every close of every company compared with the measured deals
+ok   N20261016 statement: every close row with a previous row (4142 rows, 3628 compared with the raw debt writes, max |차입 증감 - raw real borrowing| 0.96) matches the measured amounts; rows with a FIN-CF-03A record: 9 (LGEX 129, KOGS 243, AMDX 257, YWYR 271, BASP 497, LGHW 528)
+ok   N20261016 maTick 8, hidden 3: every close of every company (532 companies) confirmed exactly the measured amounts
+ok   N20261016 no absorb outside maTick / G.merge / G.liq / offer
+ok   N20261016 end state (pending and kept records of the 524 live companies): ledger (acq, every acr key) = the measured deals
+ok   N777 statement: every close row with a previous row (4150 rows, 3635 compared with the raw debt writes, max |차입 증감 - raw real borrowing| 0.98) matches the measured amounts; rows with a FIN-CF-03A record: 10 (NVDE 131, UNPX 192, TSLR 238, PNSX 350, FRPT 384, KEPX 472)
+ok   N777 maTick 11: every close of every company (537 companies) confirmed exactly the measured amounts
+ok   N777 no absorb outside maTick / G.merge / G.liq / offer
+ok   N777 end state (pending and kept records of the 526 live companies): ledger (acq, every acr key) = the measured deals
+ok   N12345 statement: every close row with a previous row (4147 rows, 3633 compared with the raw debt writes, max |차입 증감 - raw real borrowing| 0.98) matches the measured amounts; rows with a FIN-CF-03A record: 16 (FRPT 47, BUDX 92, PEPS 220, AIRB 230, PEPS 310, IBVH 371)
+ok   N12345 maTick 14, hidden 2: every close of every company (537 companies) confirmed exactly the measured amounts
+ok   N12345 no absorb outside maTick / G.merge / G.liq / offer
+ok   N12345 end state (pending and kept records of the 523 live companies): ledger (acq, every acr key) = the measured deals
+
+-- P2 GUARD debt writes in the source
+pre  GUARD the source writes a company debt D in 47 places (47 on main d553d3e; a new one must be classified here)
+ok   GUARD act1.js:36 c.D+= -> cash borrow
+ok   GUARD act1.js:37 c.D-= -> cash repay
+ok   GUARD act2.js:11 c.D+= -> cash special-dividend borrowing
+ok   GUARD act2.js:28 a.D-= -> cash overflow
+ok   GUARD act2.js:39 c.D+= -> ledger LBO
+ok   GUARD act2.js:44 c.D-= -> cash overflow
+ok   GUARD act2.js:54 x.D-= -> cash overflow
+ok   GUARD act2.js:159 c.D+= -> cash bond issue
+ok   GUARD act2.js:161 c.D-= -> cash bond call
+ok   GUARD act2.js:166 c.D+= -> cash advance
+ok   GUARD act2.js:167 c.D-= -> cash advance repaid
+ok   GUARD act2.js:175 c.D-= -> cash overflow
+ok   GUARD act2.js:200 c.D= -> norow founding
+ok   GUARD act2.js:200 c.D= -> norow founding
+ok   GUARD act2.js:200 c.D= -> norow founding
+ok   GUARD act2.js:200 c.D= -> norow founding
+ok   GUARD act2.js:210 c.D-= -> cash overflow
+ok   GUARD act2.js:229 T.D+= -> cash advance
+ok   GUARD act2.js:231 Fc.D-= -> cash advance repaid
+ok   GUARD core.js:66 c.D-= -> cash overflow
+ok   GUARD core.js:89 a.D+= -> norow init cross holdings
+ok   GUARD core.js:137 c.D-= -> cash overflow
+ok   GUARD core.js:141 c.D-= -> cash overflow
+ok   GUARD sim.js:25 c.D+= -> gr FIN-CF-03B
+ok   GUARD sim.js:26 c.D-= -> cash overflow
+ok   GUARD sim.js:27 c.D-= -> cash close repayment
+ok   GUARD sim.js:45 a.D+= -> ledger absorb
+ok   GUARD sim.js:47 t.D= -> norow absorbed target
+ok   GUARD sim.js:53 ac.D-= -> cash overflow
+ok   GUARD sim.js:118 f.D-= -> cash overflow
+ok   GUARD sim.js:156 c.D= -> ledger FIN-CF-01 relief
+ok   GUARD sim.js:160 x.D-= -> cash loan called
+ok   GUARD ui2.js:191 c.D-= -> cash overflow
+ok   GUARD ui2.js:234 c.D-= -> cash overflow
+ok   GUARD ui2.js:291 c.D-= -> cash overflow
+ok   GUARD ui2.js:293 c.D-= -> cash overflow
+ok   GUARD ui2.js:363 c.D-= -> cash overflow
+ok   GUARD ui2.js:364 cp.D-= -> cash overflow
+ok   GUARD ui2.js:489 h.D-= -> cash overflow
+ok   GUARD ui2.js:527 c.D-= -> cash overflow
+ok   GUARD ui2.js:529 c.D-= -> cash overflow
+ok   GUARD ui2.js:594 c.D-= -> cash bank run
+ok   GUARD ui2.js:614 c.D-= -> cash overflow
+ok   GUARD ui2.js:680 a.D-= -> cash overflow
+ok   GUARD ui2.js:683 c.D-= -> cash asset sale
+ok   GUARD ui2.js:735 c.D+= -> ledger hidden debt
+ok   GUARD ui2.js:735 c.D-= -> cash overflow
+info GUARD classes: {"cash":36,"ledger":4,"norow":6,"gr":1}
+ok   GUARD absorb is called in 4 places and every call passes the cash paid as its 4th argument: act2.js absorb(a,x,q.nv,0) | act2.js absorb(h,c,-hv(c,100),0) | sim.js absorb(ac,t,pay,pay) | ui2.js absorb(a,c,P,cp)
+
+errs 0 fails 0
+PASS t_fincf03_acq.js
+ALL PASS
+exit code 0

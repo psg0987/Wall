@@ -1,0 +1,155 @@
+ok   none (the unmodified game) -> passes
+ok   R1 absorb records nothing -> CAUGHT by the new test (113 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf02_issue.js also fail
+       FAIL C1-g recorded by the deal: all 0 = external, debt taken over 100, cash paid 0, cash brought in 100
+       FAIL C1-g close: ledger (acq, every acr key) = the measured deals | PNPL acr[207] none vs measured aD 100.00, aC 100.00; PNPL row 207: ledger none vs measured aD 100.00, aC 100.00
+ok   R2 every absorption is internal (stake > 50% test replaced by >= 0) -> CAUGHT by the new test (89 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL C1-g recorded by the deal: iD 100.00, iC 100.00 = external, debt taken over 100, cash paid 0, cash brought in 100
+       FAIL C1-g close: ledger (acq, every acr key) = the measured deals | PNPL acr[207] iD 100.00, iC 100.00 vs measured aD 100.00, aC 100.00; PNPL row 207: ledger iD 100.00, iC 100.00 vs measured aD 100.00, aC 100.00
+ok   R3 every absorption is external (G.liq / own subsidiary not recognised) -> CAUGHT by the new test (15 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL C1-i recorded as INTERNAL absorption (stake 100.00%): aD 100.00, aC 100.00, nothing in the external keys
+       FAIL C1-i close: ledger (acq, every acr key) = the measured deals | PNPL acr[117] aD 100.00, aC 100.00 vs measured iD 100.00, iC 100.00; PNPL row 117: ledger aD 100.00, aC 100.00 vs measured iD 100.00, iC 100.00
+ok   R4 the debt of an internal absorption is also put in the external key (counted twice) -> CAUGHT by the new test (16 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL C1-i recorded as INTERNAL absorption (stake 100.00%): aD 100.00, iD 100.00, iC 100.00, nothing in the external keys
+       FAIL C1-i close: ledger (acq, every acr key) = the measured deals | PNPL acr[117] aD 100.00, iD 100.00, iC 100.00 vs measured iD 100.00, iC 100.00; PNPL row 117: ledger aD 100.00, iD 100.00, iC 100.00 vs measured iD 100.00, iC 100
+ok   R5 absorb ignores the cash paid -> CAUGHT by the new test (53 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL C2-g recorded: aD 300.00, aC 200.00 = external, debt 300, cash paid 300 (measured 300.00), cash in 200
+       FAIL C2-g close: ledger (acq, every acr key) = the measured deals | MCSF acr[185] aD 300.00, aC 200.00 vs measured aD 300.00, aP 300.00, aC 200.00; MCSF row 185: ledger aD 300.00, aC 200.00 vs measured aD 300.00, aP 300.00, aC 200
+ok   R6 absorb ignores the cash brought in -> CAUGHT by the new test (88 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf02_issue.js also fail
+       FAIL C1-g recorded by the deal: aD 100.00 = external, debt taken over 100, cash paid 0, cash brought in 100
+       FAIL C1-g close: ledger (acq, every acr key) = the measured deals | PNPL acr[207] aD 100.00 vs measured aD 100.00, aC 100.00; PNPL row 207: ledger aD 100.00 vs measured aD 100.00, aC 100.00
+ok   R7 absorb records the debt after it moved (0) -> CAUGHT by the new test (111 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf02_issue.js also fail
+       FAIL C1-g recorded by the deal: aC 100.00 = external, debt taken over 100, cash paid 0, cash brought in 100
+       FAIL C1-g close: ledger (acq, every acr key) = the measured deals | PNPL acr[207] aC 100.00 vs measured aD 100.00, aC 100.00; PNPL row 207: ledger aC 100.00 vs measured aD 100.00, aC 100.00
+ok   R8 maTick passes no cash paid -> CAUGHT by the new test (45 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL K3: ledger (acq, every acr key) = the measured deals | ISRG acr[286] aD 73.14, aC 43.88 vs measured aD 73.14, aP 235.05, aC 43.88; ISRG row 286: ledger aD 73.14, aC 43.88 vs measured aD 73.14, aP 235.05, aC 43.88
+       FAIL K3 statement row 286 [full]: 차입 -0.14, 재무 -69.14, 인수 순현금 43.88, 자회사 흡수 0.00, 기타 -234.75, 비현금 부채 73.14 = measured; raw real borrowing 0.00 | tab: 차입 증감 -0.1, 재무활동 현금흐름 -69.1, 기타·투자 매매 -235, 인수 순현금 43.9, 비현금 부채 73.1 | ncA/maN/i
+ok   R9 maTick passes the full price, also for the stake already held -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL X2: ledger (acq, every acr key) = the measured deals | PFZR acr[134] aD 569.44, aP 1147.69, aC 66.86, iD 737.63, iP 1764.56, iC 129.40 vs measured aD 569.44, aP 1147.69, aC 66.86, iD 737.63, iP 705.82, iC 129.40; PFZR row 134
+       FAIL X2 record aD 569.44, aP 1147.69, aC 66.86, iD 737.63, iP 1764.56, iC 129.40
+ok   R10 offer passes the full price, also for the 10% already held -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL K2: ledger (acq, every acr key) = the measured deals | PNPL acr[207] aD 2149.48, aP 2575.06, aC 358.32 vs measured aD 2149.48, aP 2317.55, aC 358.32; PNPL row 207: ledger aD 2149.48, aP 2575.06, aC 358.32 vs measured aD 2149.
+       FAIL K2 record aD 2149.48, aP 2575.06, aC 358.32
+ok   R11 offer passes no cash paid -> CAUGHT by the new test (10 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL C2-g recorded: aD 300.00, aC 200.00 = external, debt 300, cash paid 300 (measured 300.00), cash in 200
+       FAIL C2-g close: ledger (acq, every acr key) = the measured deals | MCSF acr[185] aD 300.00, aC 200.00 vs measured aD 300.00, aP 300.00, aC 200.00; MCSF row 185: ledger aD 300.00, aC 200.00 vs measured aD 300.00, aP 300.00, aC 200
+ok   R12 G.merge passes the share value as cash paid -> CAUGHT by the new test (29 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf02_issue.js also fail
+       FAIL C1-g recorded by the deal: aD 100.00, aP 1748.62, aC 100.00 = external, debt taken over 100, cash paid 0, cash brought in 100
+       FAIL C1-g close: ledger (acq, every acr key) = the measured deals | PNPL acr[207] aD 100.00, aP 1748.62, aC 100.00 vs measured aD 100.00, aC 100.00; PNPL row 207: ledger aD 100.00, aP 1748.62, aC 100.00 vs measured aD 100.00, aC 1
+ok   R13 G.liq passes the subsidiary value as cash paid -> CAUGHT by the new test (10 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL C1-i recorded as INTERNAL absorption (stake 100.00%): iD 100.00, iP 1320.98, iC 100.00, nothing in the external keys
+       FAIL C1-i close: ledger (acq, every acr key) = the measured deals | PNPL acr[117] iD 100.00, iP 1320.98, iC 100.00 vs measured iD 100.00, iC 100.00; PNPL row 117: ledger iD 100.00, iP 1320.98, iC 100.00 vs measured iD 100.00, iC 1
+ok   R14 the LBO debt is not recorded -> CAUGHT by the new test (6 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL K4: ledger (acq, every acr key) = the measured deals | PNPL acr[207] none vs measured lD 5054.55; PNPL row 207: ledger none vs measured lD 5054.55
+       FAIL K4: debt written by absorb 0.00 / LBO 5054.55 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 207 (none)
+ok   R15 the LBO debt is recorded as debt taken over -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL K4: ledger (acq, every acr key) = the measured deals | PNPL acr[207] aD 5054.55 vs measured lD 5054.55; PNPL row 207: ledger aD 5054.55 vs measured lD 5054.55
+       FAIL K4: debt written by absorb 0.00 / LBO 5054.55 / hidden debt 0.00 (tracer) = record aD+iD / lD / hD of row 207 (aD 5054.55)
+ok   R16 the hidden debt is not recorded -> CAUGHT by the new test (16 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL X5: ledger (acq, every acr key) = the measured deals | PNPL acr[207] aD 1117.80, aC 103.03 vs measured aD 1117.80, aC 103.03, hD 873.91; PNPL row 207: ledger aD 1117.80, aC 103.03 vs measured aD 1117.80, aC 103.03, hD 873.91
+       FAIL X5: debt written by absorb 1117.80 / LBO 0.00 / hidden debt 873.91 (tracer) = record aD+iD / lD / hD of row 207 (aD 1117.80, aC 103.03)
+ok   R17 acqAdd records nothing -> CAUGHT by the new test (2 FAIL = calculation differs, 1 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf02_issue.js also fail
+       FAIL L1 pending acq holds the unrounded sums of the quarter: none
+       FAIL L2 the close moves it to acr[207] (the row day) = the sum of the calls of the quarter (aD 12.35, aC 3.20, hD 7.75), acq cleared, 8 keys
+ok   R18 acqAdd overwrites instead of adding -> CAUGHT by the new test (11 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL L1 pending acq holds the unrounded sums of the quarter: aD 0.00, aC 3.20, hD 7.75
+       FAIL L2 the close moves it to acr[207] (the row day) = the sum of the calls of the quarter (aD 12.35, aC 3.20, hD 7.75), acq cleared, 8 keys
+ok   L1 the close never confirms (acq stays pending) -> CAUGHT by the new test (1 FAIL = calculation differs, 1 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf02_issue.js also fail
+       FAIL L2 the close moves it to acr[207] (the row day) = the sum of the calls of the quarter (aD 12.35, aC 3.20, hD 7.75), acq cleared, 8 keys
+       ERR exception TypeError: Cannot convert undefined or null to object
+ok   L2 the close does not clear acq (next quarter counts it again) -> CAUGHT by the new test (127 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL L2 the close moves it to acr[207] (the row day) = the sum of the calls of the quarter (aD 12.35, aC 3.20, hD 7.75), acq cleared, 8 keys
+       FAIL L3 two quarters, two keys: acr[297] = iD 5.00, iC 1.50, lD 2.00; acr[207] unchanged = aD 12.35, aC 3.20, hD 7.75
+ok   L3 the close keeps only the newest quarter (one record, like R1 of the design) -> CAUGHT by the new test (7 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL L3 two quarters, two keys: acr[297] = iD 5.00, iC 1.50, lD 2.00; acr[207] unchanged = aD 12.35, aC 3.20, hD 7.75
+       FAIL SV10 acr[207] is dropped when its row leaves the 8 kept rows (oldest row now null), never earlier, no key older than the oldest row
+ok   L4 the close records one day late -> CAUGHT by the new test (117 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf02_issue.js also fail
+       FAIL L2 the close moves it to acr[207] (the row day) = the sum of the calls of the quarter (aD 12.35, aC 3.20, hD 7.75), acq cleared, 8 keys
+       FAIL L2 every key of acr is the day of a kept quarter row
+ok   L5 the close overwrites acr[day] instead of adding (a company closes at most once a day, so the slot is always empty) -> SURVIVES (expected, documented) passes | FIN-CF-01/02 tests: pass (not their subject)
+ok   L6 old records are never pruned -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL SV10 acr[207] is dropped when its row leaves the 8 kept rows (oldest row now null), never earlier, no key older than the oldest row
+ok   L7 pruning keeps only the newest row -> CAUGHT by the new test (1 FAIL = calculation differs, 1 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL L3 two quarters, two keys: acr[297] = iD 5.00, iC 1.50, lD 2.00; acr[207] unchanged = aD 12.35, aC 3.20, hD 7.75
+       ERR exception TypeError: Cannot read properties of undefined (reading '387')
+ok   L8 kill leaves acq and acr on the dead company -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL SV8 kill: acq null, acr deleted (acd kept: -721)
+       FAIL X6 the absorbed target is killed with its records (acq {"aD":0,"aP":0,"aC":0,"iD":0,"iP":0,"iC":0,"lD":752.6612099116802,"hD":0}, acr undefined)
+ok   L9 qBack keeps the pending deal of a restored export -> CAUGHT by the new test (4 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL SV5 export (packS(1)): the rows are rebuilt (qBack), the pending record is dropped (it is inside the rebuilt starting debt), acr deleted, acd = load day 137 (got 137)
+       FAIL SV5 export (packS(1)): the next close holds only what was recorded after loading (iC 9.50, hD 1.25)
+ok   L10 qBack keeps the old records -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL SV5 export (packS(1)): the rows are rebuilt (qBack), the pending record is dropped (it is inside the rebuilt starting debt), acr deleted, acd = load day 137 (got 137)
+ok   L11 qBack does not move the ledger start on a restore -> CAUGHT by the new test (3 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL SV5 export (packS(1)): the rows are rebuilt (qBack), the pending record is dropped (it is inside the rebuilt starting debt), acr deleted, acd = load day 137 (got -721)
+       FAIL SV5 export with a deal waiting (aD 1117.80): dropped on loading, ledger starts on day 137
+ok   L12 qBack moves the ledger start also in a new game (day 0) -> CAUGHT by the new test (2 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf01_relief.js also fail
+       FAIL L0 new game (day 0): every company (515) has acd = -721 and no acq / acr
+       FAIL SV6 new game: no ◐ and no ledger footnote in a fresh company's tab
+ok   L13 addCo starts the ledger on the day of creation (S.day, not before the rebuilt rows) -> CAUGHT by the new test (3 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf01_relief.js also fail
+       FAIL L0 new game (day 0): every company (515) has acd = -721 and no acq / acr
+       FAIL SV7 newCo on day 100: acd = 100 (day - 721), no records
+ok   L14 addCo gives no start (v8prep then uses S.day) -> CAUGHT by the new test (3 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf01_relief.js also fail
+       FAIL L0 new game (day 0): every company (515) has acd = -721 and no acq / acr
+       FAIL SV7 newCo on day 100: acd = 100 (day - 721), no records
+ok   L15 v8prep gives an old save no start (acd missing) -> CAUGHT by the new test (6 FAIL = calculation differs, 3 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL LG a save made before FIN-CF-03A (no acq / acr / acd) gets acd = the load day 150 for every company (v8prep)
+       FAIL SV2 deal after loading an old save (the GPT-6 example): footnotes name 27.3Q as partly recorded and the quarters closed before loading as not recorded
+ok   F1 a partly recorded quarter ignores its record (R1 rule led3) -> CAUGHT by the new test (8 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf01_relief.js also fail
+       FAIL SV2 deal after loading an old save (the GPT-6 example) [part]: 차입 1118.00, 재무 1067.00, 인수 순현금 0.00, 자회사 흡수 0.00, 기타 -1016.00, 비현금 부채 0.00 = measured | tab: 차입 증감 1,118, 재무활동 현금흐름 1,067, 기타·투자 매매 -1,016, 인수 순현금 undefined, 비현금 
+       FAIL SV2 deal after loading an old save (the GPT-6 example): footnotes name 27.3Q as partly recorded and the quarters closed before loading as not recorded
+ok   F2 a partly recorded quarter is shown as fully recorded (no ◐) -> CAUGHT by the new test (8 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf01_relief.js also fail
+       FAIL SV2 deal after loading an old save (the GPT-6 example) [part]: 차입 0.20, 재무 -50.80, 인수 순현금 103.03, 자회사 흡수 0.00, 기타 -1.23, 비현금 부채 1117.80 = measured | tab: 차입 증감 0.2, 재무활동 현금흐름 -50.8, 기타·투자 매매 -1.2, 인수 순현금 103, 비현금 부채 1,118 | r
+       FAIL SV2 deal after loading an old save (the GPT-6 example): footnotes name 27.3Q as partly recorded and the quarters closed before loading as not recorded
+ok   F3 a row whose previous row is ON the ledger start counts as fully recorded (>= instead of >) -> CAUGHT by the new test (1 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL SV11 old save written on a close day: the next quarter (previous row on the load day) is partly recorded [part]: 차입 0.20, 재무 -62.80, 인수 순현금 106.58, 자회사 흡수 0.00, 기타 -0.78, 비현금 부채 1117.80 = measured | tab: 차입 증감 0.2, 재무활동 현금흐름 
+ok   F4 a row closed before the ledger uses a record (no record can exist for such a row) -> SURVIVES (expected, documented) passes | FIN-CF-01/02 tests: pass (not their subject)
+ok   F5 차입 / 재무활동 keep the non-cash debt (the old statement) -> CAUGHT by the new test (69 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf02_issue.js also fail
+       FAIL C1 statement row 207 [full]: 차입 -2860.00, 재무 -2931.00, 인수 순현금 100.00, 자회사 흡수 0.00, 기타 2819.00, 비현금 부채 100.00 = measured | tab: 차입 증감 -2,860, 재무활동 현금흐름 -2,931, 기타·투자 매매 2,819, 인수 순현금 100, 비현금 부채 100 | 차입 -2860.00 / 재무 -2931.00
+       FAIL C2 statement row 185 [full]: 차입 -2261.00, 재무 -2394.00, 인수 순현금 -100.00, 자회사 흡수 0.00, 기타 2919.00, 비현금 부채 300.00 = measured | tab: 차입 증감 -2,261, 재무활동 현금흐름 -2,394, 기타·투자 매매 2,919, 인수 순현금 -100, 비현금 부채 300 | 차입 -2261.00 / 재무 -2394.
+ok   F6 the external acquisition cash stays in 기타 -> CAUGHT by the new test (57 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf02_issue.js also fail
+       FAIL C1 statement row 207 [full]: 차입 -2960.00, 재무 -3031.00, 인수 순현금 100.00, 자회사 흡수 0.00, 기타 3019.00, 비현금 부채 100.00 = measured | tab: 차입 증감 -2,960, 재무활동 현금흐름 -3,031, 기타·투자 매매 3,019, 인수 순현금 100, 비현금 부채 100 | 차입 -2960.00 / 재무 -3031.00
+       FAIL C2 statement row 185 [full]: 차입 -2561.00, 재무 -2694.00, 인수 순현금 -100.00, 자회사 흡수 0.00, 기타 3119.00, 비현금 부채 300.00 = measured | tab: 차입 증감 -2,561, 재무활동 현금흐름 -2,694, 기타·투자 매매 3,119, 인수 순현금 -100, 비현금 부채 300 | 차입 -2561.00 / 재무 -2694.
+ok   F7 the internal absorption cash stays in 기타 -> CAUGHT by the new test (6 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL C1i statement row 117 [full]: 차입 -2960.00, 재무 -3034.00, 인수 순현금 0.00, 자회사 흡수 100.00, 기타 2340.00, 비현금 부채 100.00 = measured | tab: 차입 증감 -2,960, 재무활동 현금흐름 -3,034, 기타·투자 매매 2,340, 자회사 흡수·투자회수 100, 비현금 부채 100 | 차입 -2960.00 / 재무 -3
+       FAIL K5 statement row 297 [full]: 차입 0.56, 재무 -58.44, 인수 순현금 0.00, 자회사 흡수 74.92, 기타 74.44, 비현금 부채 653.44 = measured; raw real borrowing 0.00 | tab: 차입 증감 0.6, 재무활동 현금흐름 -58.4, 기타·투자 매매 74.4, 자회사 흡수·투자회수 74.9, 비현금 부채 653 | 차입 0.56 
+ok   F8 the debt of an internal absorption is not taken out -> CAUGHT by the new test (6 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL C1i statement row 117 [full]: 차입 -2860.00, 재무 -2934.00, 인수 순현금 0.00, 자회사 흡수 100.00, 기타 2140.00, 비현금 부채 0.00 = measured | tab: 차입 증감 -2,860, 재무활동 현금흐름 -2,934, 기타·투자 매매 2,140, 자회사 흡수·투자회수 100, 비현금 부채 undefined | ncA/maN/inN 0.0
+       FAIL K5 statement row 297 [full]: 차입 654.00, 재무 595.00, 인수 순현금 0.00, 자회사 흡수 74.92, 기타 -653.92, 비현금 부채 0.00 = measured; raw real borrowing 0.00 | tab: 차입 증감 654, 재무활동 현금흐름 595, 기타·투자 매매 -654, 자회사 흡수·투자회수 74.9, 비현금 부채 undefined | nc
+ok   F9 the LBO debt is not taken out -> CAUGHT by the new test (2 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL K4 statement row 207 [full]: 차입 5055.00, 재무 5055.00, 인수 순현금 0.00, 자회사 흡수 0.00, 기타 -5055.00, 비현금 부채 0.00 = measured; raw real borrowing 0.00 | tab: 차입 증감 5,055, 재무활동 현금흐름 5,055, 기타·투자 매매 -5,055, 비현금 부채 undefined | ncA/maN/inN 
+       FAIL C4-u LBO debt only on the target (debt +700, no cash): b 700.00 (want 0.00), f 700.00 (want 0.00), m 0.00 (want 0.00), o -700.00 (want 0.00), dc 0.00 (want 0.00), ncA 0.00 (want 700.00)
+ok   F10 the hidden debt is not taken out -> CAUGHT by the new test (9 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL X5 statement row 207 [full]: 차입 1368.20, 재무 1326.20, 인수 순현금 103.03, 자회사 흡수 0.00, 기타 -882.23, 비현금 부채 1117.80 = measured; raw real borrowing 493.59 | tab: 차입 증감 1,368, 재무활동 현금흐름 1,326, 기타·투자 매매 -882, 인수 순현금 103, 비현금 부채 1,118 | 
+       FAIL C5-u hidden debt only (debt +80, no cash): the corrected 차입 증감 can go negative when debt was also repaid (repay 30): b 50.00 (want -30.00), f 50.00 (want -30.00), o -80.00 (want 0.00), dc -30.00 (want -30.00), ncA 0.00 (want 
+ok   F11 internal and external net cash swapped -> CAUGHT by the new test (61 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL C1 statement row 207 [full]: 차입 -2960.00, 재무 -3031.00, 인수 순현금 0.00, 자회사 흡수 100.00, 기타 2919.00, 비현금 부채 100.00 = measured | tab: 차입 증감 -2,960, 재무활동 현금흐름 -3,031, 기타·투자 매매 2,919, 인수 순현금 0.0, 비현금 부채 100 | ncA/maN/inN 100.00/0.00/1
+       FAIL C2 statement row 185 [full]: 차입 -2561.00, 재무 -2694.00, 인수 순현금 0.00, 자회사 흡수 -100.00, 기타 3219.00, 비현금 부채 300.00 = measured | tab: 차입 증감 -2,561, 재무활동 현금흐름 -2,694, 기타·투자 매매 3,219, 인수 순현금 0.0, 비현금 부채 300 | ncA/maN/inN 300.00/0.00/
+ok   F12 net cash = cash paid - cash in (sign) -> CAUGHT by the new test (57 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf02_issue.js also fail
+       FAIL C1 statement row 207 [full]: 차입 -2960.00, 재무 -3031.00, 인수 순현금 -100.00, 자회사 흡수 0.00, 기타 3119.00, 비현금 부채 100.00 = measured | tab: 차입 증감 -2,960, 재무활동 현금흐름 -3,031, 기타·투자 매매 3,119, 인수 순현금 -100, 비현금 부채 100 | ncA/maN/inN 100.00/-100
+       FAIL C2 statement row 185 [full]: 차입 -2561.00, 재무 -2694.00, 인수 순현금 100.00, 자회사 흡수 0.00, 기타 3019.00, 비현금 부채 300.00 = measured | tab: 차입 증감 -2,561, 재무활동 현금흐름 -2,694, 기타·투자 매매 3,019, 인수 순현금 100, 비현금 부채 300 | ncA/maN/inN 300.00/100.00
+ok   F13 banks' growth gr taken out too (FIN-CF-03B leaking in) -> CAUGHT by the new test (1092 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf01_relief.js also fail
+       FAIL K10 statement row 254 [full]: 차입 0.05, 재무 -7.35, 인수 순현금 109.71, 자회사 흡수 0.00, 기타 -3.46, 비현금 부채 1360.95 = measured; raw real borrowing 66.01 | tab: 차입 증감 0.0, 재무활동 현금흐름 -7.4, 기타·투자 매매 -3.5, 인수 순현금 110, 비현금 부채 1,361 | ncA/maN/in
+       FAIL K6 JPMX (kd 1) row 164: no record, 재무활동 -6.20 = the old formula exactly (gr 49.00 stays in 차입 증감 0.00)
+ok   U1 no ◐ on the cells of a partly recorded quarter -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf01_relief.js also fail
+       FAIL SV2 deal after loading an old save (the GPT-6 example) [part]: 차입 0.20, 재무 -50.80, 인수 순현금 103.03, 자회사 흡수 0.00, 기타 -1.23, 비현금 부채 1117.80 = measured | tab: 차입 증감 0.2, 재무활동 현금흐름 -50.8, 기타·투자 매매 -1.2, 인수 순현금 103, 비현금 부채 1,118 | t
+       FAIL SV3 deal before the save only (not recorded) [part]: 차입 1118.00, 재무 1066.00, 인수 순현금 0.00, 자회사 흡수 0.00, 기타 -1015.00, 비현금 부채 0.00 = measured | tab: 차입 증감 1,118, 재무활동 현금흐름 1,066, 기타·투자 매매 -1,015 | tab 차입 증감 shows 1,118 want ◐1,1
+ok   U2 negative 차입 증감 shown as 0 -> CAUGHT by the new test (7 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: t_fincf01_relief.js also fail
+       FAIL C1 statement row 207 [full]: 차입 -2960.00, 재무 -3031.00, 인수 순현금 100.00, 자회사 흡수 0.00, 기타 2919.00, 비현금 부채 100.00 = measured | tab: 차입 증감 0.0, 재무활동 현금흐름 -3,031, 기타·투자 매매 2,919, 인수 순현금 100, 비현금 부채 100 | tab 차입 증감 shows 0.0 want -2,
+       FAIL C2 statement row 185 [full]: 차입 -2561.00, 재무 -2694.00, 인수 순현금 -100.00, 자회사 흡수 0.00, 기타 3219.00, 비현금 부채 300.00 = measured | tab: 차입 증감 0.0, 재무활동 현금흐름 -2,694, 기타·투자 매매 3,219, 인수 순현금 -100, 비현금 부채 300 | tab 차입 증감 shows 0.0 want -
+ok   U3 the 인수 순현금 row never shown -> CAUGHT by the new test (21 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL C1 statement row 207 [full]: 차입 -2960.00, 재무 -3031.00, 인수 순현금 100.00, 자회사 흡수 0.00, 기타 2919.00, 비현금 부채 100.00 = measured | tab: 차입 증감 -2,960, 재무활동 현금흐름 -3,031, 기타·투자 매매 2,919, 인수 순현금 undefined, 비현금 부채 100 | tab 인수 순현금 shows un
+       FAIL C2 statement row 185 [full]: 차입 -2561.00, 재무 -2694.00, 인수 순현금 -100.00, 자회사 흡수 0.00, 기타 3219.00, 비현금 부채 300.00 = measured | tab: 차입 증감 -2,561, 재무활동 현금흐름 -2,694, 기타·투자 매매 3,219, 인수 순현금 undefined, 비현금 부채 300 | tab 인수 순현금 shows u
+ok   U4 the 자회사 흡수·투자회수 row never shown -> CAUGHT by the new test (5 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL C1i statement row 117 [full]: 차입 -2960.00, 재무 -3034.00, 인수 순현금 0.00, 자회사 흡수 100.00, 기타 2240.00, 비현금 부채 100.00 = measured | tab: 차입 증감 -2,960, 재무활동 현금흐름 -3,034, 기타·투자 매매 2,240, 자회사 흡수·투자회수 undefined, 비현금 부채 100 | tab 자회사 흡수·투자
+       FAIL K5 statement row 297 [full]: 차입 0.56, 재무 -58.44, 인수 순현금 0.00, 자회사 흡수 74.92, 기타 -0.48, 비현금 부채 653.44 = measured; raw real borrowing 0.00 | tab: 차입 증감 0.6, 재무활동 현금흐름 -58.4, 기타·투자 매매 -0.5, 자회사 흡수·투자회수 undefined, 비현금 부채 653 | tab
+ok   U5 the non-cash debt memo row never shown -> CAUGHT by the new test (25 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL C1 statement row 207 [full]: 차입 -2960.00, 재무 -3031.00, 인수 순현금 100.00, 자회사 흡수 0.00, 기타 2919.00, 비현금 부채 100.00 = measured | tab: 차입 증감 -2,960, 재무활동 현금흐름 -3,031, 기타·투자 매매 2,919, 인수 순현금 100, 비현금 부채 undefined | tab └ 인수·흡수·LBO·숨은 
+       FAIL C2 statement row 185 [full]: 차입 -2561.00, 재무 -2694.00, 인수 순현금 -100.00, 자회사 흡수 0.00, 기타 3219.00, 비현금 부채 300.00 = measured | tab: 차입 증감 -2,561, 재무활동 현금흐름 -2,694, 기타·투자 매매 3,219, 인수 순현금 -100, 비현금 부채 undefined | tab └ 인수·흡수·LBO·숨
+ok   U6 the FIN-CF-03A footnotes are removed -> CAUGHT by the new test (3 FAIL = calculation differs, 0 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL SV2 deal after loading an old save (the GPT-6 example): footnotes name 27.3Q as partly recorded and the quarters closed before loading as not recorded
+       FAIL SV3 deal before the save only (not recorded): footnotes name 27.3Q as partly recorded and the quarters closed before loading as not recorded
+ok   G1 a new non-cash debt write without a record (accounting fraud bomb also books debt) -> CAUGHT by the new test (9 FAIL = calculation differs, 1 ERR = precondition/other) | FIN-CF-01/02 tests: pass (not their subject)
+       FAIL N20261016 AMGM row 612 [full]: 차입 -37.00, 재무 -49.00, 인수 순현금 0.00, 자회사 흡수 0.00, 기타 -14.00, 비현금 부채 0.00 = measured; raw real borrowing -51.11 | B: 차입 증감 -37.00 vs raw real borrowing from the debt writes -51.11 (rounding only al
+       FAIL N20261016 RBLX row 701 [full]: 차입 -32.00, 재무 -42.00, 인수 순현금 0.00, 자회사 흡수 0.00, 기타 -8.10, 비현금 부채 0.00 = measured; raw real borrowing -40.32 | B: 차입 증감 -32.00 vs raw real borrowing from the debt writes -40.32 (rounding only all
+53 mutants; ALL MUTANTS CAUGHT (documented survivors aside), unmodified game passes
+exit 0
