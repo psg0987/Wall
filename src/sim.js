@@ -278,7 +278,7 @@ const r1=x=>Math.abs(x)>=10?Math.round(x):Math.round(x*10)/10;
 // FIN-CF-02 share-issue cash ledger: every path that issues or buys back shares for cash, or takes a cash capital contribution, calls
 // eqCash(company, cash really received (+) or paid (-)). The amount waits in c.eqq; earn() confirms it as c.isq[close day] just before the
 // quarter record is pushed; fqDerive shows it as 증자·출자(자사주). Share-count changes without cash (splits, stock-merger consideration,
-// founding) do not call it. Recording only: nothing in the simulation reads eqq / isq / isd.
+// founding) do not call it. Recording only: nothing in the simulation reads eqq / isq / isd. Restoring an export save (qBack) drops a waiting eqq.
 function eqCash(c,x){if(c&&x&&isFinite(x))c.eqq=(c.eqq||0)+x}
 // FIN-CF-03A acquisition / non-cash debt ledger. acqAdd(company, key, amount) adds to c.acq (created on first use), the record of the
 // quarter that has not closed yet; earn() moves it to c.acr[close day] just before the quarter record is pushed; fqDerive takes the
@@ -290,7 +290,10 @@ const ACQK=["aD","aP","aC","iD","iP","iC","lD","hD"];
 function acqAdd(c,k,x){if(!c||!x||!isFinite(x))return;const p=c.acq||(c.acq={aD:0,aP:0,aC:0,iD:0,iP:0,iC:0,lD:0,hD:0});p[k]+=x}
 function qPush(c,a){(c.fq=c.fq||[]).push(a.map((x,j)=>j===0||j===21?Math.round(x):r1(x)));if(c.fq.length>8)c.fq.shift();if(c.isq){const d0=c.fq[0][0];for(const k in c.isq)if(+k<d0)delete c.isq[k];if(!Object.keys(c.isq).length)delete c.isq}
 if(c.acr){const d0=c.fq[0][0];for(const k in c.acr)if(+k<d0)delete c.acr[k];if(!Object.keys(c.acr).length)delete c.acr}}
-function qBack(c){if(c.priv&&c.fo)return;const x=SX[c.i]||SX[0],g=x.dg||.03,rev0=revQ(c),pf=pfv(c);c.fq=[];delete c.rlf;c.cfd=S.day-720;delete c.isq;c.isd=S.day-720;
+function qBack(c){if(c.priv&&c.fo)return;const x=SX[c.i]||SX[0],g=x.dg||.03,rev0=revQ(c),pf=pfv(c);c.fq=[];delete c.rlf;c.cfd=S.day-720;c.ncq=0;delete c.isq;c.isd=S.day-720;c.eqq=0;
+// FIN-CF-02-SAVE-01 (A1): the rebuilt rows are made from today's cash, debt and share count, which already hold every share trade (eqq) and every
+// chapter-11 relief (ncq) still waiting for the close, so the first real close would count them a second time: drop both. A full save keeps
+// its rows and never comes here, so its waiting amounts stay; a trade made after the restore is recorded as usual.
 // FIN-CF-03A: the rebuilt rows are made from today's debt and cash, which already hold every deal before the save, so a deal still waiting
 // in acq would be taken out of a debt change that does not contain it: drop it. Restoring a save (day > 0) starts the ledger today, so the
 // first real quarter is marked partly recorded; a new game (day 0, no deal before it) keeps the start addCo gave.

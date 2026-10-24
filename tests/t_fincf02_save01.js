@@ -291,6 +291,22 @@ for (const [lab, strip] of [['S14 export', 1], ['S15 full save (control)', 0]]) 
 }
 
 // ================================================================================================================================
+// S16 control: amounts already CONFIRMED by a close (isq, rlf) go with the real rows at a later export (unchanged rule). With A1 the export cases of
+// t_fincf02_issue.js (SV, line 187) and t_fincf01_relief.js (SV (b)) no longer start from a record carried over from before the first export, so
+// this case keeps both records alive explicitly.
+// ================================================================================================================================
+console.log('\n-- S16 control: an issue and a relief in one quarter, confirmed by the close, then an export: the records go with the real rows');
+{
+  startWorld(SEED); let T = pickLoan(); mkMine(T); const id = T.id; nextClose(T); nextClose(T); waitDays(T, 30);
+  const m = issue(T), n0 = RL.length; T.cs = 0; defic(T); callLoan(S.co[T.ln], T, 1); const R = RL.slice(n0).filter(r => r.id === id && r.R != null).reduce((a, r) => a + r.R, 0);
+  pre(m.X > 100 && R > 100 && !T.dead, 'S16 ' + T.tk + ': issue X ' + f2(m.X) + ' and relief R ' + f2(R) + ' waiting in the same quarter');
+  nextClose(T); const d1 = lastD(T);
+  pre(T.isq && Math.abs(T.isq[d1] - m.X) <= TOLI && T.rlf && T.rlf.d === d1 && Math.abs(T.rlf.R - R) <= TOLI && T.eqq === 0 && T.ncq === 0, 'S16 the close of day ' + d1 + ' confirmed both: isq ' + JSON.stringify(T.isq) + ', rlf ' + JSON.stringify(T.rlf));
+  await restore(1); T = S.co[id]; const L = fqL(T), D = L.map((x, j) => j ? fqDerive(T, x, L[j - 1]) : null);
+  ok(T.isq == null && T.rlf == null && T.eqq === 0 && T.ncq === 0 && D.every(x => !x || (x.iss === 0 && x.nc === 0)), 'S16 after the export restore the confirmed records went with the real rows (isq ' + JSON.stringify(T.isq) + ', rlf ' + JSON.stringify(T.rlf) + '); no rebuilt quarter shows an issue or a relief');
+}
+
+// ================================================================================================================================
 // FIX-OLD an export code written by the game BEFORE the fix (main d82f847; tests/fixtures/README.md), pasted into this build
 // ================================================================================================================================
 console.log('\n-- FIX-OLD export code written before the fix (pending issue cash on PNPL, pending relief on MCSF), paste restore, first closes');
