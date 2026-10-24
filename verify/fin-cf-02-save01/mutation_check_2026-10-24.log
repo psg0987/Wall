@@ -1,0 +1,13 @@
+HEAD 0e3a39d9dcb1029e8ab0c49e8e2dd7de955493cf (src/ tests/ = HEAD), run 2026-10-24 21:50:09 KST
+ok  none (the fixed game): t_fincf02_save01 passes | t_fincf02_issue.js passes, t_fincf01_relief.js passes
+ok  M1 qBack keeps the waiting share-issue cash eqq (the defect): CAUGHT by t_fincf02_save01 (errs 0 fails 45) in S1, S1/S12, S2, S3, S4, S5a, S5c, S5d, S8, S10, S11, S13, FIX-OLD | t_fincf02_issue.js FAILS (errs 0 fails 2), t_fincf01_relief.js passes
+ok  M2 the clearing runs before the c.priv&&c.fo return (a founded company loses its waiting contribution): CAUGHT by t_fincf02_save01 (errs 0 fails 2) in S9 | t_fincf02_issue.js passes, t_fincf01_relief.js passes
+ok  M3 cleared when the export is written (packS(1), option D) instead of on the restore: CAUGHT by t_fincf02_save01 (errs 0 fails 8) in S9, FIX-OLD | t_fincf02_issue.js passes, t_fincf01_relief.js passes
+ok  M4 the first close after a restore drops everything waiting, also trades made after the restore: CAUGHT by t_fincf02_save01 (errs 0 fails 7) in S3, S4, S10 | t_fincf02_issue.js passes, t_fincf01_relief.js passes
+ok  M5 eqq cleared in v8prep instead (every load, full saves too, and bankFix every 30 days): CAUGHT by t_fincf02_save01 (errs 2 fails 14) in S3, S4, S7, S8, S9, S10, S16 | t_fincf02_issue.js FAILS (errs 0 fails 88), t_fincf01_relief.js FAILS (errs 0 fails 2)
+ok  M6a qBack keeps the waiting relief ncq (option A without A1): CAUGHT by t_fincf02_save01 (errs 0 fails 9) in S14, FIX-OLD | t_fincf02_issue.js passes, t_fincf01_relief.js FAILS (errs 0 fails 4)
+ok  M6b ncq cleared in v8prep instead (every load, full saves too, and bankFix every 30 days): CAUGHT by t_fincf02_save01 (errs 1 fails 4) in S15, S16 | t_fincf02_issue.js passes, t_fincf01_relief.js FAILS (errs 1 fails 0)
+ok  M7 cleared only after day 0 (like the FIN-CF-03A ledger start): CAUGHT by t_fincf02_save01 (errs 0 fails 4) in S11 | t_fincf02_issue.js passes, t_fincf01_relief.js passes
+ALL MUTANTS CAUGHT, unmodified game passes
+elapsed 581 s
+exit code 0
