@@ -1,0 +1,11 @@
+game sha256 6930de85162a9dbf | natural.js
+seed 20261016: 720 days | days on which >=1 live company holds a pending eqq: 145 (company-days 145) | days with a pending ncq: 0 | eqCash calls 2
+   eqCash from go src/ui2.js:674: 1 call(s), total -251.18 (e.g. NTRX day 208 -251.18)
+   eqCash from go src/ui2.js:691: 1 call(s), total 197.30 (e.g. BABX day 515 197.30)
+   ch11 calls: none
+seed 777: 720 days | days on which >=1 live company holds a pending eqq: 0 (company-days 0) | days with a pending ncq: 0 | eqCash calls 0
+   ch11 calls: none
+seed 12345: 720 days | days on which >=1 live company holds a pending eqq: 211 (company-days 269) | days with a pending ncq: 0 | eqCash calls 6
+   eqCash from bankQ src/ui2.js:593 (financial company): 5 call(s), total 40.03 (e.g. BOAX day 450 14.56; BOAX day 540 5.44; SHFN day 540 10.91)
+   eqCash from go src/ui2.js:688 (financial company): 1 call(s), total -2.70 (e.g. AXAX day 661 -2.70)
+   ch11 calls: earn src/sim.js:30 "자본잠식" x1

@@ -1,0 +1,81 @@
+game sha256 6930de85162a9dbf | repro.js
+
+[R0] the reported case: seed 20261016, issue 5 days after the close, export 10 days after the close, next close
+  current, export code (packS(1) -> loadStr): PNPL last close 117, issue day 122 cash 460.60 | restore day 127: eqq 460.60, isd -593, cash 1001.58, shares 3601.95 | last rebuilt row 37: cash 965.00 (= 1001.58 x 0.9635, rounded), shares 3602.00 | after the close isq {"207":460.5987288938939}
+  current, export code (packS(1) -> loadStr): row 207 vs previous 37 | 증자·출자 460.60 | 차입 증감 115.00 | 재무활동 534.60 | 기타·투자 매매 -538.60 | 현금 증감 64.00 | 영업 269.94 | est false | st part | nc 0.00
+  current, JSON strip emulation (used by the earlier report): PNPL last close 117, issue day 122 cash 460.60 | restore day 127: eqq 460.60, isd -593, cash 1001.58, shares 3601.95 | last rebuilt row 37: cash 965.00 (= 1001.58 x 0.9635, rounded), shares 3602.00 | after the close isq {"207":460.5987288938939}
+  current, JSON strip emulation (used by the earlier report): row 207 vs previous 37 | 증자·출자 460.60 | 차입 증감 115.00 | 재무활동 534.60 | 기타·투자 매매 -538.60 | 현금 증감 64.00 | 영업 269.94 | est false | st part | nc 0.00
+  A: PNPL last close 117, issue day 122 cash 460.60 | restore day 127: eqq 460.60, isd -593, cash 1001.58, shares 3601.95 | last rebuilt row 37: cash 965.00 (= 1001.58 x 0.9635, rounded), shares 3602.00 | after the close isq undefined
+  A: row 207 vs previous 37 | 증자·출자 0.00 | 차입 증감 115.00 | 재무활동 74.00 | 기타·투자 매매 -78.00 | 현금 증감 64.00 | 영업 269.94 | est false | st part | nc 0.00
+
+[E1] share issue mid-quarter -> export -> restore the same day -> first real close (current vs A in the same world)
+  PNPL: last close day 117; issue on day 147: cash +433.45 (measured), eqq 433.45, shares 3601.95; export and restore on day 147
+  after restore: eqq 433.45, isq undefined, isd -573 (= 147 - 720); 8 rebuilt rows, the last one day 57: cash 931.00 = today's cash 974.44 x scale 0.9554 (rounded), shares 3602.00 = today's 3601.95 (already after the issue)
+  current: row 207 vs previous 57 | 증자·출자 433.45 | 차입 증감 141.00 | 재무활동 534.45 | 기타·투자 매매 -531.45 | 현금 증감 71.00 | 영업 269.94 | est false | st part | nc 0.00
+    share-issue cash recorded on PNPL after the restore (eqCash calls): 0.00
+  A: row 207 vs previous 57 | 증자·출자 0.00 | 차입 증감 141.00 | 재무활동 101.00 | 기타·투자 매매 -98.00 | 현금 증감 71.00 | 영업 269.94 | est false | st part | nc 0.00
+    share-issue cash recorded on PNPL after the restore (eqCash calls): 0.00
+  difference current - A: 증자 433.45 | 재무활동 433.45 | 기타 -433.45 | 현금 증감 0.00 | 차입 증감 0.00 | issue cash 433.45
+
+[E2] control: the same issue with a full save (packS(), quarter rows kept, qBack does not run)
+  after restore: eqq 433.45, isd -720, rows kept 8, last row day 117 (the real close 117, before the issue)
+  full save: row 207 vs previous 117 | 증자·출자 433.45 | 차입 증감 0.00 | 재무활동 393.45 | 기타·투자 매매 -0.45 | 현금 증감 461.00 | 영업 269.94 | est false | st full | nc 0.00
+  with the measured issue cash 433.45: 재무활동 should be 393.45, 기타 -0.45 -> statement MATCHES (the issue lies between two real closes)
+
+[E3] buyback 5% mid-quarter -> export -> restore (the pending cash is negative)
+  buyback cash -312.52 (measured), eqq after restore -312.52
+  current: row 207 vs previous 57 | 증자·출자 -312.52 | 차입 증감 141.00 | 재무활동 -231.52 | 기타·투자 매매 478.52 | 현금 증감 381.00 | 영업 335.94 | est false | st part | nc 0.00
+  A: row 207 vs previous 57 | 증자·출자 0.00 | 차입 증감 141.00 | 재무활동 81.00 | 기타·투자 매매 166.00 | 현금 증감 381.00 | 영업 335.94 | est false | st part | nc 0.00
+  difference current - A: 증자 -312.52 | 기타 312.52 | 현금 증감 0.00
+
+[E4] issue X before the export AND issue Z 10 days after the restore, same quarter
+  X 463.80, Z 453.66 (both measured)
+  current: row 207 vs previous 47 | 증자·출자 917.45 | 차입 증감 27.00 | 재무활동 902.45 | 기타·투자 매매 -482.45 | 현금 증감 493.00 | 영업 274.94 | est false | st part | nc 0.00
+  A: row 207 vs previous 47 | 증자·출자 453.66 | 차입 증감 27.00 | 재무활동 438.66 | 기타·투자 매매 -18.66 | 현금 증감 493.00 | 영업 274.94 | est false | st part | nc 0.00
+  cash of the quarter that is NOT in the rebuilt starting cash = Z 453.66: current shows 917.45, A 453.66
+
+[E5] boundaries (export -> restore -> first real close). "misplaced" = 증자 shown - cash recorded after the restore
+  (a) issue, export one day before the close: pending at export 453.38 (export day 206) | first real row 207 vs rebuilt 116 (restore day 206) | current: 증자 453.38, 기타 -610.38, misplaced 453.38 | A: 증자 0.00, 기타 -157.00, misplaced 0.00
+  (b) export on the close day right after the close, no trade: pending at export 0.00 (export day 207) | first real row 297 vs rebuilt 117 (restore day 207) | current: 증자 0.00, 기타 29.00, misplaced 0.00 | A: 증자 0.00, 기타 29.00, misplaced 0.00
+  (c) close, then an issue the same day after the close, then export: pending at export 454.92 (export day 207) | first real row 297 vs rebuilt 117 (restore day 207) | current: 증자 454.92, 기타 -429.92, misplaced 454.92 | A: 증자 0.00, 기타 25.00, misplaced 0.00
+  (d) issue, then export twice (restore, export again) before any close: pending at export 463.80 (export day 137) | first real row 207 vs rebuilt 47 (restore day 137) | current: 증자 463.80, 기타 -464.80, misplaced 463.80 | A: 증자 0.00, 기타 -1.00, misplaced 0.00
+  (e) issue, the close confirms it, then export: pending at export 0.00 (export day 207) | first real row 297 vs rebuilt 117 (restore day 207) | current: 증자 0.00, 기타 24.00, misplaced 0.00 | A: 증자 0.00, 기타 24.00, misplaced 0.00
+
+[E6] natural play (no player action), export on day 540 of seed 20261016 and day 555 of seed 12345: every company with a pending eqq, at its first real close
+  seed 20261016 current: export on day 540, 1 company with a pending eqq
+    BABX: pending at export 197.30 | row 571: 증자 197.30, 기타 -218.30 | recorded after the restore 0.00 | misplaced 197.30
+  seed 20261016 A: export on day 540, 1 company with a pending eqq
+    BABX: pending at export 197.30 | row 571: 증자 0.00, 기타 -21.00 | recorded after the restore 0.00 | misplaced 0.00
+  seed 12345 current: export on day 555, 2 companies with a pending eqq
+    BOAX (financial kd1): pending at export 5.44 | row 584: 증자 5.44, 기타 -92.44 | recorded after the restore 0.00 | misplaced 5.44
+    SHFN (financial kd1): pending at export 10.91 | row 616: 증자 10.91, 기타 -47.01 | recorded after the restore 0.00 | misplaced 10.91
+  seed 12345 A: export on day 555, 2 companies with a pending eqq
+    BOAX (financial kd1): pending at export 5.44 | row 584: 증자 0.00, 기타 -87.00 | recorded after the restore 0.00 | misplaced 0.00
+    SHFN (financial kd1): pending at export 10.91 | row 616: 증자 0.00, 기타 -36.10 | recorded after the restore 0.00 | misplaced 0.00
+
+[E7] FIN-CF-01 relief waiting for its close (ncq) through an export. ch11 outside earn(): only callLoan does this in the game
+  (a) ch11() called directly after an asset write-down (synthetic)
+    PNPL: chapter 11 (bk 1), relief R waiting 945.75 -> after the export restore ncq 945.75
+    current: row 207 vs previous 57 | 증자·출자 0.00 | 차입 증감 244.75 | 재무활동 244.75 | 기타·투자 매매 -856.75 | 현금 증감 -642.00 | 영업 15.28 | est false | st part | nc 945.75
+    ncq set to 0 after the restore: row 207 vs previous 57 | 증자·출자 0.00 | 차입 증감 -701.00 | 재무활동 -701.00 | 기타·투자 매매 89.00 | 현금 증감 -642.00 | 영업 15.28 | est false | st part | nc 0.00
+    full save: row 207 vs previous 117 | 증자·출자 0.00 | 차입 증감 -799.25 | 재무활동 -799.25 | 기타·투자 매매 379.25 | 현금 증감 -450.00 | 영업 15.28 | est false | st full | nc 945.75
+    current - ncq 0: 차입 증감 945.75 | 기타 -945.75 | 현금 증감 0.00
+  (b) the real loan-call path: callLoan(bank, company, 1) after a write-down (as test F2b)
+    PNPL: chapter 11 (bk 1), relief R waiting 1786.57 -> after the export restore ncq 1786.57
+    current: row 207 vs previous 57 | 증자·출자 0.00 | 차입 증감 1719.57 | 재무활동 1719.57 | 기타·투자 매매 -1755.27 | 현금 증감 -43.00 | 영업 8.50 | est false | st part | nc 1786.57
+    ncq set to 0 after the restore: row 207 vs previous 57 | 증자·출자 0.00 | 차입 증감 -67.00 | 재무활동 -67.00 | 기타·투자 매매 31.30 | 현금 증감 -43.00 | 영업 8.50 | est false | st part | nc 0.00
+    full save: row 207 vs previous 117 | 증자·출자 0.00 | 차입 증감 -881.43 | 재무활동 -881.43 | 기타·투자 매매 379.73 | 현금 증감 -509.00 | 영업 8.50 | est false | st full | nc 1786.57
+    current - ncq 0: 차입 증감 1786.57 | 기타 -1786.57 | 현금 증감 0.00
+
+[E8] FIN-CF-03A acquisition waiting for its close (acq) through an export (qBack already drops it)
+  PNPL absorbed SNWF: pending aD at export 1117.80 -> after restore acq null, acd 147 (restore day 147), eqq 0.00
+  03A: row 207 vs previous 57 | 증자·출자 0.00 | 차입 증감 61.00 | 재무활동 10.00 | 기타·투자 매매 -53.00 | 현금 증감 42.00 | 영업 348.52 | est false | st part | nc 0.00
+  row state part, ncA 0.00
+
+[E9] founded private company (c.priv && c.fo: qBack returns at once) with a pending cash contribution through an export
+  founded MVGZ: priv 1, fo 1
+  contribution 50.00, pending 50.00 -> after restore eqq 50.00, rows 0 (not rebuilt)
+  first close after restore: 1 row(s); the first row has no previous row, so it has no cash-flow column (isq {"255":50})
+  second close: row 345 vs previous 255 | 증자·출자 0.00 | 차입 증감 0.00 | 재무활동 0.00 | 기타·투자 매매 0.30 | 현금 증감 2.00 | 영업 10.84 | est false | st full | nc 0.00
+
+done

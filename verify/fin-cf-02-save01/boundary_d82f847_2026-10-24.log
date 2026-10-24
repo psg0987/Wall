@@ -1,0 +1,29 @@
+game sha256 6930de85162a9dbf | boundary.js
+
+[E10] issue X before the export, then issue Z on the restore day right after the restore (no day passes)
+  X 433.45 before the export, Z 462.49 on restore day 147
+  current: row 207 vs 57 | 증자·출자 895.95 | 재무활동 994.95 | 기타 -530.95 | 현금 증감 537.00 | est false | st part
+  A: row 207 vs 57 | 증자·출자 462.49 | 재무활동 561.49 | 기타 -97.49 | 현금 증감 537.00 | est false | st part
+
+[E11] autosave chain: export restore -> the game writes a FULL save at once (paste / cloud / file load call save()) -> that full save is restored
+  current: eqq in the full save 433.45 (X 433.45); restored from the full save: the rebuilt rows are kept, qBack does not run
+  current: row 207 vs 57 | 증자·출자 433.45 | 재무활동 534.45 | 기타 -531.45 | 현금 증감 71.00 | est false | st part
+  A at the export restore: eqq in the full save 0.00 (X 433.45); restored from the full save: the rebuilt rows are kept, qBack does not run
+  A at the export restore: row 207 vs 57 | 증자·출자 0.00 | 재무활동 101.00 | 기타 -98.00 | 현금 증감 71.00 | est false | st part
+  -> a full save written by a build WITHOUT the fix after an export restore keeps X; a fixed build loading it cannot clear it (no qBack on a full restore)
+
+[E12] option C: move the ledger start of a rebuilt company to the restore day (isd = load day instead of load day - 720)
+  isd = load day: row 207 vs 57 | 증자·출자 433.45 | 재무활동 534.45 | 기타 -531.45 | 현금 증감 71.00 | est false | st part
+  rebuilt rows shown as estimates: 0; previous row 57 < isd 147: led false, share count unchanged (dsh false) -> the rule still takes the ledger amount (X 433.45)
+
+[E13] the tab cells of the first real row after the export restore (newest column)
+  current: 증자·출자(자사주) "433" | 차입 증감 "◐141" | 재무활동 "◐534" | 기타 "◐-531" | 현금 증감 "71.0" | page clean true
+    ◐ footnote: ※ ◐ 부분 기록 분기(27.3Q): 인수·자회사 흡수·LBO·숨은 부채 기록은 저장 데이터를 불러온 2027년 5월 28일부터예요. 그 전 같은 분기에 있었던 거래는 기록이 없어 차입 증감·기타·투자 매매에 섞여 있을 수 있어요. 기록된 거래는 반영했어요. | ≈ footnote: none
+  A: 증자·출자(자사주) "–" | 차입 증감 "◐141" | 재무활동 "◐101" | 기타 "◐-98.0" | 현금 증감 "71.0" | page clean true
+    ◐ footnote: ※ ◐ 부분 기록 분기(27.3Q): 인수·자회사 흡수·LBO·숨은 부채 기록은 저장 데이터를 불러온 2027년 5월 28일부터예요. 그 전 같은 분기에 있었던 거래는 기록이 없어 차입 증감·기타·투자 매매에 섞여 있을 수 있어요. 기록된 거래는 반영했어요. | ≈ footnote: none
+
+[E14] day-0 export: a share issue on day 0 (before any day passes), export, restore on day 0 (qBack keeps acd on day 0)
+  current: X 401.54, eqq after restore 401.54, isd -720, acd -721
+  current: row 27 vs -90 | 증자·출자 401.54 | 재무활동 353.54 | 기타 -399.54 | 현금 증감 40.00 | est false | st full
+  A: X 401.54, eqq after restore 401.54, isd -720, acd -721
+  A: row 27 vs -90 | 증자·출자 0.00 | 재무활동 -48.00 | 기타 2.00 | 현금 증감 40.00 | est false | st full

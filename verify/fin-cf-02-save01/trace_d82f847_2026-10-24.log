@@ -1,0 +1,18 @@
+game sha256 6930de85162a9dbf | trace.js
+[T] PNPL: last close 117; trade, export (packS(1)), restore (loadStr + v8fix as the paste path does), first real close, statement
+   1 day 122: eqCash(PNPL, 460.60)  [eqq 0.00, isq undefined, isd -720, rows 8 (last 117)] -> [eqq 460.60, isq undefined, isd -720, rows 8 (last 117)]
+   2 day 127: packS(1): PNPL [eqq 460.60, isq undefined, isd -720, rows 8 (last 117)] written to the export text (fq left out)
+   3 day 127: loadStr -> migrate: PNPL [eqq 460.60, isq undefined, isd -720, rows none]
+   4 day 127: v8fix() start
+   5 day 127:   v8prep(PNPL)  [eqq 460.60, isq undefined, isd -720, rows none] -> [eqq 460.60, isq undefined, isd -720, rows none]  (sets eqq / isd only when missing)
+   6 day 127:   v11prep() start: no S.IX -> full rebuild (coPrep, then bfill)
+   7 day 127:     bfill() start
+   8 day 127:       qBack(PNPL)  [eqq 460.60, isq undefined, isd -720, rows 0] -> [eqq 460.60, isq undefined, isd -593, rows 8 (last 37)]
+   9 day 127:     bfill() end
+  10 day 127:   v11prep() end
+  11 day 127: v8fix() end
+  12 day 127: after the restore: PNPL [eqq 460.60, isq undefined, isd -593, rows 8 (last 37)]
+  13 day 150:   v8prep(PNPL)  [eqq 460.60, isq undefined, isd -593, rows 8 (last 37)] -> [eqq 460.60, isq undefined, isd -593, rows 8 (last 37)]  (sets eqq / isd only when missing)
+  14 day 180:   v8prep(PNPL)  [eqq 460.60, isq undefined, isd -593, rows 8 (last 37)] -> [eqq 460.60, isq undefined, isd -593, rows 8 (last 37)]  (sets eqq / isd only when missing)
+  15 day 207: earn(PNPL) close  [eqq 460.60, isq undefined, isd -593, rows 8 (last 37)] -> [eqq 0.00, isq {"207":460.5987288938939}, isd -593, rows 8 (last 207)]
+  16 day 207: fqDerive(PNPL, row 207, previous 37): led true (prev.d 37 > isd -593), dsh false (3602 -> 3602), iss 460.60, est false, cff 534.60, oth -538.60, dc 64.00

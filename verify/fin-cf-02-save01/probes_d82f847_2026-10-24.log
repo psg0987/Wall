@@ -1,0 +1,5 @@
+game sha256 6930de85162a9dbf | probes.js
+[P1] Math.random calls: during init 0, during 200 days of play 0
+[P2] draws from the game stream during v8fix: export restore 474413 (bfill and qBack rebuild histories), full restore 0 | export code 291197 chars, full save 827141 chars (day 200)
+[P3] day 200: export JSON 764767 chars, with fq kept 1077065 (+40.8%) | deflate+base64 291176 -> 442512 (+52.0%) | the real export code 291197 chars
+[P3] day 720: export JSON 795706 chars, with fq kept 1119429 (+40.7%) | deflate+base64 306596 -> 457672 (+49.3%) | the real export code 306617 chars
