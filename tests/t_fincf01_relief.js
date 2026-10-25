@@ -88,7 +88,10 @@ function trapOn(T, log) {
 // did not change takes the recorded amount or 0. Until FIN-CF-02 this SPEC used 'share-count change x close price' for every row, i.e. it copied that defect.
 const issRule = (c, q, p) => { const led = c.isd != null && p.d > c.isd, dsh = q.sh !== p.sh; return led || !dsh ? { iss: (c.isq && c.isq[q.d]) || 0, est: false } : { iss: (q.sh - p.sh) * q.p / 1e4, est: true } };
 const specCF = (c, q, p, R) => { const fin = c.kd, dep = fin ? 0 : q.A * .02, cfo = q.ni - q.eq + q.ga + dep + (q.imp || 0) + (q.wo || 0), capex = fin ? 0 : q.gr + dep, dD = q.D - p.D,
-  ir = issRule(c, q, p), iss = ir.iss, cff = dD + R - q.dv + iss, dc = q.cs - p.cs; return { cfo, capex, dD, iss, est: ir.est, cff, dc, oth: dc - cfo + capex - cff, borrow: dD + R } };
+  ir = issRule(c, q, p), iss = ir.iss, dc = q.cs - p.cs,
+  // FIN-CF-03B: a bank's / insurer's growth gr (row value, no cash) is out of 차입 증감 when the row is fully recorded (FIN-CF-03A acd) and the previous row is a real close
+  ncG = fin && (c.acd == null || p.d > c.acd) && p.d > 0 && Number.isFinite(q.gr) ? q.gr : 0, cff = dD + R - ncG - q.dv + iss;
+  return { cfo, capex, dD, iss, est: ir.est, cff, dc, oth: dc - cfo + capex - cff, borrow: dD + R - ncG, ncG } };
 // R that belongs to each visible row, from the ledger: the relief with idx k happened while the company had closed k times, so it belongs to the (k+1)th close
 function ledgerR(T) { const cl = LED.closes[T.id] || [], map = {}; for (const r of LED.ch11) if (r.id === T.id && !r.killed) { const row = cl[r.idx]; if (row) map[row.d] = (map[row.d] || 0) + r.R } return map }
 function rowCheck(T, label) {
@@ -258,7 +261,9 @@ function uiCheck(T, lab, opt) {
     const p = L[j + 1], lb = qLab(q.d), u = unk.includes(q.d);
     if (!p) { for (const k of ['b', 'f', 'o', 'dc']) if (cellsOf[k][j] !== '–') bad.push(lb + ' oldest quarter ' + k + ' = ' + cellsOf[k][j]); return }
     const R = Rm[q.d] || 0, dep = fin ? 0 : q.A * .02, cfo = q.ni - q.eq + q.ga + dep + (q.imp || 0) + (q.wo || 0), capex = fin ? 0 : q.gr + dep, ir = issRule(T, q, p), iss = ir.iss, e = ir.est ? '≈' : '';
-    const borrow = q.D - p.D + R, cff = borrow - q.dv + iss, dc = q.cs - p.cs, oth = dc - cfo + capex - cff;
+    // FIN-CF-03B (added 2026-10-25): a bank's / insurer's growth gr (no cash) is out of 차입 증감 in a fully recorded row after a real close
+    const ncG = fin && (T.acd == null || p.d > T.acd) && p.d > 0 && Number.isFinite(q.gr) ? q.gr : 0;
+    const borrow = q.D - p.D + R - ncG, cff = borrow - q.dv + iss, dc = q.cs - p.cs, oth = dc - cfo + capex - cff;
     // FIN-CF-03A (added 2026-10-24): a quarter that began on or before the acquisition-ledger start (T.acd, the load day of a restored save) and
     // ended after it is 'partly recorded' and its 차입 / 재무활동 / 기타 cells carry '◐' (design R2 4-1); this SPEC has no acquisition term, so
     // a visible quarter with an acquisition record is reported as outside it (none of these cases has one)
@@ -293,11 +298,14 @@ console.log('\n-- TC-CF01-B1 a bank (kd 1) forced into chapter 11 outside earn()
 {
   startWorld(SEED); const T = S.co.find(c => !c.dead && c.kd === 1 && !c.priv && !mine(c) && !c.own.P && c.bk === 0 && c.A > 3000); pre(!!T, 'B1 bank ' + (T && T.tk));
   nextClose(T); nextClose(T); const S0 = snap(T); defic(T); ch11(T, 'forced bank'); const rec = LED.ch11[LED.ch11.length - 1];
-  const o = nextClose(T);
+  // FIN-CF-03B: the bank's growth at the close (earn: c.A += gr, then c.D += gr, no cash) measured from the writes, to take it out of the true borrowing
+  const gw = [], gv = { A: T.A, D: T.D }; for (const k of ['A', 'D']) Object.defineProperty(T, k, { configurable: true, enumerable: true, get() { return gv[k] }, set(x) { if (x !== gv[k]) gw.push({ k, d: x - gv[k], f: names(new Error()) }); gv[k] = x } });
+  const o = nextClose(T); for (const k of ['A', 'D']) Object.defineProperty(T, k, { configurable: true, enumerable: true, writable: true, value: gv[k] });
+  const G = gw.reduce((a, e, j) => a + (e.k === 'D' && j && gw[j - 1].k === 'A' && Math.abs(gw[j - 1].d - e.d) < 1e-9 && String(e.f).includes('earn') ? e.d : 0), 0);
   if (!T.dead && o) {
     ok(rec && !rec.killed && T.rlf && Math.abs(T.rlf.R - rec.R) < 1e-9 && T.ncq === 0, 'B1 bank relief R = ' + f2(rec && rec.R) + ' recorded: rlf ' + JSON.stringify(T.rlf));
     const L = fqL(T), Q = L[L.length - 1], P = L[L.length - 2], d = fqDerive(T, Q, P), er = o.er;
-    ok(near(d.cff - d.iss + Q.dv, (o.post.D - S0.D) + rec.R, TOL), 'B1 bank 차입 증감 ' + f2(d.cff - d.iss + Q.dv) + ' = dD(true) ' + f2(o.post.D - S0.D) + ' + R ' + f2(rec.R));
+    ok(G > 1 && near(d.cff - d.iss + Q.dv, (o.post.D - S0.D) + rec.R - G, TOL), 'B1 bank 차입 증감 ' + f2(d.cff - d.iss + Q.dv) + ' = dD(true) ' + f2(o.post.D - S0.D) + ' + R ' + f2(rec.R) + ' - growth (no cash, FIN-CF-03B) ' + f2(G));
     rowCheck(T, 'B1'); uiCheck(T, 'B1 UI', { R: ledgerR(T) });
   } else ok(false, 'B1 the bank died or did not close (dead ' + T.dead + ')');
 }

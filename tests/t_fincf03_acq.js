@@ -4,8 +4,8 @@
 // THE DEFECT (main d553d3e): fqDerive takes 차입 증감 = dD + R (R: FIN-CF-01 relief) with dD = the change of the recorded debt. Debt that
 // grows without any cash is shown as borrowing and the plug '기타·투자 매매' takes it back with the opposite sign: the target's debt taken
 // over in absorb() (sim.js, all four acquisition paths), the LBO debt G.tender puts on the target, the hidden debt hqQ finds. The cash of the
-// acquisition (cash paid, the target's cash coming in) disappears in 기타·투자 매매. (Banks' / insurers' quarterly growth gr is FIN-CF-03B,
-// left as it is here.)
+// acquisition (cash paid, the target's cash coming in) disappears in 기타·투자 매매. (Banks' / insurers' quarterly growth gr is FIN-CF-03B: since
+// 2026-10-25 it is taken out of 차입 증감 too (ncG), and the checks below expect that; tests/t_fincf03b_gr.js tests it.)
 //
 // THE DESIGN THESE TESTS PIN (field names are part of the design):
 //  - acqAdd(c, key, x) adds an unrounded amount to c.acq (the quarter that has not closed); keys aD / aP / aC = debt taken over / cash paid /
@@ -105,8 +105,8 @@ function ledgerCheck(lab, ids) { const bad = [];
 // write tracer on cs / D of a company (labelled by the innermost game function), with marks at its closes and the raw values there
 const TR = new Map();
 const frame = () => { for (const l of new Error().stack.split('\n').slice(3)) { const m = l.match(/at (?:Object\.|new )?([\w$.]+) \(/); if (m && !/^(set|trace|frame)$/.test(m[1])) return m[1] } return '?' };
-function trace(c) { if (TR.has(c.id)) return TR.get(c.id); const t = { log: [], v: { cs: c.cs, D: c.D }, obj: c }; TR.set(c.id, t);
-  for (const k of ['cs', 'D']) Object.defineProperty(c, k, { configurable: true, enumerable: true, get() { return t.v[k] }, set(x) { const d = x - t.v[k]; t.v[k] = x; if (d) t.log.push({ k, d, fr: frame(), day: S.day }) } });
+function trace(c) { if (TR.has(c.id)) return TR.get(c.id); const t = { log: [], v: { cs: c.cs, D: c.D, A: c.A }, obj: c }; TR.set(c.id, t);
+  for (const k of ['cs', 'D', 'A']) Object.defineProperty(c, k, { configurable: true, enumerable: true, get() { return t.v[k] }, set(x) { const d = x - t.v[k]; t.v[k] = x; if (d) t.log.push({ k, d, fr: frame(), day: S.day }) } });
   return t }
 // the quarter that ends with row d of company c, from the tracer: raw debt / cash change between the two closes and the writes by function;
 // the non-cash debt writes the design takes out: absorb (debt taken over), G.tender (LBO), hqQ without a cash write of its own (hidden debt;
@@ -114,10 +114,11 @@ function trace(c) { if (TR.has(c.id)) return TR.get(c.id); const t = { log: [], 
 function quarterOf(c, d) { const t = TR.get(c.id); if (!t) return null; const ms = t.log.map((e, j) => e.mark ? j : -1).filter(j => j >= 0), ib = ms.findIndex(j => t.log[j].day === d);
   if (ib < 1) return null; const ja = ms[ib - 1], jb = ms[ib], w = t.log.slice(ja + 1, jb), p = t.log[ja].raw, q = t.log[jb].raw, by = {};
   const hqCash = new Set(w.filter(e => e.k === 'cs' && e.fr === 'hqQ').map(e => e.day));
-  const nc = { absorb: 0, lbo: 0, hidden: 0, relief: 0 };
-  for (const e of w) { by[e.k + ':' + e.fr] = (by[e.k + ':' + e.fr] || 0) + e.d; if (e.k !== 'D') continue;
-    if (e.fr === 'absorb') nc.absorb += e.d; else if (e.fr === 'G.tender') nc.lbo += e.d; else if (e.fr === 'hqQ' && !hqCash.has(e.day)) nc.hidden += e.d; else if (e.fr === 'ch11x') nc.relief += e.d }
-  return { dD: q.D - p.D, dc: q.cs - p.cs, by, nc, cashBorrow: (q.D - p.D) - nc.absorb - nc.lbo - nc.hidden - nc.relief, raw: { p, q } } }
+  const nc = { absorb: 0, lbo: 0, hidden: 0, relief: 0, growth: 0 };
+  // FIN-CF-03B: a financial company's growth at the close is an A write of +x by earn followed at once by a D write of the same +x (no cash)
+  for (let j = 0; j < w.length; j++) { const e = w[j]; by[e.k + ':' + e.fr] = (by[e.k + ':' + e.fr] || 0) + e.d; if (e.k !== 'D') continue; const a = w[j - 1];
+    if (c.kd && e.fr === 'earn' && a && a.k === 'A' && a.fr === 'earn' && Math.abs(a.d - e.d) < 1e-9) nc.growth += e.d; else if (e.fr === 'absorb') nc.absorb += e.d; else if (e.fr === 'G.tender') nc.lbo += e.d; else if (e.fr === 'hqQ' && !hqCash.has(e.day)) nc.hidden += e.d; else if (e.fr === 'ch11x') nc.relief += e.d }
+  return { dD: q.D - p.D, dc: q.cs - p.cs, by, nc, cashBorrow: (q.D - p.D) - nc.absorb - nc.lbo - nc.hidden - nc.relief - nc.growth, raw: { p, q } } }
 const evIn = (id, d0, d1, f) => EVT.filter(e => e.a === id && e.day > d0 && e.day <= d1 && (!f || f(e)));
 console.log('-- harness ready');
 
@@ -203,7 +204,8 @@ function rowLedger(lab, T, ids) {
 // ---- P3 statement check of one row: A = the sum identity (holds by construction), B = item by item from measured amounts --------------------
 // measured (never the ledger): the deals of the quarter from the oracle events (only those after the ledger start in a partly recorded quarter,
 // none in a quarter closed before it), the raw debt writes from the tracer. Expected statement values use the rounded quarter rows, so the
-// raw tracer comparison of 차입 증감 has the row rounding tolerance TOLR; everything else is exact (1e-6).
+// raw tracer comparison of 차입 증감 has the row rounding tolerance TOLR (two rounded debt rows), plus the rounding of the row gr (0.5 at 10 and above,
+// 0.05 below) when FIN-CF-03B takes that rounded gr out; everything else is exact (1e-6).
 const STAT = { rows: 0, tracer: 0, maxB: 0 };
 function stmtCheck(lab, T, d, o) { o = o || {};
   const L = fqL(T), j = L.findIndex(x => x.d === d), q = L[j], p = L[j - 1]; if (!q || !p) return pre(false, lab + ': row ' + d + ' with a previous row');
@@ -214,15 +216,17 @@ function stmtCheck(lab, T, d, o) { o = o || {};
   const ev = st === 'old' ? [] : EVT.filter((e, k) => inQ(e, k) && e.day > from - (st === 'part' ? 0 : 1e9)), ab = ev.filter(e => e.a === T.id && e.tD != null), ext = ab.filter(e => !e.int), int = ab.filter(e => e.int);
   const lbo = ev.filter(e => e.label === 'LBO' && e.t === T.id).reduce((a, e) => a + e.lD, 0), hid = ev.filter(e => e.label === 'hidden' && e.t === T.id).reduce((a, e) => a + e.hD, 0);
   const ncA = ab.reduce((a, e) => a + e.tD, 0) + lbo + hid, maN = ext.reduce((a, e) => a + e.tcs - e.paid, 0), inN = int.reduce((a, e) => a + e.tcs - e.paid, 0);
-  const borrowW = dD + s.nc - ncA, cffW = borrowW - q.dv + s.iss, othW = dc - cfo + capex - cffW - maN - inN, othOld = dc - cfo + capex - (dD + s.nc - q.dv + s.iss);
+  // FIN-CF-03B: a bank's / insurer's growth gr (row value) is not borrowing when the row is fully recorded and the previous row is a real close
+  const ncG = fin && st === 'full' && p.d > 0 && Number.isFinite(q.gr) ? q.gr : 0;
+  const borrowW = dD + s.nc - ncA - ncG, cffW = borrowW - q.dv + s.iss, othW = dc - cfo + capex - cffW - maN - inN, othOld = dc - cfo + capex - (dD + s.nc - q.dv + s.iss);
   const bad = [], chk = (c, m) => { if (!c) bad.push(m) };
   chk(s.st === st, 'row state ' + s.st + ' want ' + st);
-  chk(Math.abs(s.ncA - ncA) <= 1e-6 && Math.abs(s.maN - maN) <= 1e-6 && Math.abs(s.inN - inN) <= 1e-6, 'ncA/maN/inN ' + f2(s.ncA) + '/' + f2(s.maN) + '/' + f2(s.inN) + ' want measured ' + f2(ncA) + '/' + f2(maN) + '/' + f2(inN));
+  chk((s.ncG || 0) === ncG && Math.abs(s.ncA - ncA) <= 1e-6 && Math.abs(s.maN - maN) <= 1e-6 && Math.abs(s.inN - inN) <= 1e-6, 'ncG ' + f2(s.ncG) + ' want ' + f2(ncG) + ', ncA/maN/inN ' + f2(s.ncA) + '/' + f2(s.maN) + '/' + f2(s.inN) + ' want measured ' + f2(ncA) + '/' + f2(maN) + '/' + f2(inN));
   chk(Math.abs(s.cff + q.dv - s.iss - borrowW) <= 1e-6 && Math.abs(s.cff - cffW) <= 1e-6 && Math.abs(s.oth - othW) <= 1e-6, '차입 ' + f2(s.cff + q.dv - s.iss) + ' / 재무 ' + f2(s.cff) + ' / 기타 ' + f2(s.oth) + ' want ' + f2(borrowW) + ' / ' + f2(cffW) + ' / ' + f2(othW));
-  const A = Math.abs(dc - (s.cfo - s.capex + s.cff + s.maN + s.inN + s.oth)), A2 = Math.abs((s.oth - othOld) - (ncA - maN - inN));
+  const A = Math.abs(dc - (s.cfo - s.capex + s.cff + s.maN + s.inN + s.oth)), A2 = Math.abs((s.oth - othOld) - (ncA + ncG - maN - inN));
   chk(A <= 1e-6 && A2 <= 1e-6, 'A: identity off by ' + A + ', shift from the old plug off by ' + A2);
   if (o.expect) for (const [k, v] of Object.entries(o.expect)) { const g = { b: s.cff + q.dv - s.iss, f: s.cff, m: s.maN, i: s.inN, o: s.oth }[k]; chk(Math.abs(g - v) <= .01, k + ' ' + f2(g) + ' want R2 ' + f2(v)) }
-  const qo = st === 'full' ? quarterOf(T, d) : null; if (qo) { const e = Math.abs((s.cff + q.dv - s.iss) - qo.cashBorrow); STAT.tracer++; STAT.maxB = Math.max(STAT.maxB, e); chk(e <= TOLR, 'B: 차입 증감 ' + f2(s.cff + q.dv - s.iss) + ' vs raw real borrowing from the debt writes ' + f2(qo.cashBorrow) + ' (rounding only allowed)') }
+  const qo = st === 'full' ? quarterOf(T, d) : null; if (qo) { const e = Math.abs((s.cff + q.dv - s.iss) - qo.cashBorrow); STAT.tracer++; STAT.maxB = Math.max(STAT.maxB, e); chk(e <= TOLR + (ncG ? (Math.abs(q.gr) >= 9.5 ? .5 : .05) : 0), 'B: 차입 증감 ' + f2(s.cff + q.dv - s.iss) + ' vs raw real borrowing from the debt writes ' + f2(qo.cashBorrow) + ' (rounding only allowed: two rounded debt rows' + (ncG ? ' + the rounded row gr taken out (FIN-CF-03B)' : '') + ')') }
   STAT.rows++;
   if (o.quiet && !bad.length) return true;
   let ui = '';
@@ -236,7 +240,7 @@ function stmtCheck(lab, T, d, o) { o = o || {};
   ok(!bad.length, lab + ' [' + st + ']: 차입 ' + f2(s.cff + q.dv - s.iss) + ', 재무 ' + f2(s.cff) + ', 인수 순현금 ' + f2(s.maN) + ', 자회사 흡수 ' + f2(s.inN) + ', 기타 ' + f2(s.oth) + ', 비현금 부채 ' + f2(s.ncA) + ' = measured' + (qo ? '; raw real borrowing ' + f2(qo.cashBorrow) : '') + ui + (bad.length ? ' | ' + bad.slice(0, 4).join('; ') : ''));
   return !bad.length }
 const EXP = { K1: { b: .20, f: -50.80, m: 103.03, o: -1.23 }, K2: { b: 1361.52, f: 1285.52, m: -1959.23, o: -.39 }, K3: { b: -.14, f: -69.14, m: -191.17, o: .31 },
-  K4: { b: .45, f: .45, m: 0, o: -.45 }, K5: { b: .56, f: -58.44, i: 74.92, o: -.48 }, K10: { b: 66.05, f: 58.65, m: 109.71, o: -69.46 } };
+  K4: { b: .45, f: .45, m: 0, o: -.45 }, K5: { b: .56, f: -58.44, i: 74.92, o: -.48 }, K10: { b: .05, f: -7.35, m: 109.71, o: -3.46 } };   // FIN-CF-03B: was b 66.05 / f 58.65 / o -69.46 with the bank's growth gr 66 (no cash) in 차입 증감
 function scn(key, o, expect) { SCN[key] = o; const T = S.co[o.id]; for (const d of o.ds || [o.d]) stmtCheck(key + ' statement row ' + d, T, d, { expect }) }
 console.log('\n-- P2 deals through the real game functions (seed ' + SEED + '; stakes and cash set with setOwn / fields where a case needs exact numbers)');
 
@@ -385,11 +389,11 @@ console.log('\n-- P3 Gemini cases on the statement formula (hand-made rows, no o
   ok(Math.abs(a.cs - 50) <= 1e-6 && Math.abs(a.D - 400) <= 1e-6 && same(delta(a0, a.acq), Object.assign(zero(), { aD: 200, aP: ev.paid, aC: 50 })) && Math.abs(ev.paid - 300) <= 1e-6,
     'C3-g offer with cash 100 for a price 300: cash ' + f2(a.cs) + ' (0 + 50), debt ' + f2(a.D) + ' (200 borrowed + 200 taken over); recorded ' + shR(delta(a0, a.acq)) + ' (the 200 borrowed is not in the record)');
   nextClose(a); rowLedger('C3-g close', a); scn('C3', { id: a.id, d: lastD(a) }) }
-{ // K6 banks and insurers in a quarter without any FIN-CF-03A event: the statement is the old one, no new row (gr is FIN-CF-03B)
+{ // K6 banks and insurers in a quarter without any FIN-CF-03A event: no 03A row; since FIN-CF-03B the growth gr (no cash) is out of 차입 증감
   startWorld(SEED); for (const kd of [1, 2]) { const B = S.co.find(c => !c.dead && c.kd === kd && !c.priv && c.fq && c.fq.length >= 2); trace(B); nextClose(B); nextClose(B); const d = lastD(B);
     const L = fqL(B), q = L[L.length - 1], p = L[L.length - 2], s = fqDerive(B, q, p), old = q.D - p.D + s.nc - q.dv + s.iss;
-    ok(!(B.acr && B.acr[d]) && s.cff === old && s.ncA === 0 && s.maN === 0 && s.inN === 0, 'K6 ' + B.tk + ' (kd ' + kd + ') row ' + d + ': no record, 재무활동 ' + f2(s.cff) + ' = the old formula exactly (gr ' + f2(q.gr) + ' stays in 차입 증감 ' + f2(s.cff + q.dv - s.iss) + ')');
-    stmtCheck('K6 ' + B.tk + ' statement', B, d, { noNewRows: 1, expect: kd === 1 ? { b: 49, f: 42.8, o: -48.8 } : { b: 28, f: 22.6, o: -28.6 } }) } }
+    ok(!(B.acr && B.acr[d]) && p.d > 0 && Math.abs(s.cff - (old - q.gr)) <= 1e-9 && s.ncG === q.gr && s.ncA === 0 && s.maN === 0 && s.inN === 0, 'K6 ' + B.tk + ' (kd ' + kd + ') row ' + d + ': no record, 재무활동 ' + f2(s.cff) + ' = the old formula ' + f2(old) + ' minus the growth gr ' + f2(q.gr) + ' (no cash; 차입 증감 ' + f2(s.cff + q.dv - s.iss) + ')');
+    stmtCheck('K6 ' + B.tk + ' statement', B, d, { noNewRows: 1, expect: kd === 1 ? { b: 0, f: -6.2, o: .2 } : { b: 0, f: -5.4, o: -.6 } }) } }   // FIN-CF-03B: was b 49 / f 42.8 / o -48.8 and b 28 / f 22.6 / o -28.6 (gr 49 / 28 in 차입 증감)
 
 console.log('\n-- P3 save boundaries on the statement and the tab (an old save is a save without acq / acr / acd)');
 { const setup = () => { startWorld(SEED); const T = pickTarget(); mkMine(T); nextClose(T); nextClose(T); return T };
