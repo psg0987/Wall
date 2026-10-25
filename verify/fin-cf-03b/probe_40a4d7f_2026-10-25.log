@@ -1,0 +1,36 @@
+game sha256 1e7b501d9519a79f | probe.js
+[P1] natural play seed 20261016, one bank, one insurer, one ordinary company, 3 real closes each after day 0
+P1 JPMX kd 1 g 0.0500 row 74 vs -90 st full | oracle: growth 48.35 (row gr 48.00), cash debt change 0.00 | rows: dD 61.00 | statement: 차입 증감 61.00, 재무 55.40, 기타 -59.40, 현금 증감 10.00 | 차입 증감 − cash debt = 61.00
+P1 JPMX kd 1 g 0.0500 row 164 vs 74 st full | oracle: growth 48.95 (row gr 49.00), cash debt change 0.00 | rows: dD 49.00 | statement: 차입 증감 49.00, 재무 42.80, 기타 -48.80, 현금 증감 9.00 | 차입 증감 − cash debt = 49.00
+P1 JPMX kd 1 g 0.0500 row 254 vs 164 st full | oracle: growth 49.57 (row gr 50.00), cash debt change 0.00 | rows: dD 49.00 | statement: 차입 증감 49.00, 재무 42.10, 기타 -49.10, 현금 증감 10.00 | 차입 증감 − cash debt = 49.00
+P1 AIGX kd 2 g 0.0500 row 320 vs 230 st full | oracle: growth 27.53 (row gr 28.00), cash debt change 0.00 | rows: dD 28.00 | statement: 차입 증감 28.00, 재무 22.60, 기타 -28.60, 현금 증감 8.00 | 차입 증감 − cash debt = 28.00
+P1 AIGX kd 2 g 0.0500 row 410 vs 320 st full | oracle: growth 27.88 (row gr 28.00), cash debt change 0.00 | rows: dD 27.00 | statement: 차입 증감 27.00, 재무 23.10, 기타 -27.00, 현금 증감 6.00 | 차입 증감 − cash debt = 27.00
+P1 AIGX kd 2 g 0.0500 row 500 vs 410 st full | oracle: growth 28.22 (row gr 28.00), cash debt change 0.00 | rows: dD 29.00 | statement: 차입 증감 29.00, 재무 25.50, 기타 -29.20, 현금 증감 5.00 | 차입 증감 − cash debt = 29.00
+P1 PNPL kd 0 g 0.0389 row 567 vs 477 st full | oracle: growth 67.49 (row gr 67.00), cash debt change 0.00 | rows: dD 0.00 | statement: 차입 증감 0.00, 재무 -50.00, 기타 -1.00, 현금 증감 49.00 | 차입 증감 − cash debt = 0.00
+P1 PNPL kd 0 g 0.0387 row 657 vs 567 st full | oracle: growth 67.87 (row gr 68.00), cash debt change -269.59 | rows: dD -269.00 | statement: 차입 증감 -269.00, 재무 -375.00, 기타 0.00, 현금 증감 -89.00 | 차입 증감 − cash debt = 0.59
+P1 PNPL kd 0 g 0.0386 row 747 vs 657 st full | oracle: growth 68.26 (row gr 68.00), cash debt change 0.00 | rows: dD 0.00 | statement: 차입 증감 0.00, 재무 -99.00, 기타 -1.00, 현금 증감 163.00 | 차입 증감 − cash debt = 0.00
+
+[P2] bank with real cash borrowing in the same quarter: right before its close cash is pushed below zero (earn borrows it)
+   cash taken out before the close: 367.83
+P2 JPMX kd 1 g 0.0500 row 164 vs 74 st full | oracle: growth 48.95 (row gr 49.00), cash debt change 42.92 | rows: dD 92.00 | statement: 차입 증감 92.00, 재무 87.30, 기타 -417.30, 현금 증감 -318.00 | 차입 증감 − cash debt = 49.08
+   P2 check: bk 0 -> 0, relief rlf undefined, nc 0.00, ncA 0.00; 차입 증감 − cash debt − nc = 49.08 vs growth 48.95
+
+[P3] growth boundaries on a bank and an insurer: g = 0, g = -0.08, g = +0.6 set right before the close
+P3 g=0 JPMX kd 1 g 0.0000 row 164 vs 74 st full | oracle: growth 0.00 (row gr 0.00), cash debt change 0.00 | rows: dD 0.00 | statement: 차입 증감 0.00, 재무 -6.20, 기타 0.20, 현금 증감 9.00 | 차입 증감 − cash debt = 0.00
+P3 g=-0.08 JPMX kd 1 g -0.0800 row 164 vs 74 st full | oracle: growth -78.33 (row gr -78.00), cash debt change 0.00 | rows: dD -79.00 | statement: 차입 증감 -79.00, 재무 -85.20, 기타 79.20, 현금 증감 9.00 | 차입 증감 − cash debt = -79.00
+P3 g=0.6 JPMX kd 1 g 0.6000 row 164 vs 74 st full | oracle: growth 587.45 (row gr 587.00), cash debt change 0.00 | rows: dD 587.00 | statement: 차입 증감 587.00, 재무 580.80, 기타 -586.80, 현금 증감 9.00 | 차입 증감 − cash debt = 587.00
+P3 g=0 AIGX kd 2 g 0.0000 row 140 vs 50 st full | oracle: growth 0.00 (row gr 0.00), cash debt change 0.00 | rows: dD 0.00 | statement: 차입 증감 0.00, 재무 -5.00, 기타 1.00, 현금 증감 8.00 | 차입 증감 − cash debt = 0.00
+P3 g=-0.08 AIGX kd 2 g -0.0800 row 140 vs 50 st full | oracle: growth -42.97 (row gr -43.00), cash debt change 0.00 | rows: dD -43.00 | statement: 차입 증감 -43.00, 재무 -48.00, 기타 44.00, 현금 증감 8.00 | 차입 증감 − cash debt = -43.00
+P3 g=0.6 AIGX kd 2 g 0.6000 row 140 vs 50 st full | oracle: growth 322.28 (row gr 322.00), cash debt change 0.00 | rows: dD 322.00 | statement: 차입 증감 322.00, 재무 317.00, 기타 -321.00, 현금 증감 8.00 | 차입 증감 − cash debt = 322.00
+
+[P4] rows qBack rebuilt at day 0 (new game): bank and insurer, statement of the newest rebuilt row
+P4 JPMX kd 1 rebuilt row -90 vs -180 st full: dD -30.00, row gr 48.00, 차입 증감 -30.00, 기타 20.00
+P4 AIGX kd 2 rebuilt row -90 vs -180 st full: dD 15.00, row gr 27.00, 차입 증감 15.00, 기타 -17.90
+
+[P5] natural play census, 3 seeds x 720 days: every real close of every financial company, 차입 증감 − cash debt change vs row gr
+P5 seed 20261016: financial companies 44, real closes 308, growth booked as 차입 증감 total |gr| 3566.21, max 52.74, min 0.00, negative 0, |oracle growth − row gr| max 0.495, closes where 차입 증감 − cash debt ≠ growth (>1): 0
+P5 seed 777: financial companies 44, real closes 308, growth booked as 차입 증감 total |gr| 3755.42, max 44.64, min 0.00, negative 0, |oracle growth − row gr| max 0.497, closes where 차입 증감 − cash debt ≠ growth (>1): 0
+   mismatch TJVY kd 2 row 463 vs 373: 차입 증감 5.24, cash debt 45.76, growth 5.72, nc 0.00, ncA 45.76, bk 0, st full
+P5 seed 12345: financial companies 44, real closes 308, growth booked as 차입 증감 total |gr| 4211.17, max 68.96, min 0.00, negative 0, |oracle growth − row gr| max 0.495, closes where 차입 증감 − cash debt ≠ growth (>1): 1
+
+done
