@@ -1,0 +1,177 @@
+game sha256 86b951a579fcb8db | t_fincf03b_gr.js
+-- harness ready
+
+-- F1 bank, F2 insurer, F3 ordinary company: three real closes after the first one
+pre  F1-F3 companies JPMX AIGX PNPL
+  F1 bank #1: JPMX kd 1 g 0.05 row 254 vs 164 st full | raw growth 49.57 (row gr 50.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 -1.00, 재무 -7.90, 기타 0.90, ncG 50.00
+pre  F1 bank #1: the growth line of earn ran once in the quarter (raw growth 49.57)
+ok   F1 bank #1: row gr 50.00 = raw growth 49.57 rounded by qPush
+ok   F1 bank #1: ncG 50.00 = row gr 50.00
+ok   F1 bank #1: 차입 증감 -1.00 = dD 49.00 - gr 50.00 = -1.00, 재무 -7.90 = -7.90, 기타 0.90 = 0.90
+ok   F1 bank #1: 차입 증감 -1.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+  F1 bank #2: JPMX kd 1 g 0.05 row 344 vs 254 st full | raw growth 50.19 (row gr 50.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 0.00, 재무 -7.70, 기타 0.70, ncG 50.00
+pre  F1 bank #2: the growth line of earn ran once in the quarter (raw growth 50.19)
+ok   F1 bank #2: row gr 50.00 = raw growth 50.19 rounded by qPush
+ok   F1 bank #2: ncG 50.00 = row gr 50.00
+ok   F1 bank #2: 차입 증감 0.00 = dD 50.00 - gr 50.00 = 0.00, 재무 -7.70 = -7.70, 기타 0.70 = 0.70
+ok   F1 bank #2: 차입 증감 0.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+  F1 bank #3: JPMX kd 1 g 0.05 row 434 vs 344 st full | raw growth 50.81 (row gr 51.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 0.00, 재무 -7.70, 기타 0.70, ncG 51.00
+pre  F1 bank #3: the growth line of earn ran once in the quarter (raw growth 50.81)
+ok   F1 bank #3: row gr 51.00 = raw growth 50.81 rounded by qPush
+ok   F1 bank #3: ncG 51.00 = row gr 51.00
+ok   F1 bank #3: 차입 증감 0.00 = dD 51.00 - gr 51.00 = 0.00, 재무 -7.70 = -7.70, 기타 0.70 = 0.70
+ok   F1 bank #3: 차입 증감 0.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+  F2 insurer #1: AIGX kd 2 g 0.05 row 500 vs 410 st full | raw growth 28.22 (row gr 28.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 1.00, 재무 -2.50, 기타 -1.20, ncG 28.00
+pre  F2 insurer #1: the growth line of earn ran once in the quarter (raw growth 28.22)
+ok   F2 insurer #1: row gr 28.00 = raw growth 28.22 rounded by qPush
+ok   F2 insurer #1: ncG 28.00 = row gr 28.00
+ok   F2 insurer #1: 차입 증감 1.00 = dD 29.00 - gr 28.00 = 1.00, 재무 -2.50 = -2.50, 기타 -1.20 = -1.20
+ok   F2 insurer #1: 차입 증감 1.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+  F2 insurer #2: AIGX kd 2 g 0.05 row 590 vs 500 st full | raw growth 28.58 (row gr 29.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 -1.00, 재무 -4.50, 기타 1.70, ncG 29.00
+pre  F2 insurer #2: the growth line of earn ran once in the quarter (raw growth 28.58)
+ok   F2 insurer #2: row gr 29.00 = raw growth 28.58 rounded by qPush
+ok   F2 insurer #2: ncG 29.00 = row gr 29.00
+ok   F2 insurer #2: 차입 증감 -1.00 = dD 28.00 - gr 29.00 = -1.00, 재무 -4.50 = -4.50, 기타 1.70 = 1.70
+ok   F2 insurer #2: 차입 증감 -1.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+  F2 insurer #3: AIGX kd 2 g 0.05 row 680 vs 590 st full | raw growth 28.93 (row gr 29.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 0.00, 재무 -4.10, 기타 0.10, ncG 29.00
+pre  F2 insurer #3: the growth line of earn ran once in the quarter (raw growth 28.93)
+ok   F2 insurer #3: row gr 29.00 = raw growth 28.93 rounded by qPush
+ok   F2 insurer #3: ncG 29.00 = row gr 29.00
+ok   F2 insurer #3: 차입 증감 0.00 = dD 29.00 - gr 29.00 = 0.00, 재무 -4.10 = -4.10, 기타 0.10 = 0.10
+ok   F2 insurer #3: 차입 증감 0.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+  F3 ordinary #1: PNPL kd 0 g 0.04 row 747 vs 657 st full | raw growth 68.26 (row gr 68.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 0.00, 재무 -99.00, 기타 -1.00, ncG 0.00
+pre  F3 ordinary #1: the growth line of earn ran once in the quarter (raw growth 68.26)
+ok   F3 ordinary #1: row gr 68.00 = raw growth 68.26 rounded by qPush
+ok   F3 ordinary #1: ncG 0.00 = 0 (not a financial company)
+ok   F3 ordinary #1: 차입 증감 0.00 = dD 0.00 = 0.00, 재무 -99.00 = -99.00, 기타 -1.00 = -1.00
+ok   F3 ordinary #1: 차입 증감 0.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+  F3 ordinary #2: PNPL kd 0 g 0.04 row 837 vs 747 st full | raw growth 68.66 (row gr 69.00), raw cash debt change -289.65, R 0.00, ncA 0.00 | statement 차입 -290.00, 재무 -377.00, 기타 1.00, ncG 0.00
+pre  F3 ordinary #2: the growth line of earn ran once in the quarter (raw growth 68.66)
+ok   F3 ordinary #2: row gr 69.00 = raw growth 68.66 rounded by qPush
+ok   F3 ordinary #2: ncG 0.00 = 0 (not a financial company)
+ok   F3 ordinary #2: 차입 증감 -290.00 = dD -290.00 = -290.00, 재무 -377.00 = -377.00, 기타 1.00 = 1.00
+ok   F3 ordinary #2: 차입 증감 -290.00 = the cash borrowing measured from the debt writes -289.65 (within the row rounding)
+  F3 ordinary #3: PNPL kd 0 g 0.04 row 927 vs 837 st full | raw growth 69.08 (row gr 69.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 0.00, 재무 -94.00, 기타 0.00, ncG 0.00
+pre  F3 ordinary #3: the growth line of earn ran once in the quarter (raw growth 69.08)
+ok   F3 ordinary #3: row gr 69.00 = raw growth 69.08 rounded by qPush
+ok   F3 ordinary #3: ncG 0.00 = 0 (not a financial company)
+ok   F3 ordinary #3: 차입 증감 0.00 = dD 0.00 = 0.00, 재무 -94.00 = -94.00, 기타 0.00 = 0.00
+ok   F3 ordinary #3: 차입 증감 0.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+
+-- F4 bank: cash runs short at the close (earn borrows it: real cash borrowing) and the growth of the same quarter
+pre  F4 no chapter 11 (bk 0), cash taken out 377.12
+  F4: JPMX kd 1 g 0.05 row 254 vs 164 st full | raw growth 49.57 (row gr 50.00), raw cash debt change 42.00, R 0.00, ncA 0.00 | statement 차입 41.00, 재무 35.70, 기타 -375.70, ncG 50.00
+pre  F4: the growth line of earn ran once in the quarter (raw growth 49.57)
+ok   F4: row gr 50.00 = raw growth 49.57 rounded by qPush
+ok   F4: ncG 50.00 = row gr 50.00
+ok   F4: 차입 증감 41.00 = dD 91.00 - gr 50.00 = 41.00, 재무 35.70 = 35.70, 기타 -375.70 = -375.70
+ok   F4: 차입 증감 41.00 = the cash borrowing measured from the debt writes 42.00 (within the row rounding)
+pre  F4 both are there: cash borrowing 42.00, growth 49.57
+
+-- F5 growth rate set right before the close: 0, -0.08, +0.6 (bank and insurer)
+  F5 kd 1 g 0: JPMX kd 1 g 0.00 row 254 vs 164 st full | raw growth 0.00 (row gr 0.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 0.00, 재무 -6.90, 기타 -0.10, ncG 0.00
+pre  F5 kd 1 g 0: the growth line of earn ran once in the quarter (raw growth 0.00; g 0 writes nothing)
+ok   F5 kd 1 g 0: row gr 0.00 = raw growth 0.00 rounded by qPush
+ok   F5 kd 1 g 0: ncG 0.00 = 0 (previous row rebuilt / not fully recorded)
+ok   F5 kd 1 g 0: 차입 증감 0.00 = dD 0.00 = 0.00, 재무 -6.90 = -6.90, 기타 -0.10 = -0.10
+ok   F5 kd 1 g 0: 차입 증감 0.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+ok   F5 g 0: nothing to take out (gr 0.00)
+  F5 kd 1 g -0.08: JPMX kd 1 g -0.08 row 254 vs 164 st full | raw growth -79.31 (row gr -79.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 -1.00, 재무 -7.90, 기타 0.90, ncG -79.00
+pre  F5 kd 1 g -0.08: the growth line of earn ran once in the quarter (raw growth -79.31)
+ok   F5 kd 1 g -0.08: row gr -79.00 = raw growth -79.31 rounded by qPush
+ok   F5 kd 1 g -0.08: ncG -79.00 = row gr -79.00
+ok   F5 kd 1 g -0.08: 차입 증감 -1.00 = dD -80.00 - gr -79.00 = -1.00, 재무 -7.90 = -7.90, 기타 0.90 = 0.90
+ok   F5 kd 1 g -0.08: 차입 증감 -1.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+ok   F5 negative growth is taken out with its sign (ncG -79.00)
+  F5 kd 1 g 0.6: JPMX kd 1 g 0.60 row 254 vs 164 st full | raw growth 594.80 (row gr 595.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 -1.00, 재무 -7.90, 기타 0.90, ncG 595.00
+pre  F5 kd 1 g 0.6: the growth line of earn ran once in the quarter (raw growth 594.80)
+ok   F5 kd 1 g 0.6: row gr 595.00 = raw growth 594.80 rounded by qPush
+ok   F5 kd 1 g 0.6: ncG 595.00 = row gr 595.00
+ok   F5 kd 1 g 0.6: 차입 증감 -1.00 = dD 594.00 - gr 595.00 = -1.00, 재무 -7.90 = -7.90, 기타 0.90 = 0.90
+ok   F5 kd 1 g 0.6: 차입 증감 -1.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+  F5 kd 2 g 0: AIGX kd 2 g 0.00 row 230 vs 140 st full | raw growth 0.00 (row gr 0.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 0.00, 재무 -5.00, 기타 -1.00, ncG 0.00
+pre  F5 kd 2 g 0: the growth line of earn ran once in the quarter (raw growth 0.00; g 0 writes nothing)
+ok   F5 kd 2 g 0: row gr 0.00 = raw growth 0.00 rounded by qPush
+ok   F5 kd 2 g 0: ncG 0.00 = 0 (previous row rebuilt / not fully recorded)
+ok   F5 kd 2 g 0: 차입 증감 0.00 = dD 0.00 = 0.00, 재무 -5.00 = -5.00, 기타 -1.00 = -1.00
+ok   F5 kd 2 g 0: 차입 증감 0.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+ok   F5 g 0: nothing to take out (gr 0.00)
+  F5 kd 2 g -0.08: AIGX kd 2 g -0.08 row 230 vs 140 st full | raw growth -43.51 (row gr -44.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 0.00, 재무 -5.00, 기타 -1.00, ncG -44.00
+pre  F5 kd 2 g -0.08: the growth line of earn ran once in the quarter (raw growth -43.51)
+ok   F5 kd 2 g -0.08: row gr -44.00 = raw growth -43.51 rounded by qPush
+ok   F5 kd 2 g -0.08: ncG -44.00 = row gr -44.00
+ok   F5 kd 2 g -0.08: 차입 증감 0.00 = dD -44.00 - gr -44.00 = 0.00, 재무 -5.00 = -5.00, 기타 -1.00 = -1.00
+ok   F5 kd 2 g -0.08: 차입 증감 0.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+ok   F5 negative growth is taken out with its sign (ncG -44.00)
+  F5 kd 2 g 0.6: AIGX kd 2 g 0.60 row 230 vs 140 st full | raw growth 326.31 (row gr 326.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 0.00, 재무 -5.00, 기타 -1.00, ncG 326.00
+pre  F5 kd 2 g 0.6: the growth line of earn ran once in the quarter (raw growth 326.31)
+ok   F5 kd 2 g 0.6: row gr 326.00 = raw growth 326.31 rounded by qPush
+ok   F5 kd 2 g 0.6: ncG 326.00 = row gr 326.00
+ok   F5 kd 2 g 0.6: 차입 증감 0.00 = dD 326.00 - gr 326.00 = 0.00, 재무 -5.00 = -5.00, 기타 -1.00 = -1.00
+ok   F5 kd 2 g 0.6: 차입 증감 0.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+
+-- F6 bank merger (deposits taken over: FIN-CF-03A ncA) and growth in the same quarter
+pre  F6 JPMX absorbed HNFN after 5 tries
+  F6: JPMX kd 1 g 0.05 row 254 vs 164 st full | raw growth 66.01 (row gr 66.00), raw cash debt change 0.00, R 0.00, ncA 1294.95 | statement 차입 0.05, 재무 -7.35, 기타 -3.46, ncG 66.00
+pre  F6: the growth line of earn ran once in the quarter (raw growth 66.01)
+ok   F6: row gr 66.00 = raw growth 66.01 rounded by qPush
+ok   F6: ncG 66.00 = row gr 66.00
+ok   F6: 차입 증감 0.05 = dD 1361.00 - ncA 1294.95 - gr 66.00 = 0.05, 재무 -7.35 = -7.35, 기타 -3.46 = -3.46
+ok   F6: 차입 증감 0.05 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+pre  F6 both are there: deposits taken over (ncA) 1294.95, growth 66.01
+
+-- F7 bank chapter 11 outside the close (FIN-CF-01 relief R) and growth in the same quarter
+pre  F7 relief waiting 1860.14
+  F7: JPMX kd 1 g 0.05 row 254 vs 164 st full | raw growth 24.27 (row gr 24.00), raw cash debt change -175.35, R 1860.14, ncA 0.00 | statement 차입 -175.86, 재무 -179.56, 기타 0.36, ncG 24.00
+pre  F7: the growth line of earn ran once in the quarter (raw growth 24.27)
+ok   F7: row gr 24.00 = raw growth 24.27 rounded by qPush
+ok   F7: ncG 24.00 = row gr 24.00
+ok   F7: 차입 증감 -175.86 = dD -2012.00 + R 1860.14 - gr 24.00 = -175.86, 재무 -179.56 = -179.56, 기타 0.36 = 0.36
+ok   F7: 차입 증감 -175.86 = the cash borrowing measured from the debt writes -175.35 (within the row rounding)
+pre  F7 relief in the row: R 1860.14, nc 1860.14, growth 24.27
+
+-- F8 rows rebuilt by qBack: day-0 rows, the first real close after them, an export restore (first real row part, second full), a full save
+ok   F8 day 0: the 8 rebuilt rows (days -720..-90) get no correction
+  F8 first real close (previous row rebuilt at day 0): JPMX kd 1 g 0.05 row 74 vs -90 st full | raw growth 48.35 (row gr 48.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 61.00, 재무 55.40, 기타 -59.40, ncG 0.00
+pre  F8 first real close (previous row rebuilt at day 0): the growth line of earn ran once in the quarter (raw growth 48.35)
+ok   F8 first real close (previous row rebuilt at day 0): row gr 48.00 = raw growth 48.35 rounded by qPush
+ok   F8 first real close (previous row rebuilt at day 0): ncG 0.00 = 0 (previous row rebuilt / not fully recorded)
+ok   F8 first real close (previous row rebuilt at day 0): 차입 증감 61.00 = dD 61.00 = 61.00, 재무 55.40 = 55.40, 기타 -59.40 = -59.40
+ok   F8 first real close (previous row rebuilt at day 0): not corrected (the previous row is rebuilt, its debt is made from the state at day 0 / the restore): 차입 증감 61.00
+  F8 second real close: JPMX kd 1 g 0.05 row 164 vs 74 st full | raw growth 48.95 (row gr 49.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 0.00, 재무 -6.20, 기타 0.20, ncG 49.00
+pre  F8 second real close: the growth line of earn ran once in the quarter (raw growth 48.95)
+ok   F8 second real close: row gr 49.00 = raw growth 48.95 rounded by qPush
+ok   F8 second real close: ncG 49.00 = row gr 49.00
+ok   F8 second real close: 차입 증감 0.00 = dD 49.00 - gr 49.00 = 0.00, 재무 -6.20 = -6.20, 기타 0.20 = 0.20
+ok   F8 second real close: 차입 증감 0.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+  F8 full save restore, next close: JPMX kd 1 g 0.05 row 254 vs 164 st full | raw growth 49.57 (row gr 50.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 -1.00, 재무 -7.90, 기타 0.90, ncG 50.00
+pre  F8 full save restore, next close: the growth line of earn ran once in the quarter (raw growth 49.57)
+ok   F8 full save restore, next close: row gr 50.00 = raw growth 49.57 rounded by qPush
+ok   F8 full save restore, next close: ncG 50.00 = row gr 50.00
+ok   F8 full save restore, next close: 차입 증감 -1.00 = dD 49.00 - gr 50.00 = -1.00, 재무 -7.90 = -7.90, 기타 0.90 = 0.90
+ok   F8 full save restore, next close: 차입 증감 -1.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+ok   F8 export restore: no rebuilt row is corrected (8 rows, all before the restore day 274)
+ok   F8 export restore, first real row: st part (◐), ncG 0.00 (previous row rebuilt)
+  F8 export restore, second real row: JPMX kd 1 g 0.05 row 434 vs 344 st full | raw growth 50.81 (row gr 51.00), raw cash debt change 0.00, R 0.00, ncA 0.00 | statement 차입 0.00, 재무 -7.80, 기타 0.80, ncG 51.00
+pre  F8 export restore, second real row: the growth line of earn ran once in the quarter (raw growth 50.81)
+ok   F8 export restore, second real row: row gr 51.00 = raw growth 50.81 rounded by qPush
+ok   F8 export restore, second real row: ncG 51.00 = row gr 51.00
+ok   F8 export restore, second real row: 차입 증감 0.00 = dD 51.00 - gr 51.00 = 0.00, 재무 -7.80 = -7.80, 기타 0.80 = 0.80
+ok   F8 export restore, second real row: 차입 증감 0.00 = the cash borrowing measured from the debt writes 0.00 (within the row rounding)
+
+-- F9 the 현금흐름 tab
+ok   F9 bank: memo row ["50.0","49.0","–","–"] = row gr of the corrected quarters ["50.0","49.0","–","–"]
+ok   F9 bank: 차입 증감 cells ["-1.0","0.0","61.0"] = ["-1.0","0.0","61.0"]
+ok   F9 ordinary company: no memo row
+
+-- F10 rows without a usable gr
+ok   F10 gr missing: ncG 0, 재무 42.80 (dD unchanged), 기타 -48.80
+ok   F10 gr NaN: ncG 0, 재무 42.80 (dD unchanged), 기타 -48.80
+ok   F10 gr Infinity: ncG 0, 재무 42.80 (dD unchanged), 기타 -48.80
+ok   F10 gr null: ncG 0, 재무 42.80 (dD unchanged), 기타 -48.80
+
+-- F11 census: seed 777, 720 days, every financial company, every close whose previous row is a real fully recorded close
+pre  F11 308 corrected closes checked (87 closes after a rebuilt / partly recorded row skipped)
+ok   F11 every corrected close: ncG = row gr and 차입 증감 = measured cash borrowing within the row rounding
+
+errs 0 fails 0

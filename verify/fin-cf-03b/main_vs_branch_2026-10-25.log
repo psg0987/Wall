@@ -1,0 +1,77 @@
+# run with verify/fin-cf-03b/main_vs_branch.py: main 40a4d7f, and NOTHING left out of the hashed state (LEDGER set empty) - the per-case text 'without eqq/isq/ncq/rlf' is the wording of the reused fin-cf-02-save01 script
+HEAD 855b8228647de814d5d9be73f9aa0709c0002ccd (src/ tests/ = 63cc7d3), run 2026-10-25 18:22:58 KST
+main 40a4d7f game sha256 1e7b501d9519a79f | branch (working tree) game sha256 86b951a579fcb8db
+case 0 (seed 20261016, 720 days (natural, no restore)): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 721 lines) | the four ledger fields differ on 0 of 720 days
+case 1 (seed 777, 720 days (natural, no restore)): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 721 lines) | the four ledger fields differ on 0 of 720 days
+case 2 (seed 12345, 720 days (natural, no restore)): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 721 lines) | the four ledger fields differ on 0 of 720 days
+case 3 (seed 20261016, 400 days + pick;mine on day 0, issue;export on day 147): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 401 lines) | the four ledger fields differ on 0 of 400 days
+   main  : 0 ACT pick PNPL
+   main  : 0 ACT mine PNPL mine true
+   main  : 147 ACT issue issue 433.45 eqq 433.45
+   main  : 147 ACT export export restore day 147 PNPL eqq 0.00 ncq 0.00
+case 4 (seed 20261016, 400 days + pick;mine;cash on day 0, buyback;export on day 147): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 401 lines) | the four ledger fields differ on 0 of 400 days
+   main  : 0 ACT pick PNPL
+   main  : 0 ACT mine PNPL mine true
+   main  : 0 ACT cash cash 7006.66
+   main  : 147 ACT buyback buyback -312.52
+   main  : 147 ACT export export restore day 147 PNPL eqq 0.00 ncq 0.00
+case 5 (seed 20261016, 400 days + pick;mine on day 0, issue;full on day 147): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 401 lines) | the four ledger fields differ on 0 of 400 days
+   main  : 0 ACT pick PNPL
+   main  : 0 ACT mine PNPL mine true
+   main  : 147 ACT issue issue 433.45 eqq 433.45
+   main  : 147 ACT full full restore day 147 PNPL eqq 433.45
+case 6 (seed 20261016, 720 days + pending;export on day 540): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 721 lines) | the four ledger fields differ on 0 of 720 days
+   main  : 540 ACT pending waiting eqq: BABX 197.30 | ncq: 
+   main  : 540 ACT export export restore day 540
+case 7 (seed 20261016, 400 days + pending;export on day 225): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 401 lines) | the four ledger fields differ on 0 of 400 days
+   main  : 225 ACT pending waiting eqq: NTRX -251.18 | ncq: 
+   main  : 225 ACT export export restore day 225
+case 8 (seed 12345, 720 days + pending;export on day 555): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 721 lines) | the four ledger fields differ on 0 of 720 days
+   main  : 555 ACT pending waiting eqq: BOAX 5.44, SHFN 10.91 | ncq: 
+   main  : 555 ACT export export restore day 555
+case 9 (seed 20261016, 400 days + pick on day 0, callloan;export on day 147): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 401 lines) | the four ledger fields differ on 0 of 400 days
+   main  : 0 ACT pick PNPL
+   main  : 147 ACT callloan loan call paid 788.60, debt 3160.48 -> 585.31, ncq 1786.57
+   main  : 147 ACT export export restore day 147 PNPL eqq 0.00 ncq 0.00
+case 10 (seed 20261016, 400 days + pick;mine on day 0, merge;issue;export on day 147): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 401 lines) | the four ledger fields differ on 0 of 400 days
+   main  : 0 ACT pick PNPL
+   main  : 0 ACT mine PNPL mine true
+   main  : 147 ACT merge PNPL <- SNWF dead 1 acq {"aD":1117.8}
+   main  : 147 ACT issue issue 568.31 eqq 568.31
+   main  : 147 ACT export export restore day 147 PNPL eqq 0.00 ncq 0.00
+case 11 (seed 20261016, 500 days + found on day 0, cap;export on day 275): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 501 lines) | the four ledger fields differ on 0 of 500 days
+   main  : 0 ACT found founded MVGZ priv 1 fo 1
+   main  : 275 ACT cap MVGZ eqq 50.00
+   main  : 275 ACT export export restore day 275
+case 12 (seed 20261016, 300 days + pick;mine;issue;export on day 0): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 301 lines) | the four ledger fields differ on 0 of 300 days
+   main  : 0 ACT pick PNPL
+   main  : 0 ACT mine PNPL mine true
+   main  : 0 ACT issue issue 401.54 eqq 401.54
+   main  : 0 ACT export export restore day 0 PNPL eqq 0.00 ncq 0.00
+case 13 (seed 20261016, 400 days + pick;mine on day 0, issue;export;issue;full on day 147): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 401 lines) | the four ledger fields differ on 0 of 400 days
+   main  : 0 ACT pick PNPL
+   main  : 0 ACT mine PNPL mine true
+   main  : 147 ACT issue issue 433.45 eqq 433.45
+   main  : 147 ACT export export restore day 147 PNPL eqq 0.00 ncq 0.00
+   main  : 147 ACT issue issue 462.49 eqq 462.49
+   main  : 147 ACT full full restore day 147 PNPL eqq 462.49
+case 14 (seed 20261016, 400 days + mergeext on day 147, full on day 250): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 401 lines) | the four ledger fields differ on 0 of 400 days
+   main  : 147 ACT mergeext PNPL <- SNWF dead 1 after 1
+   main  : 250 ACT full full restore day 250 PNPL eqq 0.00
+case 15 (seed 20261016, 400 days + mergesister on day 147, export on day 180): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 401 lines) | the four ledger fields differ on 0 of 400 days
+   main  : 147 ACT mergesister PNPL <- SNWF (ctl P) dead 1
+   main  : 180 ACT export export restore day 180 PNPL eqq 0.00 ncq 0.00
+case 16 (seed 777, 400 days + tenderliq on day 60, liq on day 200, full on day 260): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 401 lines) | the four ledger fields differ on 0 of 400 days
+   main  : 60 ACT tenderliq PNPL tender CRWS priv 1
+   main  : 200 ACT liq liq CRWS dead 1
+   main  : 260 ACT full full restore day 260 PNPL eqq 0.00
+case 17 (seed 12345, 400 days + lbo on day 120, export on day 150): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 401 lines) | the four ledger fields differ on 0 of 400 days
+   main  : 120 ACT lbo LBO PNPL priv 1
+   main  : 150 ACT export export restore day 150 PNPL eqq 0.00 ncq 0.00
+case 18 (seed 20261016, 400 days + offer on day 150): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 401 lines) | the four ledger fields differ on 0 of 400 days
+   main  : 150 ACT offer ALPB offer from PNPL: ALPB를 PNPL에 프리미엄 26%로 매각했습니다
+case 19 (seed 20261016, 500 days + matickown on day 60): whole state without eqq/isq/ncq/rlf and the random streams identical on every day (main == branch, 501 lines) | the four ledger fields differ on 0 of 500 days
+   main  : 60 ACT matickown PFZR (r0) holds 60% of RSHE
+ALL IDENTICAL
+elapsed 404 s
+exit code 0

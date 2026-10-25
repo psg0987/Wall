@@ -1,0 +1,13 @@
+HEAD 855b8228647de814d5d9be73f9aa0709c0002ccd (src/ tests/ = 63cc7d3), run 2026-10-25 18:16:41 KST
+ok  none (the fixed game): t_fincf03b_gr passes | t_fincf03_acq.js passes, t_fincf01_relief.js passes
+ok  M1 ncG not taken out of cff (the defect): CAUGHT by t_fincf03b_gr (errs 0 fails 33) in F1, F2, F4, F5, F6, F7, F8, F11 | t_fincf03_acq.js FAILS (errs 0 fails 960), t_fincf01_relief.js FAILS (errs 0 fails 3)
+ok  M2 sign reversed (cff + ncG): CAUGHT by t_fincf03b_gr (errs 0 fails 33) in F1, F2, F4, F5, F6, F7, F8, F11 | t_fincf03_acq.js FAILS (errs 0 fails 960), t_fincf01_relief.js FAILS (errs 0 fails 3)
+ok  M3 also on partly recorded rows (no st check): CAUGHT by t_fincf03b_gr (errs 0 fails 2) in F8 | t_fincf03_acq.js passes, t_fincf01_relief.js passes
+ok  M4 also after rows rebuilt at day 0 (no prev.d > 0): CAUGHT by t_fincf03b_gr (errs 0 fails 4) in F8 | t_fincf03_acq.js FAILS (errs 0 fails 135), t_fincf01_relief.js FAILS (errs 0 fails 2)
+ok  M5 every company, not only financial ones: CAUGHT by t_fincf03b_gr (errs 0 fails 10) in F3, F9 | t_fincf03_acq.js FAILS (errs 0 fails 9967), t_fincf01_relief.js FAILS (errs 0 fails 59)
+ok  M6 no finite check (missing gr): CAUGHT by t_fincf03b_gr (errs 0 fails 4) in F10 | t_fincf03_acq.js passes, t_fincf01_relief.js passes
+ok  M7 positive growth only: CAUGHT by t_fincf03b_gr (errs 0 fails 8) in F5 | t_fincf03_acq.js passes, t_fincf01_relief.js passes
+ok  M8 memo row missing: CAUGHT by t_fincf03b_gr (errs 0 fails 1) in F9 | t_fincf03_acq.js passes, t_fincf01_relief.js passes
+ALL MUTANTS CAUGHT, unmodified game passes
+elapsed 368 s
+exit code 0
