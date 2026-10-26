@@ -1,0 +1,25 @@
+HEAD a3f3f4fe90c971e745698f9f04d86b1b06a8a957, run 2026-10-26 11:45:30 KST: python3 tests/run.py
+PASS t12_sim.js
+PASS t13_ui.js
+PASS t14_advisor.js
+PASS t18_ai_native.js
+PASS t18_ai_web.js
+PASS t_clean_surplus.js
+PASS t_close_spec.js
+PASS t_impair_ui.js
+PASS t_bank_writeoff.js
+PASS t_bank_writeoff_cases.js
+PASS t_bank_writeoff_cashflow.js
+PASS t_reg01_bank_imp_wo.js
+PASS t_r4c_bank_tg.js
+PASS t_fincf01_relief.js
+PASS t_fincf02_issue.js
+PASS t_fincf03_acq.js
+PASS t_fincf02_save01.js
+PASS t_fincf03b_gr.js
+PASS t_auto_a4r.js
+PASS t_golden.js
+ALL PASS
+dist/game.js sha256 fa058dd29f142729
+elapsed 295 s
+exit code 0

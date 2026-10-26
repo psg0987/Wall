@@ -1,0 +1,55 @@
+HEAD 2108246b3523a2162a2f61fb6bd22f3295083192, run 2026-10-26 11:50:37 KST: python3 verify/rt-auto-risk-07/reproduce_risk06.py <handoff> 2
+branch src/sim.js git blob e6125975baf3ee4730e621399cbe868294b1572b | worlds 50 x (branch A2 vs raw A4R, handoff A2 vs raw A2)
+1189984950 combined slot0: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1189984950 combined slot1: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1189984950 combined slot2: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1189984950 combined slot3: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1189984950 combined slot4: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1189984950 normal slot0: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1189984950 normal slot1: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1189984950 normal slot2: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1189984950 normal slot3: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1189984950 normal slot4: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1209589274 combined slot0: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1209589274 combined slot1: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1209589274 combined slot2: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1209589274 combined slot3: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1209589274 combined slot4: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1209589274 normal slot0: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1209589274 normal slot1: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1209589274 normal slot2: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1209589274 normal slot3: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1209589274 normal slot4: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1897612031 combined slot0: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1897612031 combined slot1: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1897612031 combined slot2: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1897612031 combined slot3: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1897612031 combined slot4: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1897612031 normal slot0: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1897612031 normal slot1: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1897612031 normal slot2: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1897612031 normal slot3: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+1897612031 normal slot4: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+42665739 combined slot0: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+42665739 combined slot1: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+42665739 combined slot2: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+42665739 combined slot3: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+42665739 combined slot4: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+42665739 normal slot0: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+42665739 normal slot1: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+42665739 normal slot2: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+42665739 normal slot3: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+42665739 normal slot4: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+864628880 combined slot0: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+864628880 combined slot1: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+864628880 combined slot2: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+864628880 combined slot3: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+864628880 combined slot4: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+864628880 normal slot0: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+864628880 normal slot1: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+864628880 normal slot2: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+864628880 normal slot3: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+864628880 normal slot4: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+ALL 50 WORLDS MATCH (branch = raw A4R, handoff = raw A2)
+elapsed 607 s
+exit code 0

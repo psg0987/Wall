@@ -1,0 +1,20 @@
+smoke, working tree on a0209a4 + staged cleanup (src/ tests/ unchanged), run 2026-10-26 12:23:22 KST
+== 1. python3 verify/rt-auto-risk-07/reproduce_risk06.py --worlds 2   (committed ZIP, 2 jobs)
+handoff RT_AUTO_RISK_07_CLAUDE_HANDOFF.zip sha256 0c10f964f3c8d875... OK | manifest 130 files: ALL MATCH
+branch src/sim.js git blob e6125975baf3ee4730e621399cbe868294b1572b | worlds 2 x (branch A2 vs raw A4R, handoff A2 vs raw A2)
+1189984950 normal slot0: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+42665739 combined slot4: branch A2 = raw A4R: MATCH | handoff A2 = raw A2: MATCH
+ALL 2 WORLDS MATCH (branch = raw A4R, handoff = raw A2)
+exit code 0
+== 1b. python3 verify/rt-auto-risk-07/reproduce_risk06.py --check-only
+handoff RT_AUTO_RISK_07_CLAUDE_HANDOFF.zip sha256 0c10f964f3c8d875... OK | manifest 130 files: ALL MATCH
+exit code 0
+== 2. python3 tests/run.py t_auto_a4r
+PASS t_auto_a4r.js
+ALL PASS
+exit code 0
+== 3. python3 tests/run.py golden
+PASS t_golden.js
+ALL PASS
+exit code 0
+dist/game.js sha256 fa058dd29f142729

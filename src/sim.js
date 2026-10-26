@@ -164,7 +164,18 @@ S.fs=S.fs.filter(f=>{if(rnd()>.2)return true;const q=S.co.filter(c=>!c.dead&&!c.
 function rbank(){if(S.df<2)return;for(const b of S.co){if(b.dead||b.kd!==1||!b.ctl||b.ctl[0]!=="r")continue;const r=S.R[+b.ctl.slice(1)];
 for(const x of S.co){if(x.dead||x.ln!==b.id||!mine(x)||rating(x)<4||eq(x)<=0||(x.lc||0)>S.day||rnd()>.3)continue;x.frz=b.id+1;const p=callLoan(b,x,.5);L("🏦 "+r.n+"이(가) 지배하는 "+b.tk+" 은행이 "+x.tk+"의 대출 "+F(p)+"을 회수하고 신용을 동결했습니다! 거래 은행을 바꾸세요",1)}}}
 function autop(c){const r=rating(c),roa=c.ni*4/Math.max(1,c.A),gap=c.kd?0:S.dg[c.i]-S.cg[c.i];
-c.g=r>=4?0:roa>.1&&r<=2&&gap>-.01?.1:.04;c.pay=r>=4||c.nol>c.A*.05?0:.3;c.sweep=r>=3?2:1;if(!c.kd)c.ps=r<=3&&roa>.06?1:0;if(c.i===HOLD){c.g=0;c.ps=0;c.pay=0}}
+c.g=r>=4?0:roa>.1&&r<=2&&gap>-.01?.1:.04;c.pay=r>=4||c.nol>c.A*.05?0:.3;c.sweep=r>=3?2:1;if(!c.kd)c.ps=r<=3&&roa>.06?1:0;
+// RT-AUTO-RISK-07 (A4R, risk-defensive, ordinary companies only): the nonfinancial A4R rule of RT-AUTO-RISK-06, transcribed unchanged from the frozen
+// runner rt_auto_risk06_runner.js (sha256 4093762398e0...), __riskPolicy(x,"A4R") else-branch. Banks / insurers (c.kd) and holding companies keep the
+// rule above. With r <= 2 and ni > 0 it gives the same g / pay / sweep / ps as above; it stops growth, cuts dividends, repays debt and pauses R&D when
+// the rating is 3 or worse, the company loses money or cash (tc = 6% of assets) runs short.
+if(!c.kd&&c.i!==HOLD){const tc=c.A*.06;
+const halt=r>=4||(r===3&&(c.ni<=0||c.cs<tc*.5||gap<-.02))||(c.ni<0&&c.cs<tc);
+c.g=halt?0:roa>.1&&r<=2&&gap>-.01?.1:.04;
+c.pay=(r>=4||c.ni<=0||c.nol>c.A*.05||(r===3&&c.cs<tc))?0:r===3?.15:.3;
+c.sweep=r>=3||c.ni<=0?2:1;
+c.ps=r<=3&&roa>.06&&(r<=2||c.cs>=tc*.5)?1:0;}
+if(c.i===HOLD){c.g=0;c.ps=0;c.pay=0}}
 const MIS=[["첫 주식 매수","시장 탭에서 회사를 골라 +1% 매수해 보세요.",()=>S.co.some(c=>c.own.P&&!c.dead),20,"m"],
 ["첫 경영권 확보","지분 20% 이상이면서 최대 그룹이 되면 경영권을 얻습니다. 종목 화면 매매 탭의 '경영권까지' 버튼을 써 보세요.",()=>S.co.some(mine),30,"scr"],
 ["회사를 거래 주체로","위쪽 '거래 주체' 칩을 눌러 내가 지배하는 회사를 고르세요.",()=>S.te!=="P",30,"te"],

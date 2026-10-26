@@ -1,0 +1,6 @@
+# handoff reference (A4R_NONFIN_INTEGRATION_REFERENCE.js) vs RISK-06 runner + A2 baseline:
+PASS: 23814 boundary-grid cases matched RISK-06 policy + original A2 baseline; 18522 financial/HOLD preserved; 1296 normal nonfinancial cases
+exit code 0
+# the same grid with this branch's real autop (src/sim.js at 2108246) as autopMerged:
+PASS: 23814 boundary-grid cases matched RISK-06 policy + original A2 baseline; 18522 financial/HOLD preserved; 1296 normal nonfinancial cases
+exit code 0
