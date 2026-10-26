@@ -23,10 +23,18 @@ function setOwn(c,k,v){if(v<=1e-6){delete c.own[k];delete c.bs[k];if(k[0]==="c")
 const held=c=>{let t=0;for(const k in c.own)t+=c.own[k];return t};
 const pub=c=>Math.max(0,100-held(c));
 const root=k=>{if(k[0]!=="c")return k;const h=S.co[+k.slice(1)];return h&&h.ctl||k};
-function ctlAll(){for(const c of S.co)if(c.dead)c.ctl=null;
+// RT-AUTO-UX-01: detect genuinely new control transitions before the fixed-point calculation.
+// Capture only state already in memory; no save-schema changes or unrelated ON/OFF resets.
+function ctlAll(){const before=S.co.map(c=>c.dead?null:c.ctl);for(const c of S.co)if(c.dead)c.ctl=null;
 for(let it=0;it<7;it++){let ch=0;for(const c of S.co){if(c.dead)continue;const g={};for(const k in c.own){const r=root(k);g[r]=(g[r]||0)+c.own[k]}
 let b=null,m=0,m2=0;for(const r in g){const v=g[r];if(v>m){m2=m;m=v;b=r}else if(v>m2)m2=v}
-let n=m>=20&&m>m2+1e-9?b:null;if(n==="c"+c.id)n=null;if(n!==c.ctl){c.ctl=n;ch=1}}if(!ch)break}S.cd=0}
+let n=m>=20&&m>m2+1e-9?b:null;if(n==="c"+c.id)n=null;if(n!==c.ctl){c.ctl=n;ch=1}}if(!ch)break}S.cd=0;
+// A newly controlled company already flagged ON, or covered by the global auto-on-acquire option,
+// receives a decision immediately. Existing manually OFF companies are never affected.
+for(const c of S.co){if(c.dead||c.ctl!=="P"||before[c.id]==="P")continue;
+if(S.apAll)c.ap=1;
+if(c.ap)autop(c);
+}}
 const grp=(c,r)=>{let t=0;for(const k in c.own)if(root(k)===r)t+=c.own[k];return t};
 const mine=c=>c.ctl==="P"&&!c.dead;
 const rootName=r=>!r?"일반 주주":r==="P"?"나":r[0]==="r"?S.R[+r.slice(1)].n:S.co[+r.slice(1)].tk+" 그룹";

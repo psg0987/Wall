@@ -5,7 +5,7 @@ function sellK(c,k,pct,p1){const own=c.own[k]||0;pct=Math.min(pct,own);if(pct<=0
 function covX(c,pct){pct=Math.min(pct,c.sp);if(pct<=0)return null;const cost=mc(c)*pct/100*(1+pct/100*1.5),sb=c.sb*pct/c.sp,g=sb-cost,t=Math.max(0,g)*.22;S.cash+=g-t;if(g>0)S.fl.sh=1;c.sp-=pct;c.sb-=sb;if(c.sp<.01){c.sp=0;c.sb=0}c.p*=1+pct/100*1.5;rec("환매",c,cost,"나");return g-t}
 function settleX(c,m){settleNew(c,m);if(c.sp>0)covX(c,100);S.op=S.op.filter(o=>{if(o.i!==c.id)return true;S.cash+=o.nsh*Math.max(0,o.t==="C"?c.p*m-o.k:o.k-c.p*m)/1e4;return false})}
 const cost1=(c,pct)=>mc(c)*pct/100*(1+pct/100*.8)*1.01;
-function afterCtl(c,was){ctlAll();if(was!=="P"&&mine(c)){if(was&&was[0]==="r")S.fl.steal=1;if(S.apAll)c.ap=1;L("🏆 "+c.tk+" 경영권 확보! ("+eName(S.te)+" 명의)",1);return 1}if(was==="P"&&!mine(c)){L("⚠ "+c.tk+" 경영권을 잃었습니다",1);return 1}return 0}
+function afterCtl(c,was){ctlAll();if(was!=="P"&&mine(c)){if(was&&was[0]==="r")S.fl.steal=1;L("🏆 "+c.tk+" 경영권 확보! ("+eName(S.te)+" 명의)",1);return 1}if(was==="P"&&!mine(c)){L("⚠ "+c.tk+" 경영권을 잃었습니다",1);return 1}return 0}
 G.buy=(i,pct)=>{const c=S.co[i],e=teOK(),k=eKey(e);if(c.dead||c.priv)return;if(e===i)return toast("자기 회사 주식은 경영 메뉴의 '자사주 매입'을 쓰세요");
 pct=Math.min(pct,pub(c)-c.sp-4);if(pct<=.05)return toast("시장에 남은 물량이 부족합니다");const x=cost1(c,pct);
 if(!ePay(e,x))return toast("자금 부족: 필요 "+F(x)+", "+eName(e)+" 가용 "+F(eAvail(e)));const was=c.ctl;

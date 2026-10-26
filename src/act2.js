@@ -155,6 +155,20 @@ G.stab=t=>{stab=t;render();const s=$("sh");if(s)s.scrollTop=0};
 G.ps=(i,v)=>{const c=S.co[i];if(!mine(c)||c.kd)return;c.ps=v;L(c.tk+" "+PSN(c.i)+" 연 "+v+"% (사업자산 대비)",1);render()};
 G.ap=i=>{const c=S.co[i];if(!mine(c))return;c.ap=c.ap?0:1;if(c.ap)autop(c);toast(c.tk+" 자동 경영 "+(c.ap?"켜짐":"꺼짐"));render()};
 G.apAll=()=>{S.apAll=S.apAll?0:1;render()};
+// RT-AUTO-UX-01: explicit bulk actions only (never automatic cash transfers, M&A, or new growth rules).
+let autoPage=0;
+G.autoPage=n=>{autoPage=Math.max(0,n|0);render()};
+G.autoBulk=on=>{
+  if(on!==0&&on!==1)return;
+  const companies=S.co.filter(mine);
+  let changed=0;
+  for(const c of companies){if((!!c.ap)===(!!on))continue;
+    c.ap=on;
+    if(on)autop(c);
+    changed++;
+  }
+  toast("지배 회사 "+changed+"곳 자동경영 "+(on?"켜짐":"꺼짐"));render();
+};
 G.bissue=(i,f)=>{const c=S.co[i];if(!mine(c)||c.kd)return;if(c.bond>0)return toast("회사채는 한 번에 한 종류만 발행할 수 있어요. 먼저 상환하세요");const x=Math.max(0,eq(c))*f;if(x<5)return toast("자본이 작아 발행할 수 없어요");if(c.sz>S.day&&rating(c)>=4)return toast("시즈닝 기간에는 정크본드(BB 이하)를 낼 수 없어요 ("+(c.sz-S.day)+"일 남음)");
 c.D+=x;const r=rating(c);c.cs+=x*.985;c.bond=x;c.cpn=S.prime+SPR[r]+1;c.bmat=S.day+3600;S.fl.bond=1;rec("회사채 발행",c,x);L(c.tk+" 회사채 "+F(x)+" 발행 (쿠폰 "+c.cpn.toFixed(1)+"%, 10년"+(r>=4?", 정크본드":"")+")",1);render()};
 G.bcall=i=>{const c=S.co[i];if(!mine(c)||c.bond<=0)return;const px=Math.min(1.05,bd(c)*1.02),face=c.bond,cost=face*px;if(!ePay(i,cost))return toast(c.tk+" 자금 부족: 필요 "+F(cost));
