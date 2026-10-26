@@ -1,0 +1,76 @@
+game of 8b6ed6e sha256 86b951a579fcb8db | test tests/t_auto_a4r.js sha256 c338e60b5ecbf289
+-- harness ready
+
+-- G0 source of autop
+FAIL G0 autop holds the five frozen A4R statements verbatim, guarded by !c.kd && c.i !== HOLD with tc = 6% of assets, and no A4G growth restore
+FAIL G0 order: the existing A2 lines, then A4R, then the holding-company override
+
+-- G1 boundary grid (rating from the real rating() of a copy of a real company, D set to reach the band)
+pre  G1 template companies PNPL JPMX AIGX MVGZ
+pre  G1 37044 cases, every intended rating reached by the real rating() (0 missed)
+FAIL G1 every case: autop = A4R for ordinary companies, = A2 for banks / insurers / holding companies | 2904 off, e.g. PNPL r0 ni-50 cash0 gap-0.04 nol0: got g 0.04, pay 0.3, sweep 1, ps 0 want g 0, pay 0, sweep 2, ps 0; PNPL r0 ni-50 cash0 gap-0.04 nol0.05: got g 0.04, pay 0.3, sweep 1, ps 0 want g 0, pay 0, sweep 2, ps 0; PNPL r0 ni-50 cash0 gap-0.04 nol0.051: got g 0.04, pay 0, sweep 1, ps 0 want g 0, pay 0, sweep 2, ps 0
+ok   G1 ordinary companies with r <= 2 and ni > 0: 2268 / 2268 cases decide exactly as A2 (g, pay, sweep, ps)
+pre  G1 the rules differ in 2904 cases (all of them ordinary companies in distress)
+
+-- G2 natural play, autopilot on through G.ap on day 0, 720 days, every autop call compared with the rule for its inputs
+pre  G2 seed 20261016: 13 companies controlled by the player (ZGSK JLIR MEIO HNMI DHTO UNAL BUNX ALPB MCSF NTRX JPMX AIGX MVGZ)
+ok   G2 seed 20261016: G.ap turned the autopilot on and ran autop at once on day 0 for all 13
+FAIL G2 seed 20261016: 117 autop calls (90 ordinary, 27 financial / holding) all decide by their rule | 39 wrong, e.g. ZGSK@0 got g 0.04, pay 0.3, sweep 2, ps 1; JLIR@0 got g 0.04, pay 0.3, sweep 2, ps 1
+ok   G2 seed 20261016: 51 normal profitable calls (r <= 2, ni > 0) decide exactly as A2
+  info seed 20261016: ordinary calls where A4R and A2 differ (defensive rule acted): 39 e.g. ZGSK@0 r3 ni 4.4; JLIR@0 r3 ni 7.1; HNMI@0 r3 ni 16.0
+pre  G2 seed 777: 13 companies controlled by the player (TJTC NAMU MRNO CLTR QPCF PLNT KIAX MSCD NFLK FRPT JPMX AIGX HRYD)
+ok   G2 seed 777: G.ap turned the autopilot on and ran autop at once on day 0 for all 13
+FAIL G2 seed 777: 117 autop calls (90 ordinary, 27 financial / holding) all decide by their rule | 12 wrong, e.g. QPCF@0 got g 0.04, pay 0.3, sweep 2, ps 1; PLNT@0 got g 0.04, pay 0.3, sweep 2, ps 1
+ok   G2 seed 777: 78 normal profitable calls (r <= 2, ni > 0) decide exactly as A2
+  info seed 777: ordinary calls where A4R and A2 differ (defensive rule acted): 12 e.g. QPCF@0 r3 ni 24.3; PLNT@0 r3 ni 33.4; QPCF@18 r3 ni 25.2
+
+-- G3 distress states made on real companies (debt raised to reach the rating), autopilot switched on
+pre  G3 controlled: PNPL JPMX AIGX MVGZ
+FAIL G3 PNPL (kd 0) loss, cash short (halt): g 0.04, pay 0.3, sweep 1, ps 0 = A4R (A2 would give g 0.04, pay 0.3, sweep 1, ps 0)
+FAIL G3 PNPL (kd 0) rating 3, profitable, cash fine: g 0.04, pay 0.3, sweep 2, ps 1 = A4R (A2 would give g 0.04, pay 0.3, sweep 2, ps 1)
+FAIL G3 PNPL (kd 0) rating 3, profitable, cash short: g 0.04, pay 0.3, sweep 2, ps 1 = A4R (A2 would give g 0.04, pay 0.3, sweep 2, ps 1)
+ok   G3 PNPL (kd 0) rating 4: g 0, pay 0, sweep 2, ps 0 = A4R (= A2 here)
+ok   G3 PNPL (kd 0) insolvent (rating 6): g 0, pay 0, sweep 2, ps 0 = A4R (= A2 here)
+ok   G3 PNPL (kd 0) normal: g 0.1, pay 0.3, sweep 1, ps 1 = A4R (= A2 here)
+ok   G3 JPMX (kd 1) loss, cash short (halt): g 0.04, pay 0.3, sweep 1, ps 0 = A2
+ok   G3 JPMX (kd 1) rating 3, profitable, cash fine: g 0.04, pay 0.3, sweep 2, ps 0 = A2
+ok   G3 JPMX (kd 1) rating 3, profitable, cash short: g 0.04, pay 0.3, sweep 2, ps 0 = A2
+ok   G3 JPMX (kd 1) rating 4: g 0, pay 0, sweep 2, ps 0 = A2
+ok   G3 JPMX (kd 1) insolvent (rating 6): g 0, pay 0, sweep 2, ps 0 = A2
+ok   G3 JPMX (kd 1) normal: g 0.1, pay 0.3, sweep 1, ps 0 = A2
+ok   G3 AIGX (kd 2) loss, cash short (halt): g 0.04, pay 0.3, sweep 1, ps 0 = A2
+ok   G3 AIGX (kd 2) rating 3, profitable, cash fine: g 0.04, pay 0.3, sweep 2, ps 0 = A2
+ok   G3 AIGX (kd 2) rating 3, profitable, cash short: g 0.04, pay 0.3, sweep 2, ps 0 = A2
+ok   G3 AIGX (kd 2) rating 4: g 0, pay 0, sweep 2, ps 0 = A2
+ok   G3 AIGX (kd 2) insolvent (rating 6): g 0, pay 0, sweep 2, ps 0 = A2
+ok   G3 AIGX (kd 2) normal: g 0.1, pay 0.3, sweep 1, ps 0 = A2
+ok   G3 MVGZ (kd 0, HOLD) loss, cash short (halt): g 0, pay 0, sweep 1, ps 0 = A2
+ok   G3 MVGZ (kd 0, HOLD) rating 3, profitable, cash fine: g 0, pay 0, sweep 2, ps 0 = A2
+ok   G3 MVGZ (kd 0, HOLD) rating 3, profitable, cash short: g 0, pay 0, sweep 2, ps 0 = A2
+ok   G3 MVGZ (kd 0, HOLD) rating 4: g 0, pay 0, sweep 2, ps 0 = A2
+ok   G3 MVGZ (kd 0, HOLD) insolvent (rating 6): g 0, pay 0, sweep 2, ps 0 = A2
+ok   G3 MVGZ (kd 0, HOLD) normal: g 0, pay 0, sweep 1, ps 0 = A2
+
+-- G4 autopilot ON / OFF and manual settings
+pre  G4 controlled PNPL, not controlled MCSF
+ok   G4 G.ap on a company the player does not control does nothing (ap 0)
+ok   G4 ON: ap 1 and autop ran at once
+ok   G4 OFF: ap 0
+ok   G4 OFF through a close: manual pay 0.5 and g 0.07 kept, autop not called
+ok   G4 ON through a close: autop called once by earn, decided by A4R (g 0.04, pay 0.3, sweep 1, ps 1)
+
+-- G5 save compatibility
+ok   G5 full save: ap kept (1), no new save field
+ok   G5 full save: the next close decides by A4R (g 0.04, pay 0.3, sweep 1, ps 1)
+ok   G5 export save: ap kept (1), no new save field
+ok   G5 export save: the next close decides by A4R (g 0.04, pay 0.3, sweep 1, ps 1)
+pre  G5 old save (save8.json, version 12 after migrate): controlled PNPL
+ok   G5 old save: a close with the autopilot on decides by A4R, values finite (g 0.1, pay 0.3, sweep 1, ps 1)
+
+-- G6 chapter 11 with the autopilot on
+ok   G6 insolvent at the close: chapter 11 ran once (bk 1, dead false)
+ok   G6 the autopilot decided before chapter 11 by A4R on rating 6: g 0, pay 0, sweep 2, ps 0
+ok   G6 the close after chapter 11: player stake 0, control lost, autop not called (0 calls)
+
+errs 0 fails 8
+exit code 1
