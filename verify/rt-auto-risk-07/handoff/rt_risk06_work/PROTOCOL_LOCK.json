@@ -1,0 +1,64 @@
+{
+  "workId": "RT-AUTO-RISK-06",
+  "baseline": "8b6ed6e6695e0d042836a54f301076c533b55d53",
+  "seedMethod": "First five unsigned positive 31-bit numbers from SHA256(RT-AUTO-RISK-06|OOS|2026-10-26|index), indices starting 0, excluding listed previous seeds",
+  "seeds": [
+    1189984950,
+    1897612031,
+    1209589274,
+    864628880,
+    42665739
+  ],
+  "tracks": [
+    "normal",
+    "combined"
+  ],
+  "arms": [
+    "A2",
+    "A4R"
+  ],
+  "firmSlots": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "days": 720,
+  "directEV2Off": true,
+  "totalWorlds": 100,
+  "policyFrozen": true,
+  "primaryOutcome": "paired firstChapter11Day and control loss; report event-on limitations",
+  "secondary": [
+    "preWipeoutDaysRating4",
+    "preWipeoutInsolventDays",
+    "cashShortAmount",
+    "cleanPlayerBookReturnPct",
+    "stakeAdjustedPlayerBookReturnPct"
+  ],
+  "noPosthocExclusions": true,
+  "priorSeedsSorted": [
+    42,
+    777,
+    1009,
+    1013,
+    1409,
+    2027,
+    7919,
+    9001,
+    12345,
+    15427,
+    65521,
+    65537,
+    73021,
+    99991,
+    104729,
+    131071,
+    271828,
+    314159,
+    424242,
+    808017,
+    8675309,
+    20261016
+  ]
+}

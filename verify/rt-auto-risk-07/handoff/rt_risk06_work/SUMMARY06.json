@@ -1,0 +1,258 @@
+{
+  "task": "RT-AUTO-RISK-06",
+  "baseline": "8b6ed6e6695e0d042836a54f301076c533b55d53",
+  "runnerSHA256": "4093762398e09a12e2ac82d7dd621ea27b3d92818bf469e347b680a87d74ba63",
+  "protocol": {
+    "workId": "RT-AUTO-RISK-06",
+    "baseline": "8b6ed6e6695e0d042836a54f301076c533b55d53",
+    "seedMethod": "First five unsigned positive 31-bit numbers from SHA256(RT-AUTO-RISK-06|OOS|2026-10-26|index), indices starting 0, excluding listed previous seeds",
+    "seeds": [
+      1189984950,
+      1897612031,
+      1209589274,
+      864628880,
+      42665739
+    ],
+    "tracks": [
+      "normal",
+      "combined"
+    ],
+    "arms": [
+      "A2",
+      "A4R"
+    ],
+    "firmSlots": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "days": 720,
+    "directEV2Off": true,
+    "totalWorlds": 100,
+    "policyFrozen": true,
+    "primaryOutcome": "paired firstChapter11Day and control loss; report event-on limitations",
+    "secondary": [
+      "preWipeoutDaysRating4",
+      "preWipeoutInsolventDays",
+      "cashShortAmount",
+      "cleanPlayerBookReturnPct",
+      "stakeAdjustedPlayerBookReturnPct"
+    ],
+    "noPosthocExclusions": true,
+    "priorSeedsSorted": [
+      42,
+      777,
+      1009,
+      1013,
+      1409,
+      2027,
+      7919,
+      9001,
+      12345,
+      15427,
+      65521,
+      65537,
+      73021,
+      99991,
+      104729,
+      131071,
+      271828,
+      314159,
+      424242,
+      808017,
+      8675309,
+      20261016
+    ],
+    "runnerSHA256": "4093762398e09a12e2ac82d7dd621ea27b3d92818bf469e347b680a87d74ba63"
+  },
+  "actualWorlds": 100,
+  "actualPairs": 50,
+  "normal": {
+    "nPairs": 25,
+    "A2_ch11": 0,
+    "A4R_ch11": 0,
+    "rescued": 0,
+    "newHarm": 0,
+    "bothChapter11": 0,
+    "neitherChapter11": 25,
+    "rescuedCases": [],
+    "newHarmCases": [],
+    "cleanDelta": {
+      "mean": 0.019417243989625986,
+      "median": 0.0,
+      "min": 0.0,
+      "max": 0.4854310997406497
+    },
+    "cleanWinTieLoss": [
+      1,
+      24,
+      0
+    ],
+    "cleanAmongBothSurvive": {
+      "mean": 0.019417243989625986,
+      "median": 0.0,
+      "min": 0.0,
+      "max": 0.4854310997406497
+    },
+    "afterTaxDelta": {
+      "mean": 0.02385946455471718,
+      "median": 0.0,
+      "min": 0.0,
+      "max": 0.5964866138679294
+    },
+    "cashShortfallMeanDelta": 0.0,
+    "preWipeoutRiskDaysMeanDelta": 0,
+    "eventLogSame": 25,
+    "decisionLogSame": 24,
+    "bySeed": [
+      {
+        "seed": 1189984950,
+        "n": 5,
+        "A2_ch11": 0,
+        "A4R_ch11": 0,
+        "cleanMeanDelta": 0.0
+      },
+      {
+        "seed": 1897612031,
+        "n": 5,
+        "A2_ch11": 0,
+        "A4R_ch11": 0,
+        "cleanMeanDelta": 0.09708621994812994
+      },
+      {
+        "seed": 1209589274,
+        "n": 5,
+        "A2_ch11": 0,
+        "A4R_ch11": 0,
+        "cleanMeanDelta": 0.0
+      },
+      {
+        "seed": 864628880,
+        "n": 5,
+        "A2_ch11": 0,
+        "A4R_ch11": 0,
+        "cleanMeanDelta": 0.0
+      },
+      {
+        "seed": 42665739,
+        "n": 5,
+        "A2_ch11": 0,
+        "A4R_ch11": 0,
+        "cleanMeanDelta": 0.0
+      }
+    ]
+  },
+  "combined": {
+    "nPairs": 25,
+    "A2_ch11": 20,
+    "A4R_ch11": 16,
+    "rescued": 4,
+    "newHarm": 0,
+    "bothChapter11": 16,
+    "neitherChapter11": 5,
+    "rescuedCases": [
+      {
+        "seed": 1189984950,
+        "slot": 4,
+        "tk": "RGVV",
+        "A2_day": 526
+      },
+      {
+        "seed": 864628880,
+        "slot": 1,
+        "tk": "FNUV",
+        "A2_day": 553
+      },
+      {
+        "seed": 864628880,
+        "slot": 2,
+        "tk": "METX",
+        "A2_day": 545
+      },
+      {
+        "seed": 864628880,
+        "slot": 3,
+        "tk": "ALPB",
+        "A2_day": 341
+      }
+    ],
+    "newHarmCases": [],
+    "cleanDelta": {
+      "mean": 15.442291274108944,
+      "median": 0,
+      "min": -0.35615931651576016,
+      "max": 97.39644324077834
+    },
+    "cleanWinTieLoss": [
+      5,
+      16,
+      4
+    ],
+    "cleanAmongBothSurvive": {
+      "mean": 0.5128216640482305,
+      "median": -0.30138223686229715,
+      "min": -0.35615931651576016,
+      "max": 3.799623906856195
+    },
+    "afterTaxDelta": {
+      "mean": 15.546751499775958,
+      "median": 0,
+      "min": -0.1840943925656373,
+      "max": 97.39644324077834
+    },
+    "cashShortfallMeanDelta": -136.8448683240488,
+    "preWipeoutRiskDaysMeanDelta": -26.64,
+    "eventLogSame": 25,
+    "decisionLogSame": 0,
+    "bySeed": [
+      {
+        "seed": 1189984950,
+        "n": 5,
+        "A2_ch11": 5,
+        "A4R_ch11": 4,
+        "cleanMeanDelta": 19.067622544235864
+      },
+      {
+        "seed": 1897612031,
+        "n": 5,
+        "A2_ch11": 3,
+        "A4R_ch11": 3,
+        "cleanMeanDelta": 0.6996483339987796
+      },
+      {
+        "seed": 1209589274,
+        "n": 5,
+        "A2_ch11": 5,
+        "A4R_ch11": 5,
+        "cleanMeanDelta": 0
+      },
+      {
+        "seed": 864628880,
+        "n": 5,
+        "A2_ch11": 5,
+        "A4R_ch11": 2,
+        "cleanMeanDelta": 57.63101216226063
+      },
+      {
+        "seed": 42665739,
+        "n": 5,
+        "A2_ch11": 2,
+        "A4R_ch11": 2,
+        "cleanMeanDelta": -0.1868266699505491
+      }
+    ]
+  },
+  "sourceHashChecks": true,
+  "allInitialConditionsPairMatched": true,
+  "limitations": [
+    "Only 5 independent seed clusters",
+    "Each world grants player firm control without acquisition cost",
+    "Direct EV2 event shutdown is sensitivity condition, not natural game world",
+    "RNG and macro state may diverge after policy changes",
+    "PreWipeout risk days are exposure durations with competing chapter11 censoring",
+    "Clean fixed-stake pre-tax book is only a diagnostic, not actual shareholder wealth",
+    "Only nonfinancial firms examined"
+  ]
+}
