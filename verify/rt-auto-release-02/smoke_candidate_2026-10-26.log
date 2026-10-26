@@ -1,0 +1,43 @@
+# node verify/rt-auto-release-02/smoke_candidate.js <v24 index.html of main b421980> index.html android/proj/assets/index.html | branch release-v25 on b421980 + rebuilt index.html | 2026-10-26 14:36:04 KST
+v24 page web_v24_index.html sha256 688a5b5dd6c51dc0c7a7add029965a2be8a6e1e0eda775173d7a95aada3912e4
+ok   v24: P,B,I and founded HOLD under 자동 경영, Q switched on and off (ap 1,0,1,1,1)
+ok   v24 full save (localStorage, 801KB) and export code (286KB) taken on day 200, save version 12
+ok   v24 page: no page/console error (blocked external font request, not counted: https://fonts.googleapis.com/css2 net::ERR_TUNNEL_CONNECTION_FAILED)
+== candidate index.html sha256 dc61ae512e18ca840932041f11378f6a9edfa4be0a1a7fd771b78f3cfa1ddfc4
+ok   B1 v24 full save boots: day 200, 521 companies, cash, ownership and 자동 경영 flags equal
+ok   B1 restored g/pay/sweep/ps of every company equal the v24 save (nothing recomputed at load)
+ok   B2 v24 export code imports through 세이브 가져오기: same day, companies, ownership, flags and settings
+ok   B3 old_save_1ecdc53_seed12345_day440.wsr imports: day 440, save version 12, 530 companies
+ok   B3 old_save_d82f847_seed20261016_day127.wsr imports: day 127, save version 12, 517 companies
+ok   B2/B3 page: no page/console error (blocked external font request, not counted: https://fonts.googleapis.com/css2 net::ERR_TUNNEL_CONNECTION_FAILED)
+ok   B4 300 days after restore: 13 autop calls (P 3, B 3, I 3, H 4, Q 0) all equal the reference; P calls where A4R differs from A2: 0
+ok   B5b B mild distress, ratings 3/3/3/3: all 4 calls on A2; 4 of them are cases where the A4R statement would decide differently (e.g. rating 3 A2 {"g":0.04,"pay":0.3,"sweep":2,"ps":0} vs A4R-if-applied {"g":0,"pay":0,"sweep":2,"ps":0})
+ok   B5b I mild distress, ratings 3/3/3/3: all 4 calls on A2; 4 of them are cases where the A4R statement would decide differently (e.g. rating 3 A2 {"g":0.04,"pay":0.3,"sweep":2,"ps":0} vs A4R-if-applied {"g":0,"pay":0,"sweep":2,"ps":0})
+ok   B5 P (ordinary, rating 2, ni<0, cash 1% of assets): A4R {"g":0,"pay":0,"sweep":2,"ps":0} — A2 would be {"g":0.04,"pay":0.3,"sweep":1,"ps":0}
+ok   B5 B (bank, rating 5): stays on A2 {"g":0,"pay":0,"sweep":2,"ps":0}
+ok   B5 I (insurer, rating 6): stays on A2 {"g":0,"pay":0,"sweep":2,"ps":0}
+ok   B5 H (HOLD): g 0, pay 0, ps 0 {"g":0,"pay":0,"sweep":1,"ps":0}
+ok   B5 forced distress reached P, B, I, H (4 calls; skipped {})
+ok   B6 자동 경영 OFF on P: a close passed with no autop call, manual-looking settings kept (g .123, pay .456)
+ok   B6 자동 경영 ON again: exactly one immediate autop call
+ok   B1/B4-B6 page: no page/console error (blocked external font request, not counted: https://fonts.googleapis.com/css2 net::ERR_TUNNEL_CONNECTION_FAILED)
+== candidate android/proj/assets/index.html sha256 3425bf6a6c8f2b87416171bae0d1494d9ed913b6be75728daca1de2b6113c71f
+ok   B1 v24 full save boots: day 200, 521 companies, cash, ownership and 자동 경영 flags equal
+ok   B1 restored g/pay/sweep/ps of every company equal the v24 save (nothing recomputed at load)
+ok   B2 v24 export code imports through 세이브 가져오기: same day, companies, ownership, flags and settings
+ok   B3 old_save_1ecdc53_seed12345_day440.wsr imports: day 440, save version 12, 530 companies
+ok   B3 old_save_d82f847_seed20261016_day127.wsr imports: day 127, save version 12, 517 companies
+ok   B2/B3 page: no page/console error
+ok   B4 300 days after restore: 13 autop calls (P 3, B 3, I 3, H 4, Q 0) all equal the reference; P calls where A4R differs from A2: 0
+ok   B5b B mild distress, ratings 3/3/3/3: all 4 calls on A2; 4 of them are cases where the A4R statement would decide differently (e.g. rating 3 A2 {"g":0.04,"pay":0.3,"sweep":2,"ps":0} vs A4R-if-applied {"g":0,"pay":0,"sweep":2,"ps":0})
+ok   B5b I mild distress, ratings 3/3/3/3: all 4 calls on A2; 4 of them are cases where the A4R statement would decide differently (e.g. rating 3 A2 {"g":0.04,"pay":0.3,"sweep":2,"ps":0} vs A4R-if-applied {"g":0,"pay":0,"sweep":2,"ps":0})
+ok   B5 P (ordinary, rating 2, ni<0, cash 1% of assets): A4R {"g":0,"pay":0,"sweep":2,"ps":0} — A2 would be {"g":0.04,"pay":0.3,"sweep":1,"ps":0}
+ok   B5 B (bank, rating 5): stays on A2 {"g":0,"pay":0,"sweep":2,"ps":0}
+ok   B5 I (insurer, rating 6): stays on A2 {"g":0,"pay":0,"sweep":2,"ps":0}
+ok   B5 H (HOLD): g 0, pay 0, ps 0 {"g":0,"pay":0,"sweep":1,"ps":0}
+ok   B5 forced distress reached P, B, I, H (4 calls; skipped {})
+ok   B6 자동 경영 OFF on P: a close passed with no autop call, manual-looking settings kept (g .123, pay .456)
+ok   B6 자동 경영 ON again: exactly one immediate autop call
+ok   B1/B4-B6 page: no page/console error
+ALL OK
+exit code 0

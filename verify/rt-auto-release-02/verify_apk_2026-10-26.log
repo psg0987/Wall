@@ -1,0 +1,46 @@
+# python3 verify/rt-auto-release-02/verify_apk.py dist/raider-tycoon-2.5.apk dist/raider-tycoon-2.4.apk 3425bf6a… | 2026-10-26 14:36:21 KST
+dist/raider-tycoon-2.5.apk
+  apk_sha256    1e9bf29676988c524b75f179bd3e8961c18a3d292ba1cc2be5c81117c3ae936f
+  bytes         21805386
+  badging       package: name='com.wsr.tycoon' versionCode='25' versionName='2.5'
+  cert_sha256   38dd881076ebc1810eef1bf44bfa5f0ff0e6473138324a188b8edb30c17e24d8
+  cert_subject  C=KR,O=Raider Tycoon (personal build),CN=Raider Tycoon
+  cert_valid    2026-10-01..2066-09-21
+  asset_sha256  3425bf6a6c8f2b87416171bae0d1494d9ed913b6be75728daca1de2b6113c71f
+  v2            signature OK, content digest OK, cert key = signer key
+dist/raider-tycoon-2.4.apk
+  apk_sha256    69258eb583138ad7109540b654629e13ec755c2002f31ea95c88186338ba6a16
+  bytes         21804662
+  badging       package: name='com.wsr.tycoon' versionCode='24' versionName='2.4'
+  cert_sha256   38dd881076ebc1810eef1bf44bfa5f0ff0e6473138324a188b8edb30c17e24d8
+  cert_subject  C=KR,O=Raider Tycoon (personal build),CN=Raider Tycoon
+  cert_valid    2026-10-01..2066-09-21
+  asset_sha256  dc0d44bd68b7a5fddd5e2595f61e78237dfa1e735011d8a8be813042eff55a9d
+  v2            signature OK, content digest OK, cert key = signer key
+PASS same signing certificate
+PASS same package
+PASS asset = expected 3425bf6a6c8f2b87
+exit code 0
+
+# same check against the released APK 2.3
+dist/raider-tycoon-2.5.apk
+  apk_sha256    1e9bf29676988c524b75f179bd3e8961c18a3d292ba1cc2be5c81117c3ae936f
+  bytes         21805386
+  badging       package: name='com.wsr.tycoon' versionCode='25' versionName='2.5'
+  cert_sha256   38dd881076ebc1810eef1bf44bfa5f0ff0e6473138324a188b8edb30c17e24d8
+  cert_subject  C=KR,O=Raider Tycoon (personal build),CN=Raider Tycoon
+  cert_valid    2026-10-01..2066-09-21
+  asset_sha256  3425bf6a6c8f2b87416171bae0d1494d9ed913b6be75728daca1de2b6113c71f
+  v2            signature OK, content digest OK, cert key = signer key
+(released, outside repo) raider-tycoon-2.3.apk
+  apk_sha256    12b11f63e08edaecb530c4375241e25a668a128cc3d6fddcbdc3bbc36a3cfcef
+  bytes         21798190
+  badging       package: name='com.wsr.tycoon' versionCode='23' versionName='2.3'
+  cert_sha256   38dd881076ebc1810eef1bf44bfa5f0ff0e6473138324a188b8edb30c17e24d8
+  cert_subject  C=KR,O=Raider Tycoon (personal build),CN=Raider Tycoon
+  cert_valid    2026-10-01..2066-09-21
+  asset_sha256  c754c19f99fca266c860c4316c615c60223c557bcf292b1fc97e3c3de10b1e72
+  v2            signature OK, content digest OK, cert key = signer key
+PASS same signing certificate
+PASS same package
+exit code 0

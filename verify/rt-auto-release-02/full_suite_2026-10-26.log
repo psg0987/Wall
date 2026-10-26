@@ -1,0 +1,24 @@
+# RT-AUTO-RELEASE-02-CANDIDATE full suite | HEAD b4219808662a441aad596fd597c7f7a804c1ba55 | 2026-10-26T05:30:40Z | run alone except: APK build, verify_apk and smoke ran in parallel in other processes (separate files)
+PASS t12_sim.js
+PASS t13_ui.js
+PASS t14_advisor.js
+PASS t18_ai_native.js
+PASS t18_ai_web.js
+PASS t_clean_surplus.js
+PASS t_close_spec.js
+PASS t_impair_ui.js
+PASS t_bank_writeoff.js
+PASS t_bank_writeoff_cases.js
+PASS t_bank_writeoff_cashflow.js
+PASS t_reg01_bank_imp_wo.js
+PASS t_r4c_bank_tg.js
+PASS t_fincf01_relief.js
+PASS t_fincf02_issue.js
+PASS t_fincf03_acq.js
+PASS t_fincf02_save01.js
+PASS t_fincf03b_gr.js
+PASS t_auto_a4r.js
+PASS t_golden.js
+ALL PASS
+exit code 0
+elapsed 341s

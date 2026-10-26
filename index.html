@@ -660,7 +660,18 @@ S.fs=S.fs.filter(f=>{if(rnd()>.2)return true;const q=S.co.filter(c=>!c.dead&&!c.
 function rbank(){if(S.df<2)return;for(const b of S.co){if(b.dead||b.kd!==1||!b.ctl||b.ctl[0]!=="r")continue;const r=S.R[+b.ctl.slice(1)];
 for(const x of S.co){if(x.dead||x.ln!==b.id||!mine(x)||rating(x)<4||eq(x)<=0||(x.lc||0)>S.day||rnd()>.3)continue;x.frz=b.id+1;const p=callLoan(b,x,.5);L("🏦 "+r.n+"이(가) 지배하는 "+b.tk+" 은행이 "+x.tk+"의 대출 "+F(p)+"을 회수하고 신용을 동결했습니다! 거래 은행을 바꾸세요",1)}}}
 function autop(c){const r=rating(c),roa=c.ni*4/Math.max(1,c.A),gap=c.kd?0:S.dg[c.i]-S.cg[c.i];
-c.g=r>=4?0:roa>.1&&r<=2&&gap>-.01?.1:.04;c.pay=r>=4||c.nol>c.A*.05?0:.3;c.sweep=r>=3?2:1;if(!c.kd)c.ps=r<=3&&roa>.06?1:0;if(c.i===HOLD){c.g=0;c.ps=0;c.pay=0}}
+c.g=r>=4?0:roa>.1&&r<=2&&gap>-.01?.1:.04;c.pay=r>=4||c.nol>c.A*.05?0:.3;c.sweep=r>=3?2:1;if(!c.kd)c.ps=r<=3&&roa>.06?1:0;
+// RT-AUTO-RISK-07 (A4R, risk-defensive, ordinary companies only): the nonfinancial A4R rule of RT-AUTO-RISK-06, transcribed unchanged from the frozen
+// runner rt_auto_risk06_runner.js (sha256 4093762398e0...), __riskPolicy(x,"A4R") else-branch. Banks / insurers (c.kd) and holding companies keep the
+// rule above. With r <= 2 and ni > 0 it gives the same g / pay / sweep / ps as above; it stops growth, cuts dividends, repays debt and pauses R&D when
+// the rating is 3 or worse, the company loses money or cash (tc = 6% of assets) runs short.
+if(!c.kd&&c.i!==HOLD){const tc=c.A*.06;
+const halt=r>=4||(r===3&&(c.ni<=0||c.cs<tc*.5||gap<-.02))||(c.ni<0&&c.cs<tc);
+c.g=halt?0:roa>.1&&r<=2&&gap>-.01?.1:.04;
+c.pay=(r>=4||c.ni<=0||c.nol>c.A*.05||(r===3&&c.cs<tc))?0:r===3?.15:.3;
+c.sweep=r>=3||c.ni<=0?2:1;
+c.ps=r<=3&&roa>.06&&(r<=2||c.cs>=tc*.5)?1:0;}
+if(c.i===HOLD){c.g=0;c.ps=0;c.pay=0}}
 const MIS=[["첫 주식 매수","시장 탭에서 회사를 골라 +1% 매수해 보세요.",()=>S.co.some(c=>c.own.P&&!c.dead),20,"m"],
 ["첫 경영권 확보","지분 20% 이상이면서 최대 그룹이 되면 경영권을 얻습니다. 종목 화면 매매 탭의 '경영권까지' 버튼을 써 보세요.",()=>S.co.some(mine),30,"scr"],
 ["회사를 거래 주체로","위쪽 '거래 주체' 칩을 눌러 내가 지배하는 회사를 고르세요.",()=>S.te!=="P",30,"te"],
@@ -1251,13 +1262,16 @@ const fqL=c=>(c.fq||[]).map(fqo);
 // same for a company the acquirer held more than 50% of directly just before (a simplification for the company-by-company statements).
 // st: 'old' = the row closed before the ledger started (c.acd; a save made before FIN-CF-03A): no record, shown as before, footnote;
 // 'part' = the quarter began before the ledger (load day) and ended after it: what was recorded is used, the cells are marked ◐;
-// 'full' = recorded from start to end. Banks' / insurers' growth gr stays in 차입 증감 (FIN-CF-03B).
+// 'full' = recorded from start to end.
+// FIN-CF-03B: a bank / insurer (c.kd) grows at the close by c.A += gr; c.D += gr (earn) with no cash, so ncG = q.gr (the growth stored in the row) is
+// taken out of 차입 증감 / 재무활동 like ncA, only when the row is 'full' and the previous row is a real close (prev.d > 0: rows rebuilt at day 0 are dated
+// before day 0; after an export restore the first real row is 'part'), whose debt change really holds that growth; a missing / non-finite gr counts 0.
 function fqDerive(c,q,prev){const x=SX[c.i]||SX[0],fin=c.kd,gp=fin?q.rev:Math.max(q.op+q.rd+q.rev*.04,q.rev*x.gm),sga=fin?Math.max(0,q.rev-q.op):gp-q.op-q.rd,cogs=fin?0:q.rev-gp,
 pre=q.op-q.it+q.ii-q.ga,dep=fin?0:q.A*.02,cfo=q.ni-q.eq+q.ga+dep+(q.imp||0)+(q.wo||0),capex=fin?0:q.gr+dep,dD=prev?q.D-prev.D:null,led=!!(prev&&c&&c.isd!=null&&prev.d>c.isd),dsh=!!prev&&q.sh!==prev.sh,iss=!prev?0:led||!dsh?(c&&c.isq&&c.isq[q.d]||0):(q.sh-prev.sh)*q.p/1e4,est=!led&&dsh,
 nc=prev&&c&&c.rlf&&c.rlf.d===q.d&&isFinite(c.rlf.R)?c.rlf.R:0,unk=prev&&!(c&&c.rlf&&c.rlf.d===q.d)&&c&&c.bk>0&&c.cfd!=null&&prev.d<c.cfd&&q.A>0&&Math.abs(q.A+q.cs+q.gw+q.pv-q.D-.15*q.A)<=3,
-st=!prev||!c?null:c.acd==null||prev.d>c.acd?"full":q.d<=c.acd?"old":"part",A3=(st==="part"||st==="full")&&c.acr&&c.acr[q.d]||null,ncA=A3?A3.aD+A3.iD+A3.lD+A3.hD:0,maN=A3?A3.aC-A3.aP:0,inN=A3?A3.iC-A3.iP:0,
-cff=prev?dD+nc-ncA-q.dv+iss:null,dc=prev?q.cs-prev.cs:null,oth=prev?dc-cfo+capex-cff-maN-inN:null,bank=fin?0:Math.max(0,q.D-q.bond-q.pa),eq0=q.A+q.cs+q.gw+q.pv-q.D;
-return{gp,sga,cogs,pre,dep,cfo,capex,cff,dc,oth,nc,unk:!!unk,est,bank,eqv:eq0,wc:fin?0:q.A*.18,ppe:fin?0:q.A*.82,fcf:cfo-capex,iss,st,ncA,maN,inN,ax:!!(A3&&(A3.aD||A3.aP||A3.aC)),ix:!!(A3&&(A3.iD||A3.iP||A3.iC))}}
+st=!prev||!c?null:c.acd==null||prev.d>c.acd?"full":q.d<=c.acd?"old":"part",A3=(st==="part"||st==="full")&&c.acr&&c.acr[q.d]||null,ncA=A3?A3.aD+A3.iD+A3.lD+A3.hD:0,ncG=fin&&st==="full"&&prev&&prev.d>0&&Number.isFinite(q.gr)?q.gr:0,maN=A3?A3.aC-A3.aP:0,inN=A3?A3.iC-A3.iP:0,
+cff=prev?dD+nc-ncA-ncG-q.dv+iss:null,dc=prev?q.cs-prev.cs:null,oth=prev?dc-cfo+capex-cff-maN-inN:null,bank=fin?0:Math.max(0,q.D-q.bond-q.pa),eq0=q.A+q.cs+q.gw+q.pv-q.D;
+return{gp,sga,cogs,pre,dep,cfo,capex,cff,dc,oth,nc,unk:!!unk,est,bank,eqv:eq0,wc:fin?0:q.A*.18,ppe:fin?0:q.A*.82,fcf:cfo-capex,iss,st,ncA,ncG,maN,inN,ax:!!(A3&&(A3.aD||A3.aP||A3.aC)),ix:!!(A3&&(A3.iD||A3.iP||A3.iC))}}
 function ttm(L,k){if(L.length<4)return null;return L.slice(-4).reduce((a,q)=>a+q[k],0)}
 function fRatios(c){const L=fqL(c);if(L.length<1)return null;const q=L[L.length-1],d=fqDerive(c,q,L[L.length-2]),ni=ttm(L,"ni"),op=ttm(L,"op"),rev=ttm(L,"rev"),dv=ttm(L,"dv"),it=ttm(L,"it"),m=mc(c),eqv=Math.max(1e-9,eq(c)),
 eps=ni!=null?ni*1e4/c.sh:null,bps=eqv*1e4/c.sh,ya=L.length>=8?L.slice(-8,-4):null,g=(k)=>ya&&ttm(L,k)!=null?(ttm(L,k)/Math.max(1e-9,Math.abs(ya.reduce((a,z)=>a+z[k],0)))-(ya.reduce((a,z)=>a+z[k],0)<0?-1:1))*100:null;
@@ -1301,7 +1315,7 @@ if(fseg===1)return h+fTable(c,[["매출액",q=>q.rev],["매출원가",(q,d)=>fin
 ["-","주당·비율"],["EPS (원)",q=>q.ni*1e4/q.sh,"krw"],["영업이익률",q=>q.rev?q.op/q.rev*100:null,"pct",T=>T.rev?T.op/T.rev*100:null],["순이익률",q=>q.rev?q.ni/q.rev*100:null,"pct",T=>T.rev?T.ni/T.rev*100:null],["배당 지급",q=>q.dv]],{ttm:1})+`<div class="mu" style="margin-top:6px;line-height:1.6">매출에서 원가와 판관비를 빼면 영업이익, 여기서 이자·세금 등을 빼면 순이익이에요. 지분법 이익은 20% 이상 가진 회사의 이익 중 내 몫입니다.</div>`;
 if(fseg===2)return h+fTable(c,[["현금",q=>q.cs],[fin?"대출·운용 자산":"매출채권·재고",(q,d)=>fin?q.A:d.wc],["유형자산(설비)",(q,d)=>fin?null:d.ppe],["영업권",q=>q.gw],["투자 지분",q=>q.pv],["자산총계",q=>q.A+q.cs+q.gw+q.pv,"b"],["-","부채"],
 ...(fin?[[c.kd===1?"예금":"보험 부채",q=>q.D]]:[["은행 차입",(q,d)=>d.bank],["회사채",q=>q.bond],["대여금(내가 빌려줌)",q=>q.pa]]),["부채총계",q=>q.D,"b"],["자본총계",(q,d)=>d.eqv,"b"],["부채비율",(q,d)=>d.eqv>0?q.D/d.eqv*100:null,"pct"],["주당순자산 BPS",(q,d)=>d.eqv*1e4/q.sh],["발행주식(만주)",q=>q.sh]])+`<div class="mu" style="margin-top:6px;line-height:1.6">자산 = 부채 + 자본. 부채비율이 높을수록 이자 부담과 파산 위험이 커져요.</div>`;
-if(fseg===3)return h+fTable(c,[["순이익",q=>q.ni],["감가상각(비현금)",(q,d)=>d.dep],["지분법·상각 조정",q=>q.ga-q.eq],...(fqL(c).some(q=>q.imp||q.wo)?[["손상·대손상각(비현금 조정)",q=>(q.imp||0)+(q.wo||0)]]:[]),["영업활동 현금흐름",(q,d)=>d.cfo,"b"],["설비투자",(q,d)=>fin?null:-d.capex],["잉여현금흐름 FCF",(q,d)=>fin?null:d.fcf,"b"],["차입 증감",(q,d)=>d.cff==null?null:d.unk?"미확인":cfM(d,0,d.cff+q.dv-d.iss)],["배당 지급",q=>-q.dv],["증자·출자(자사주)",(q,d)=>d.est?"≈"+fN(d.iss):d.iss||null],["재무활동 현금흐름",(q,d)=>d.unk?"미확인":cfM(d,d.est,d.cff),"b"],...(cfAx(c,"ax")?[["인수 순현금",(q,d)=>d.cff!=null&&d.ax?cfM(d,0,d.maN):null]]:[]),...(cfAx(c,"ix")?[["자회사 흡수·투자회수(순현금)",(q,d)=>d.cff!=null&&d.ix?cfM(d,0,d.inN):null]]:[]),["기타·투자 매매",(q,d)=>d.unk?"미확인":cfM(d,d.est,d.oth)],["현금 증감",(q,d)=>d.dc,"b"],...(cfRl(c)?[["└ 법정관리 부채 감면(비현금, 위 차입·재무활동에서 뺌)",(q,d)=>d.nc||null]]:[]),...(cfAx(c,"ncA")?[["└ 인수·흡수·LBO·숨은 부채로 늘어난 부채(비현금, 위 차입·재무활동에서 뺌)",(q,d)=>d.cff!=null&&d.ncA?cfM(d,0,d.ncA):null]]:[])])+`<div class="mu" style="margin-top:6px;line-height:1.6">이익이 나도 현금이 들어오지 않으면 위험해요. 잉여현금흐름(영업현금 − 설비투자)이 배당과 빚 상환의 원천입니다.</div>`+cfNote(c);
+if(fseg===3)return h+fTable(c,[["순이익",q=>q.ni],["감가상각(비현금)",(q,d)=>d.dep],["지분법·상각 조정",q=>q.ga-q.eq],...(fqL(c).some(q=>q.imp||q.wo)?[["손상·대손상각(비현금 조정)",q=>(q.imp||0)+(q.wo||0)]]:[]),["영업활동 현금흐름",(q,d)=>d.cfo,"b"],["설비투자",(q,d)=>fin?null:-d.capex],["잉여현금흐름 FCF",(q,d)=>fin?null:d.fcf,"b"],["차입 증감",(q,d)=>d.cff==null?null:d.unk?"미확인":cfM(d,0,d.cff+q.dv-d.iss)],["배당 지급",q=>-q.dv],["증자·출자(자사주)",(q,d)=>d.est?"≈"+fN(d.iss):d.iss||null],["재무활동 현금흐름",(q,d)=>d.unk?"미확인":cfM(d,d.est,d.cff),"b"],...(cfAx(c,"ax")?[["인수 순현금",(q,d)=>d.cff!=null&&d.ax?cfM(d,0,d.maN):null]]:[]),...(cfAx(c,"ix")?[["자회사 흡수·투자회수(순현금)",(q,d)=>d.cff!=null&&d.ix?cfM(d,0,d.inN):null]]:[]),["기타·투자 매매",(q,d)=>d.unk?"미확인":cfM(d,d.est,d.oth)],["현금 증감",(q,d)=>d.dc,"b"],...(cfRl(c)?[["└ 법정관리 부채 감면(비현금, 위 차입·재무활동에서 뺌)",(q,d)=>d.nc||null]]:[]),...(cfAx(c,"ncA")?[["└ 인수·흡수·LBO·숨은 부채로 늘어난 부채(비현금, 위 차입·재무활동에서 뺌)",(q,d)=>d.cff!=null&&d.ncA?cfM(d,0,d.ncA):null]]:[]),...(cfAx(c,"ncG")?[["└ 예금·보험부채 증감(자산과 함께 늘거나 줄어 현금 없음, 위 차입·재무활동에서 뺌)",(q,d)=>d.cff!=null&&d.ncG?d.ncG:null]]:[])])+`<div class="mu" style="margin-top:6px;line-height:1.6">이익이 나도 현금이 들어오지 않으면 위험해요. 잉여현금흐름(영업현금 − 설비투자)이 배당과 빚 상환의 원천입니다.</div>`+cfNote(c);
 const r=fRatios(c)||{},sa=secAvg(c.i);return h+`<div class="pn"><div class="ph"><b>투자지표</b><span class="mu">회사 · 업종 중간값</span></div>`+[["PER (주가/주당순이익)",fX(r.per),fX(sa.per)],["PBR (주가/주당순자산)",fX(r.pbr),fX(sa.pbr)],["PSR (시총/매출)",fX(r.psr),"–"],["EV/EBITDA",fX(r.ev),"–"],["ROE (자기자본이익률)",fP(r.roe),fP(sa.roe)],["ROA (총자산이익률)",fP(r.roa),"–"],["영업이익률",fP(r.opm),fP(sa.opm)],["순이익률",fP(r.npm),"–"],["부채비율",fP(r.de),fP(sa.de)],["이자보상배율",fX(r.icr),"–"],["배당수익률",fP(r.dy),fP(sa.dy)],["배당성향",fP(r.po),"–"],["EPS (연간)",r.eps!=null?W(r.eps):"–","–"],["BPS",W(r.bps||0),"–"],["매출 성장 (1년)",fP(r.gRev),"–"],["순이익 성장 (1년)",fP(r.gNi),"–"]].map(([a,b,s])=>brow(a,`<b>${b}</b> <span class="mu">${s}</span>`)).join("")+`<div class="br mu" style="line-height:1.6;white-space:normal">같은 업종끼리 비교해야 의미가 있어요. 성장이 빠른 업종은 PER이 높아도 비싸지 않을 수 있습니다. ${B("개념서: 가치평가","G.book('val')")}</div></div>`}
 
 function scrList(){const f=scf;return S.co.filter(c=>{if(c.dead||c.priv)return false;if(f.sec>=0&&c.i!==f.sec)return false;if(f.tier>=0&&tn(c)!==f.tier)return false;if(f.tech&&!techOk(c,f.tech))return false;const r=rating(c);
