@@ -1,0 +1,4 @@
+# layout check (node verify/rt-auto-ux-01/layout.js V25.html BRANCH.html), HEAD 55f312c | 2026-10-26 20:57:12 KST: document height vs the app's scroll container 'sh', and where the last control sits after scrolling to the end
+v25_index.html set {"doc":4412,"inner":915,"scrollers":["sh:915/2399"]} last control after scrolling to the end (top,bottom,viewport): [814,852,915]
+branch_site.html set {"doc":4412,"inner":915,"scrollers":["sh:915/2443"]} last control after scrolling to the end (top,bottom,viewport): [814,852,915]
+branch_site.html auto {"doc":4412,"inner":915,"scrollers":["sh:915/3483"]} last control after scrolling to the end (top,bottom,viewport): [815,852,915]

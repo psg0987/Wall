@@ -1,0 +1,31 @@
+# probe on branch working tree = HEAD 55f312c | 2026-10-26 20:56:20 KST
+game sha256 76ffc6e2b1c5970c | probe.js
+build: branch (G.autoBulk present)
+ok   P1 61 controlled companies (60 taken directly + those they control indirectly)
+ok   P1 pages 25/25/11, labels 1/3 2/3 3/3, 이전 disabled only on 1, 다음 only on 3 [[25,"1/3",true,false],[25,"2/3",false,false],[11,"3/3",false,true]]
+ok   P1 pages list every controlled company once, in id order
+ok   P1 page 99 clamps to the last page
+ok   P1 negative page clamps to 1
+ok   P1 after giving up the companies of pages 2-3 while on page 3, the page clamps to 1/1 with 21 rows
+ok   P1 no NaN/undefined in the page
+ok   P1 zero companies: empty message, bulk buttons disabled
+info P2 founded HOLD true ap after founding 0
+ok   P2 bulk ON: 4 controlled (ordinary, bank, insurer, HOLD) ON, one autop each
+ok   P2 every bulk decision equals the existing rule (A4R ordinary, A2 bank/insurer, HOLD 0/0/0) ord{"g":0.04,"pay":0.3,"sweep":1,"ps":1} kd1{"g":0.04,"pay":0.3,"sweep":1,"ps":0} kd2{"g":0.04,"pay":0.3,"sweep":2,"ps":0} HOLD{"g":0,"pay":0,"sweep":1,"ps":0}
+ok   P2 bulk OFF: all OFF, parameters unchanged, no autop
+ok   P2 no uncontrolled company has ap set
+ok   P3 apAll ON, manually OFF company (still controlled: true) stays OFF through ctlAll and 200 days, no autop call for it
+info P4 apAll=0 manual OFF, lost (true) and regained via setOwn+ctlAll: ap=0 autop calls=0
+info P4 apAll=0 flag ON kept while not controlled, regained: ap=1 autop calls=1
+info P4 apAll=0 G.buy 60% of PNPL: mine=true ap=0 autop calls=0
+info P4 apAll=1 manual OFF, lost (true) and regained via setOwn+ctlAll: ap=1 autop calls=1
+info P4 apAll=1 flag ON kept while not controlled, regained: ap=1 autop calls=1
+info P4 apAll=1 G.buy 60% of PNPL: mine=true ap=1 autop calls=1
+info P5 apAll=0 founded IT·소프트웨어 preset 0 (growth .2, R&D 2): ap=0 g=0.2 ps=2 pay=0 autop calls=0
+info P5 apAll=1 founded IT·소프트웨어 preset 0 (growth .2, R&D 2): ap=1 g=0.04 ps=0 pay=0 autop calls=1
+info P6 apAll=0 P 23.6% behind holder c406 -> holder sells, next step's ctlAll: was mine false, now mine true ap=0 autop calls for it=0
+info P6 apAll=1 P 23.6% behind holder c406 -> holder sells, next step's ctlAll: was mine false, now mine true ap=1 autop calls for it=1
+info P7a no player control, 360 days: state a687719eae24a978
+info P7b 8 controlled, 자동 경영 ON at day 0, apAll 0, 360 days: state 2e01254a331091d2 autop calls 41
+info P7c 8 controlled with apAll 1 (set before taking control), 360 days: state 8198d5dd9adf52d5 ap 11111111
+errs 0 fails 0

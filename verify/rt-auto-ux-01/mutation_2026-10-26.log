@@ -1,0 +1,13 @@
+# mutation check, HEAD 55f312c | 2026-10-26 20:56:36 KST
+== M1: ctlAll new-control hook removed from src/core.js (temporarily), rest of the patch kept: python3 verify/fin-cf-02-save01/run.py tests/t_auto_ux01.js
+game sha256 98c7d799908627d9 | t_auto_ux01.js
+FAIL new direct control triggers exactly one immediate policy application
+FAIL new control does not retain old manual business policy
+FAIL repeated ctlAll does not duplicate policy
+FAIL manually OFF remains OFF through ctlAll
+FAIL indirect company ownership transition gets immediate policy
+errs 0 fails 5
+== M0: the test on base main b421980 (no G.autoBulk)
+game of b421980 sha256 fa058dd29f142729 | test tests/t_auto_ux01.js sha256 b43b16d189c9fbd6
+TypeError: G.autoBulk is not a function
+exit code 1

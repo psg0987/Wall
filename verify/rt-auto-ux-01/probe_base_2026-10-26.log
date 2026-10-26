@@ -1,0 +1,22 @@
+# probe on base main b421980 | 2026-10-26 20:56:28 KST
+game of b421980 sha256 fa058dd29f142729 | test verify/rt-auto-ux-01/probe.js sha256 32f95ac5d73d8acd
+build: base (no G.autoBulk)
+info P1 n/a on base
+info P2 founded HOLD true ap after founding 0
+info P2 bulk n/a on base
+ok   P3 apAll ON, manually OFF company (still controlled: true) stays OFF through ctlAll and 200 days, no autop call for it
+info P4 apAll=0 manual OFF, lost (true) and regained via setOwn+ctlAll: ap=0 autop calls=0
+info P4 apAll=0 flag ON kept while not controlled, regained: ap=1 autop calls=0
+info P4 apAll=0 G.buy 60% of PNPL: mine=true ap=0 autop calls=0
+info P4 apAll=1 manual OFF, lost (true) and regained via setOwn+ctlAll: ap=0 autop calls=0
+info P4 apAll=1 flag ON kept while not controlled, regained: ap=1 autop calls=0
+info P4 apAll=1 G.buy 60% of PNPL: mine=true ap=1 autop calls=0
+info P5 apAll=0 founded IT·소프트웨어 preset 0 (growth .2, R&D 2): ap=0 g=0.2 ps=2 pay=0 autop calls=0
+info P5 apAll=1 founded IT·소프트웨어 preset 0 (growth .2, R&D 2): ap=0 g=0.2 ps=2 pay=0 autop calls=0
+info P6 apAll=0 P 23.6% behind holder c406 -> holder sells, next step's ctlAll: was mine false, now mine true ap=0 autop calls for it=0
+info P6 apAll=1 P 23.6% behind holder c406 -> holder sells, next step's ctlAll: was mine false, now mine true ap=0 autop calls for it=0
+info P7a no player control, 360 days: state a687719eae24a978
+info P7b 8 controlled, 자동 경영 ON at day 0, apAll 0, 360 days: state 2e01254a331091d2 autop calls 40
+info P7c 8 controlled with apAll 1 (set before taking control), 360 days: state 76c3f1869864d1fc ap 00000000
+errs 0 fails 0
+exit code 0
