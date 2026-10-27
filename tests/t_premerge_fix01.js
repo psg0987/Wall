@@ -67,7 +67,12 @@ function oldLoop() { const ctl = S.co.map(c => c.dead ? null : c.ctl), rootc = k
   ctlAll(); const s = [JSON.stringify(q.map(c => c.ctl))]; for (let k = 0; k < 5; k++) { S.cd = 1; ctlAll(); s.push(JSON.stringify(q.map(c => c.ctl))) }
   ok(!o.settled, 'K7 the old 7-sweep loop does not settle this cycle (precondition)');
   ok(new Set(s).size === 1 && S.cd === 0, 'K7 new ctlAll ends and gives the same controllers on 6 calls in a row ' + s[0] + (new Set(s).size > 1 ? ' then ' + [...new Set(s)].slice(1).join(' ') : ''));
-  ok(q.every(c => !mine(c)), 'K7 no company of the flipping cycle is counted as P-controlled'); }
+  ok(q.every(c => !mine(c)), 'K7 no company of the flipping cycle is counted as P-controlled');
+  // K7b (added after the fix, see verify/rt-premerge-fix-01/mutation_cap100_2026-10-27.log): this cycle flips with period 2, so an even sweep cap
+  // also returns the same state on every call. Start ctlAll from the other state of the cycle (one raw sweep applied first): the result must not change.
+  const raw = () => { for (const c of S.co) { if (c.dead) continue; const g = {}; for (const k in c.own) { const r = root(k); g[r] = (g[r] || 0) + c.own[k] } let b = null, m = 0, m2 = 0; for (const r in g) { const v = g[r]; if (v > m) { m2 = m; m = v; b = r } else if (v > m2) m2 = v } let n = m >= 20 && m > m2 + 1e-9 ? b : null; if (n === 'c' + c.id) n = null; c.ctl = n } };
+  const r1 = JSON.stringify(q.map(c => c.ctl)); q.forEach(c => c.ctl = null); raw(); raw(); const mid = JSON.stringify(q.map(c => c.ctl)); ctlAll(); const r2 = JSON.stringify(q.map(c => c.ctl)); q.forEach(c => c.ctl = null); raw(); ctlAll(); const r3 = JSON.stringify(q.map(c => c.ctl));
+  ok(r1 === r2 && r2 === r3, 'K7b same result whichever state of the flip ctlAll starts from: ' + r1 + ' / from ' + mid + ': ' + r2 + ' / from one sweep: ' + r3); }
 
 // ---------- K8 a dead company in a chain, K9 bank / insurer / holding company in a chain
 { world(9); const ms = pickIso(5); chain(ms); ms[2].dead = 1; ctlAll(); ok(ms[2].ctl === null && mine(ms[4]) && mine(ms[3]) && !mine(ms[1]) && !mine(ms[0]), 'K8 dead middle company: its controller null, the chain stops below it ' + JSON.stringify(ms.map(c => c.ctl))); }
