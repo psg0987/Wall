@@ -1,0 +1,39 @@
+# BEFORE the fix: tests/t_premerge_fix01.js on exp/rt-auto-ux-01-fix = UX HEAD 9999851 game code (src unchanged) | 2026-10-27 09:32:00 KST
+game sha256 76ffc6e2b1c5970c | t_premerge_fix01.js
+ok K0 180 real states where the old 7-sweep loop settled: new ctlAll gives the same controllers in 180 (old loop unsettled in 0)
+FAIL K1 11-level reverse chain: one ctlAll makes all 11 controlled by P, S.cd 0 — controllers ["c353","c420","c467","c514","P","P","P","P","P","P","P"]
+FAIL K1 new-control auto: 11 companies ON, one decision each (7)
+ok K1 every decision equals the existing rule (A4R)
+FAIL K2 P sells the top stake: one ctlAll removes control of all 11 — controllers ["P","P","P","P","c514","c514","c514","c514","c514","c514",null]
+FAIL K3 regain: one ctlAll gives back all 11; their kept 자동 경영 ON flags each run the rule once (7)
+FAIL K4 200-level reverse chain settles in one call (1 ms)
+ok K4 ordinary world: 200 ctlAll calls 12 ms (0.06 ms each)
+ok K4 1 companies taken: 1 controlled (indirect included), page 1/1, 전체 ON 1 decisions
+ok K4 25 companies taken: 25 controlled (indirect included), page 1/1, 전체 ON 25 decisions
+ok K4 26 companies taken: 28 controlled (indirect included), page 1/2, 전체 ON 28 decisions
+ok K4 66 companies taken: 69 controlled (indirect included), page 1/3, 전체 ON 69 decisions
+ok K5 A 60% of B and B 60% of A: ends, stable over calls, not P ["c514",null]
+ok K6 P 30% of A, A 60% of B, B 25% of A: both controlled by P
+ok K7 the old 7-sweep loop does not settle this cycle (precondition)
+FAIL K7 new ctlAll ends and gives the same controllers on 6 calls in a row [null,"c337","c0","r0"] then [null,"c0",null,"c0"]
+ok K7 no company of the flipping cycle is counted as P-controlled
+ok K8 dead middle company: its controller null, the chain stops below it ["c259","c259",null,"P","P"]
+ok K9 founded HOLD -> insurer -> bank -> ordinary, option ON: all controlled in one call, decisions A2 / A2 / A4R ord{"g":0.04,"pay":0.15,"sweep":2,"ps":1} kd1{"g":0.04,"pay":0.3,"sweep":1,"ps":0} kd2{"g":0.04,"pay":0.3,"sweep":1,"ps":0}
+ok K9 explicit ON on the HOLD: 0 / 0 / 0
+FAIL F1 founding with new-control auto ON: 자동 경영 stays OFF, preset kept (g 0.04, ps 0), no decision run
+FAIL F1 explicit 자동 경영 ON afterwards: the existing rule once undefined
+FAIL F2 founding through a controlled company (indirect control) with the option ON: preset kept, OFF, no decision
+FAIL F3 founding a bank with the option ON: preset g .05 kept, OFF, no decision
+FAIL F3 explicit ON on the founded bank: A2 rule
+ok F4 buying 60% of an existing company with the option ON: ON and the rule at once (unchanged)
+ok F5 a founded company lost and controlled again later counts as an acquisition: ON, one decision
+ok R1 option OFF: a manually OFF company that loses and regains control is still OFF, no decision
+ok R1 option ON: a manually OFF company that loses and regains control is ON again with one decision
+ok R2 option OFF, flag left ON while not controlled: regained, decision at once
+ok R3 option ON, manual OFF kept while control is kept (ctlAll x5, 120 days)
+FAIL U1 자동경영 관리 page, option ON: bulk scope (held now), option state + toggle, founding and regain notes
+FAIL U1 자동경영 관리 page, option OFF: bulk scope (held now), option state + toggle, founding and regain notes
+FAIL U2 settings button names the option as for companies controlled from now on
+FAIL U3 전체 OFF with the option ON: the toast says companies controlled later will still be ON — 지배 회사 0곳 자동경영 꺼짐
+errs 0 fails 15
+runner verdict: 1 test file(s) failed
