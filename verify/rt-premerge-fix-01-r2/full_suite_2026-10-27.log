@@ -1,0 +1,30 @@
+# full suite with tests/t_premerge_r2_cycle.js registered (23 tests) | branch exp/rt-premerge-fix-01-r2, game code = FIX HEAD 0734999 (src unchanged) | run alone | 2026-10-27 10:18:18 KST
+PASS t12_sim.js
+PASS t13_ui.js
+PASS t14_advisor.js
+PASS t18_ai_native.js
+PASS t18_ai_web.js
+PASS t_clean_surplus.js
+PASS t_close_spec.js
+PASS t_impair_ui.js
+PASS t_bank_writeoff.js
+PASS t_bank_writeoff_cases.js
+PASS t_bank_writeoff_cashflow.js
+PASS t_reg01_bank_imp_wo.js
+PASS t_r4c_bank_tg.js
+PASS t_fincf01_relief.js
+PASS t_fincf02_issue.js
+PASS t_fincf03_acq.js
+PASS t_fincf02_save01.js
+PASS t_fincf03b_gr.js
+PASS t_auto_a4r.js
+PASS t_auto_ux01.js
+PASS t_premerge_fix01.js
+FAIL t_premerge_r2_cycle.js
+FAIL X2 start [null,null,null]: expected [P,P,P], actual [null,null,null]
+FAIL X4 expected: all three P-controlled, 자동 경영 ON, one decision each; actual mine false/false/false, ap 0/0/0, decisions 0/0/0
+PASS t_golden.js
+1 test file(s) failed
+exit code 1
+elapsed 284s
+dist/game.js sha256 f3a2de924e3600e277ad1cec49e1d2cf8a2d026d8217c2e32d7b4b55d5a77f3a

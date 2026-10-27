@@ -1,0 +1,18 @@
+# tests/t_premerge_r2_cycle.js on the game code of b4219808662a441aad596fd597c7f7a804c1ba55 | 2026-10-27 10:18:07 KST
+game of b421980 sha256 fa058dd29f142729 | test tests/t_premerge_r2_cycle.js sha256 86411b22e761fcc8
+info X1 125 controller combinations checked with the independent rule; fixed points: [["P","P","P"]]
+ok X1 the only fixed point is [P,P,P]
+info X1 independent sweeps (id order A<B<C) from [null,null,null]: [null,null,null] -> ["P","r1","P"] -> [null,"r1","A"] -> [null,"A","A"] -> ["P","r1","P"] -> [null,"r1","A"] -> [null,"A","A"] -> ["P","r1","P"] -> [null,"r1","A"] -> [null,"A","A"]
+ok X2 precondition: A, B, C hold / are held only as specified (ids 40,224,404)
+info X2 actual after ctlAll from [null,null,null]: ["P","r1","P"] (second call: [null,"r1","A"]), S.cd 0
+FAIL X2 start [null,null,null]: expected [P,P,P], actual ["P","r1","P"]
+info X3 actual after ctlAll from [P,P,P]: ["P","P","P"]
+ok X3 start [P,P,P]: expected [P,P,P], actual ["P","P","P"]
+info X4 S.apAll ON, start [null,null,null]: [{"ctl":"P","mine":true,"ap":0,"calls":0},{"ctl":"r1","mine":false,"ap":0,"calls":0},{"ctl":"P","mine":true,"ap":0,"calls":0}]
+FAIL X4 expected: all three P-controlled, 자동 경영 ON, one decision each; actual mine true/false/true, ap 0/0/0, decisions 0/0/0
+info X4 S.apAll ON, start [P,P,P] (already controlled, so no new control): [{"ctl":"P","ap":0,"calls":0},{"ctl":"P","ap":0,"calls":0},{"ctl":"P","ap":0,"calls":0}]
+info X5 old 7-sweep loop from [null,null,null]: ["P","r1","P"] (not settled after 7 sweeps)
+info X5 old 7-sweep loop from ["P","P","P"]: ["P","P","P"] (settled)
+info X0 ids in order A<B<C: ["P","r1","P"] | A<C<B: ["P","P","P"] | B<A<C: ["P","P","P"] | B<C<A: [null,"r1","A"] | C<A<B: ["P","r1","A"] | C<B<A: ["P","P","P"]
+errs 0 fails 2
+exit code 1
