@@ -25,13 +25,34 @@ const pub=c=>Math.max(0,100-held(c));
 const root=k=>{if(k[0]!=="c")return k;const h=S.co[+k.slice(1)];return h&&h.ctl||k};
 // RT-AUTO-UX-01: detect genuinely new control transitions before the fixed-point calculation.
 // Capture only state already in memory; no save-schema changes or unrelated ON/OFF resets.
-function ctlAll(){const before=S.co.map(c=>c.dead?null:c.ctl);for(const c of S.co)if(c.dead)c.ctl=null;
-for(let it=0;it<7;it++){let ch=0;for(const c of S.co){if(c.dead)continue;const g={};for(const k in c.own){const r=root(k);g[r]=(g[r]||0)+c.own[k]}
+// RT-PREMERGE-FIX-01 (control depth): a sweep is unchanged (companies in id order, a stake held by a company counted under that company's
+// controller). The old loop stopped after 7 sweeps even when the last one still changed something, so a chain of holdings deeper than the
+// sweeps (e.g. 11 levels listed in reverse id order) was left half done. Now the sweeps go on until one changes nothing; where the old loop
+// had settled, the same sweeps run and give the same result. A holding cycle can make the sweeps flip between states forever: when a whole
+// controller state repeats, the companies whose controller differs inside the repeating part have no stable controlling holder, so they get
+// none (null) and stay held at null while the others are swept again; if others start to flip, they join. The held set only grows, so this
+// ends. Very long runs without a repeat (not seen) end the same way at 4 x companies + 20 sweeps, holding what changed after the first
+// companies + 1 sweeps (by then every company outside a cycle has settled).
+// founded: id of a company founded right now (G.fdGo); its first control is a founding, not an acquisition (see below).
+function ctlAll(founded){const before=S.co.map(c=>c.dead?null:c.ctl);for(const c of S.co)if(c.dead)c.ctl=null;
+const N=S.co.length,held=new Set(),snap=()=>S.co.map(c=>c.ctl);
+const sweep=()=>{let ch=0;for(const c of S.co){if(c.dead||held.has(c.id))continue;const g={};for(const k in c.own){const r=root(k);g[r]=(g[r]||0)+c.own[k]}
 let b=null,m=0,m2=0;for(const r in g){const v=g[r];if(v>m){m2=m;m=v;b=r}else if(v>m2)m2=v}
-let n=m>=20&&m>m2+1e-9?b:null;if(n==="c"+c.id)n=null;if(n!==c.ctl){c.ctl=n;ch=1}}if(!ch)break}S.cd=0;
+let n=m>=20&&m>m2+1e-9?b:null;if(n==="c"+c.id)n=null;if(n!==c.ctl){c.ctl=n;ch=1}}return ch};
+for(;;){const states=[snap()],at=new Map([[states[0].join("\u0001"),0]]);let flip=null;
+for(let it=1;sweep();it++){const s=snap(),k=s.join("\u0001");
+if(at.has(k)){flip=states.slice(at.get(k));break}
+if(it>=4*N+20){flip=states.slice(Math.min(states.length-1,N+1));flip.push(s);break}
+at.set(k,it);states.push(s)}
+if(!flip)break;
+let add=0;for(const c of S.co){if(c.dead||held.has(c.id))continue;if(flip.some(s=>s[c.id]!==flip[0][c.id])){held.add(c.id);c.ctl=null;add=1}}
+if(!add)break}
+S.cd=0;
 // A newly controlled company already flagged ON, or covered by the global auto-on-acquire option,
 // receives a decision immediately. Existing manually OFF companies are never affected.
-for(const c of S.co){if(c.dead||c.ctl!=="P"||before[c.id]==="P")continue;
+// RT-PREMERGE-FIX-01: a company founded right now is not an acquisition — it keeps the preset chosen at founding and starts with
+// 자동 경영 as it was created (off); the player turns it on explicitly. Losing and later regaining its control is an acquisition again.
+for(const c of S.co){if(c.dead||c.ctl!=="P"||before[c.id]==="P"||c.id===founded)continue;
 if(S.apAll)c.ap=1;
 if(c.ap)autop(c);
 }}

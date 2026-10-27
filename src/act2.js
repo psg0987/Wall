@@ -167,7 +167,8 @@ G.autoBulk=on=>{
     if(on)autop(c);
     changed++;
   }
-  toast("지배 회사 "+changed+"곳 자동경영 "+(on?"켜짐":"꺼짐"));render();
+  // RT-PREMERGE-FIX-01: 전체 ON/OFF acts on the companies held now; S.apAll (companies controlled later) is separate — say so when they differ
+  toast("지배 회사 "+changed+"곳 자동경영 "+(on?"켜짐":"꺼짐")+(!on&&S.apAll?" · 앞으로 새로 지배하는 회사는 자동경영이 켜집니다 (설정에서 바꿀 수 있어요)":on&&!S.apAll?" · 앞으로 새로 지배하는 회사는 꺼진 상태로 시작합니다":""));render();
 };
 G.bissue=(i,f)=>{const c=S.co[i];if(!mine(c)||c.kd)return;if(c.bond>0)return toast("회사채는 한 번에 한 종류만 발행할 수 있어요. 먼저 상환하세요");const x=Math.max(0,eq(c))*f;if(x<5)return toast("자본이 작아 발행할 수 없어요");if(c.sz>S.day&&rating(c)>=4)return toast("시즈닝 기간에는 정크본드(BB 이하)를 낼 수 없어요 ("+(c.sz-S.day)+"일 남음)");
 c.D+=x;const r=rating(c);c.cs+=x*.985;c.bond=x;c.cpn=S.prime+SPR[r]+1;c.bmat=S.day+3600;S.fl.bond=1;rec("회사채 발행",c,x);L(c.tk+" 회사채 "+F(x)+" 발행 (쿠폰 "+c.cpn.toFixed(1)+"%, 10년"+(r>=4?", 정크본드":"")+")",1);render()};
@@ -215,7 +216,7 @@ if(s===12){c.A=E*9;c.cs=c.A*.08;c.D=c.A+c.cs-E}else if(s===13){c.A=E*5;c.cs=c.A*
 c.gw=0;c.sh=Math.max(10,E/2);c.p=Math.max(60,eq(c)*1e4/c.sh);c.tg=c.p;c.hist=[Math.round(c.p)];c.hl=[[c.hist[0],c.hist[0]]];c.dh=c.dl=c.p;c.ni=0;c.pni=0;
 c.nol=cost;c.edge=isInd(s)?(rnd()-.45)*.008:0;c.mg=.5;c.vol=c.kd?.022:.035;c.ru=isInd(s)?6:0;c.cty=f.cty;c.sz=S.day+540;c.pt=S.day;c.fo=1;c.priv=1;c.pay=0;
 const P=[[.2,2],[.06,1],[0,0]][f.pre]||[.06,1];c.g=s===HOLD?0:isFin(s)?.05:P[0];c.ps=isInd(s)?P[1]:0;
-const k=eKey(fo);setOwn(c,k,100);c.bs[k]=cap;S.fd=(S.fd||[]).filter(d=>S.day-d<720);S.fd.push(S.day);S.fl.fd=1;if(s===HOLD)S.fl.hd=1;ctlAll();rec("회사 설립",c,cap,eName(fo));
+const k=eKey(fo);setOwn(c,k,100);c.bs[k]=cap;S.fd=(S.fd||[]).filter(d=>S.day-d<720);S.fd.push(S.day);S.fl.fd=1;if(s===HOLD)S.fl.hd=1;ctlAll(c.id);rec("회사 설립",c,cap,eName(fo));
 L("🏗 "+eName(fo)+" 명의로 "+c.tk+" "+c.n+" 설립 · "+SEC[s][0]+" · "+CTRY[c.cty][0]+" 법인 · 자본금 "+F(cap)+" (설립 비용 "+F(cost)+")"+(s===HOLD?". 자금 이동에서 보유 주식을 현물출자하거나, 거래 주체를 이 회사로 바꿔 지분을 사 보세요":""),1);
 FD=null;sel=c.id;stab="m";pg="";render()};
 G.rename=i=>{const c=S.co[i];if(!mine(c))return;openMd({t:"이름·티커 변경",b:"법률 비용 1억이 회사 현금에서 나갑니다.",h:`<input class="in" id="rnn" maxlength="18" value="${esc(c.n)}" aria-label="회사 이름"><input class="in" id="rnt" maxlength="5" value="${esc(c.tk)}" aria-label="티커" style="text-transform:uppercase">`,o:[["취소","n"],["변경","y"]]});mcb=()=>G.renameGo(i)};
