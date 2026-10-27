@@ -45,7 +45,7 @@ function autoOpsPg(){
   const pageSize=25,nPages=Math.max(1,Math.ceil(all.length/pageSize));
   if(autoPage>=nPages)autoPage=nPages-1;
   const rows=all.slice(autoPage*pageSize,(autoPage+1)*pageSize);
-  let h=hd("자동경영 관리")+`<div class="card"><b>내 지배 회사 자동경영</b><div class="mu" style="margin:6px 0;line-height:1.6">${all.length}개 회사 · 자동경영 ON ${on}개 · OFF ${all.length-on}개</div><div class="mu" style="line-height:1.6">현재 안정형 A4R 정책을 그대로 사용합니다. 전체 ON/OFF는 지금 현재 지배 중인 ${all.length}개 회사에만 적용되고, 회사 자금을 직접 거래하지 않습니다.</div><div class="bs" style="margin-top:10px">${B("전체 ON","G.autoBulk(1)","p",!all.length)}${B("전체 OFF","G.autoBulk(0)","",!all.length)}</div></div>`+
+  let h=hd("자동경영 관리")+`<div class="card"><b>내 지배 회사 자동경영</b><div class="mu" style="margin:6px 0;line-height:1.6">${all.length}개 회사 · 자동경영 ON ${on}개 · OFF ${all.length-on}개</div><div class="mu" style="line-height:1.6">현재 안정형 A4R 정책을 그대로 사용합니다. 전체 ON/OFF는 현재 지배 중인 ${all.length}개 회사에만 적용되고, 회사 자금을 직접 거래하지 않습니다.</div><div class="bs" style="margin-top:10px">${B("전체 ON","G.autoBulk(1)","p",!all.length)}${B("전체 OFF","G.autoBulk(0)","",!all.length)}</div></div>`+
   // RT-PREMERGE-FIX-01: the option for companies controlled later (S.apAll) is shown apart from the bulk buttons, with its two rules
   `<div class="card"><div class="row"><b>앞으로 새로 지배하는 회사: 자동경영 ${S.apAll?"켜짐":"꺼짐"}</b></div><div class="mu" style="margin:6px 0;line-height:1.6">인수·공개매수 등으로 앞으로 지배권을 얻는 회사에 적용돼요. 전체 ON/OFF를 눌러도 이 설정은 바뀌지 않아요. 직접 설립한 회사는 설립 때 고른 경영 설정을 유지하고 자동경영이 꺼진 상태로 시작해요. 자동경영을 끈 회사도 지배권을 잃었다가 다시 얻으면 이 설정을 따라요.</div><div class="bs">${B(S.apAll?"새로 지배하는 회사 자동경영 끄기":"새로 지배하는 회사 자동경영 켜기","G.apAll()",S.apAll?"":"p")}</div></div>`;
   if(!all.length)return h+`<div class="card mu">아직 지배하는 회사가 없습니다. 기업의 경영권을 얻으면 이곳에 표시됩니다.</div>`;
