@@ -1,0 +1,11 @@
+# node verify/rt-premerge-fix-01/smoke_fix.js <fix branch page, HEAD 3c939dd> | Chromium 412x915 emulation | 2026-10-27 09:44:23 KST
+page fix_site.html sha256 550f2b9e3569bd18cf73aabc74928678b4b63da0527c1c1ecd4af3a7a2e8eef3
+ok   W1 bulk scope (4 companies) and the option card are shown inside 412 px (scrollWidth 412)
+ok   W2 the card toggle switches the option off and on, label follows
+ok   W3 전체 OFF with the option ON: all held OFF, option still ON, toast: 지배 회사 4곳 자동경영 꺼짐 · 앞으로 새로 지배하는 회사는 자동경영이 켜집니다 (설정에서 바꿀 수 있어요)
+ok   W4 founding (설립 button tapped) with the option ON: preset g .2 / R&D 2 kept, 자동 경영 OFF, no decision {"id":515,"mine":true,"ap":0,"g":0.2,"ps":2,"calls":0}
+ok   W4 자동 경영 ON on the founded company (company page button tapped): one decision, now g 0.04 / R&D 0
+ok   W5 11-level reverse chain in the page: one ctlAll, 11 controlled, 11 ON {"mine":11,"ap":11,"calls":11,"cd":0}
+ok   page: no page error (blocked Google Fonts request not counted)
+ALL OK
+exit code 0

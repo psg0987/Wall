@@ -1,0 +1,27 @@
+# RT-PREMERGE-FIX-01 full suite | HEAD 945a5d3379cf9b8e93022f95f9717036b544a113 (exp/rt-auto-ux-01-fix) clean src/tests | run alone | 2026-10-27 09:46:02 KST
+PASS t12_sim.js
+PASS t13_ui.js
+PASS t14_advisor.js
+PASS t18_ai_native.js
+PASS t18_ai_web.js
+PASS t_clean_surplus.js
+PASS t_close_spec.js
+PASS t_impair_ui.js
+PASS t_bank_writeoff.js
+PASS t_bank_writeoff_cases.js
+PASS t_bank_writeoff_cashflow.js
+PASS t_reg01_bank_imp_wo.js
+PASS t_r4c_bank_tg.js
+PASS t_fincf01_relief.js
+PASS t_fincf02_issue.js
+PASS t_fincf03_acq.js
+PASS t_fincf02_save01.js
+PASS t_fincf03b_gr.js
+PASS t_auto_a4r.js
+PASS t_auto_ux01.js
+PASS t_premerge_fix01.js
+PASS t_golden.js
+ALL PASS
+exit code 0
+elapsed 278s
+dist/game.js sha256 f3a2de924e3600e277ad1cec49e1d2cf8a2d026d8217c2e32d7b4b55d5a77f3a

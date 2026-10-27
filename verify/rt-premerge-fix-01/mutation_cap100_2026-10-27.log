@@ -1,0 +1,8 @@
+# mutation (temporary, not committed): ctlAll = the old sweep loop with the cap raised from 7 to 100, founding/wording fixes kept; tests/t_premerge_fix01.js incl. K7b | 2026-10-27 09:45:17 KST
+game sha256 a90a7d25399a1b30 | t_premerge_fix01.js
+FAIL K4 200-level reverse chain settles in one call (9 ms)
+ok K7 the old 7-sweep loop does not settle this cycle (precondition)
+ok K7 new ctlAll ends and gives the same controllers on 6 calls in a row [null,"c0",null,"c0"]
+ok K7 no company of the flipping cycle is counted as P-controlled
+FAIL K7b same result whichever state of the flip ctlAll starts from: [null,"c0",null,"c0"] / from [null,"c0",null,"c0"]: [null,"c0",null,"c0"] / from one sweep: [null,"c337","c0","r0"]
+errs 0 fails 2
