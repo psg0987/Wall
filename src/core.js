@@ -45,7 +45,10 @@ function ctlAll(founded,opt){
   const dag=groups.map(()=>new Set()),indeg=groups.map(()=>0);
   for(let v=0;v<n;v++)if(comp[v]>=0)for(const w of edges[v])if(comp[w]!==comp[v]&&!dag[comp[v]].has(comp[w])){dag[comp[v]].add(comp[w]);indeg[comp[w]]++}
   const queue=[];for(let i=0;i<groups.length;i++)if(!indeg[i])queue.push(i);
-  const result=Array(n).fill(null),Q=Array(n).fill(null),GINFO=[],budget={used:0,max:50000};
+  const result=Array(n).fill(null),Q=Array(n).fill(null),GINFO=[];
+  // RT-PREMERGE-FIX-01-R3-R2: an order-free search budget. The number of cyclic SCCs K is known before any search; every cyclic SCC gets
+  // the same fixed limit min(5000, floor(50000 / K)) DFS nodes, so no SCC uses budget another one left (no dependence on processing order).
+  const nCyc=groups.filter(g=>g.length>1||edges[g[0]].includes(g[0])).length,LIMIT=nCyc?Math.min(5000,Math.floor(50000/nCyc)):5000;
   const exact=(id,v)=>{result[id]=v;Q[id]={st:v===null?"EXACT_NONE":"EXACT",poss:[v]}};
   const pending=(id,st,poss)=>{result[id]="?";Q[id]={st,poss:poss||"ANY"}};
   const evalOne=(c,local)=>{const g=new Map();for(const [key,pct] of Object.entries(c.own)){
@@ -107,24 +110,28 @@ function ctlAll(founded,opt){
       if(key[0]!=="c")owners.add(key);else {const h=+key.slice(1);if(comp[h]===gi)owners.add("c"+h);else owners.add(result[h]||"c"+h)}
     }
     // All reachable labels are a safe SUPerset; no direct-share pruning is used.
-    const baseDomain=[...owners].filter(x=>x!=="?"),domains=ids.map(id=>baseDomain.filter(x=>x!=="c"+id));
-    const product=domains.reduce((x,d)=>x*d.length,1);
-    if(ids.length>8||product>4096||budget.used+product>budget.max){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"BUDGET_EXCEEDED",product});continue}
+    const baseDomain=[...owners].filter(x=>x!=="?");
+    // R3-R2: members enumerated by candidate-set size (ascending); ties keep id order, which changes only the order solutions are found, not the
+    // node count. The full DFS node count 1 + d1 + d1*d2 + ... is computed before searching and compared with the fixed per-SCC limit.
+    ids.sort((a,b)=>(baseDomain.length-(owners.has("c"+a)?1:0))-(baseDomain.length-(owners.has("c"+b)?1:0))||a-b);
+    const domains=ids.map(id=>baseDomain.filter(x=>x!=="c"+id));
+    const product=domains.reduce((x,d)=>x*d.length,1);let planned=1;for(let i=0,p=1;i<domains.length;i++){p*=domains[i].length;planned+=p}
+    if(ids.length>8||product>4096||planned>LIMIT){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"BUDGET_EXCEEDED",product,planned,limit:LIMIT});continue}
     const fixed=[];let nodes=0,completed=true;const state=[];
-    function visit(i){if(++nodes>5000){completed=false;return}if(i===ids.length){const local=new Map(ids.map((id,j)=>[id,state[j]]));
+    function visit(i){if(++nodes>planned){completed=false;return}if(i===ids.length){const local=new Map(ids.map((id,j)=>[id,state[j]]));
         if(ids.every((id)=>evalOne(S.co[id],local)===local.get(id))&&grounded(ids,state))fixed.push(state.slice());return;
       }
       for(const v of domains[i]){state[i]=v;visit(i+1);if(!completed)return}
     }
-    visit(0);budget.used+=nodes;
-    if(!completed){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"BUDGET_EXCEEDED",product,nodes});continue}
-    if(!fixed.length){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"NO_SUPPORTED",product,nodes});continue}
+    visit(0);
+    if(!completed){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"BUDGET_EXCEEDED",product,planned,limit:LIMIT,nodes});continue}
+    if(!fixed.length){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"NO_SUPPORTED",product,planned,limit:LIMIT,nodes});continue}
     const old=ids.map(id=>before[id]),keep=fixed.find(c=>c.every((v,i)=>v===old[i]));
     for(let i=0;i<ids.length;i++){
       const poss=[...new Set(fixed.map(x=>x[i]))],value=keep?keep[i]:poss.length===1?poss[0]:"?";
       value==="?"?pending(ids[i],"AMBIG",poss):exact(ids[i],value)
     }
-    GINFO.push({members:ids,status:keep?"EXACT_MULTI_KEPT":fixed.length===1?"EXACT_UNIQUE":"EXACT_MULTI_AMBIG",product,nodes,solutions:fixed.length});
+    GINFO.push({members:ids,status:keep?"EXACT_MULTI_KEPT":fixed.length===1?"EXACT_UNIQUE":"EXACT_MULTI_AMBIG",product,planned,limit:LIMIT,nodes,solutions:fixed.length});
   }
   // Publish only after every result is computed, never partially during SCC exploration.
   CTLQ=Q;CTLS=GINFO;
