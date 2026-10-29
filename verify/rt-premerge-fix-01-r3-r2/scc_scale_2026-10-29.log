@@ -1,0 +1,11 @@
+# verify/rt-premerge-fix-01-r3-r2/scc_scale.js on HEAD 87b3ff5 (Node 22, desktop CPU of this workspace) | 2026-10-29 10:27:56 KST
+info dense 1 + 2-cycles 0 = cyclic SCCs 1: limit 5000, statuses {"EXACT_MULTI_KEPT":1}, P-controlled 4/4, ctlAll median 6.5 ms (max 18.7)
+info dense 5 + 2-cycles 0 = cyclic SCCs 5: limit 5000, statuses {"EXACT_MULTI_KEPT":5}, P-controlled 20/20, ctlAll median 21.6 ms (max 33.3)
+info dense 10 + 2-cycles 0 = cyclic SCCs 10: limit 5000, statuses {"EXACT_MULTI_KEPT":10}, P-controlled 40/40, ctlAll median 48.1 ms (max 57.5)
+info dense 17 + 2-cycles 0 = cyclic SCCs 17: limit 2941, statuses {"EXACT_MULTI_KEPT":17}, P-controlled 68/68, ctlAll median 74.6 ms (max 82.6)
+info dense 18 + 2-cycles 0 = cyclic SCCs 18: limit 2777, statuses {"BUDGET_EXCEEDED":18}, P-controlled 0/72, ctlAll median 1.2 ms (max 1.4)
+info dense 20 + 2-cycles 0 = cyclic SCCs 20: limit 2500, statuses {"BUDGET_EXCEEDED":20}, P-controlled 0/80, ctlAll median 1.2 ms (max 1.4)
+info dense 10 + 2-cycles 40 = cyclic SCCs 50: limit 1000, statuses {"EXACT_MULTI_KEPT":40,"BUDGET_EXCEEDED":10}, P-controlled 80/120, ctlAll median 1.7 ms (max 2.1)
+info dense 0 + 2-cycles 100 = cyclic SCCs 100: limit 500, statuses {"EXACT_MULTI_KEPT":100}, P-controlled 200/200, ctlAll median 4.7 ms (max 6.9)
+info dense 0 + 2-cycles 150 = cyclic SCCs 150: limit 333, statuses {"EXACT_MULTI_KEPT":150}, P-controlled 300/300, ctlAll median 2.3 ms (max 4.2)
+info ordinary world (515 companies, no cycle): ctlAll median 0.41 ms, p95 1.11 ms
