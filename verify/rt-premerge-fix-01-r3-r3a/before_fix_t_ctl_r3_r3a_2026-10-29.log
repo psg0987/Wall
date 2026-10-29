@@ -1,0 +1,6 @@
+# BEFORE the fix: tests/t_ctl_r3_r3a.js on 7746ea4 game code (src unchanged) | 2026-10-29 20:42:24 KST
+game sha256 1170a4a122701750 | t_ctl_r3_r3a.js
+FAIL S1 4 unrelated pending companies are 4 separate entries, each with its own share: [{"w":52.7,"t":"판정 보류"}]
+ok S2 the real controller group (나) still adds up its companies: [{"w":15.7,"t":"나"}]
+FAIL S3 the legend does not show a merged "판정 보류 NN%" group: 판정 보류 53% · 독립 회사 32% · 나 16%
+errs 0 fails 2
