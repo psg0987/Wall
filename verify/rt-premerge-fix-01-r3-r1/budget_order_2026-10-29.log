@@ -1,0 +1,5 @@
+# verify/rt-premerge-fix-01-r3-r1/budget_order.js on the R1 working tree | 2026-10-29 10:02:03 KST
+info numbering A (109 ms): group statuses ["APPROX","APPROX","APPROX","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE"]
+info numbering B (107 ms): group statuses ["EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","EXACT_NONE","APPROX","APPROX","APPROX"]
+info groups whose status differs between numberings: [0,1,2,17,18,19] | P-controlled companies per group A [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] B [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+RESULT order-dependent: same structures, different authority depending on company numbering

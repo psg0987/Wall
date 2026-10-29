@@ -1,5 +1,5 @@
-# BEFORE the fix: tests/t_ctl_r3_r1.js on dfab4d9 game code (src unchanged) | 2026-10-29 09:59:35 KST
-game sha256 25fce8453152523e | t_ctl_r3_r1.js
+# BEFORE the fix (final test file): tests/t_ctl_r3_r1.js on the game code of dfab4d9 (R3 integration HEAD, no R1 fix) | 2026-10-29 10:00:45 KST
+game of dfab4d9 sha256 25fce8453152523e | test tests/t_ctl_r3_r1.js sha256 72e6e46b15f3d406
 FAIL U1 hqQ does not change the growth rate of a pending company (g 0.0979)
 FAIL U2 4000 aiEvent calls: pending companies considered 364 times
 FAIL U3 offer.mk(target) does not choose the pending company as acquirer (chose 0, pending 0)
@@ -17,3 +17,4 @@ FAIL S1 save JSON: no ctl "?"; pending ids in ctlp undefined
 ok S2 the live game still shows them pending after saving
 ok S3 loading restores pending at once (AMBIG/AMBIG), no waiting for a next day
 errs 0 fails 12
+exit code 1

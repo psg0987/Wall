@@ -1,0 +1,20 @@
+info R1 build: live ctl ? ? | saved ctl null null | ctlp [30,324] | "?" anywhere in saved co: false
+== old engine d8f814f2ee618ac50d5a746a11c55196db71c037
+info loaded: pending ids from the save [30,324] ctl now [null,null] mine false,false rootName 일반 주주,일반 주주 | "?" labels in state: 0
+info after 30 days: ctl ["c324",null] | "?" labels in state: 0
+exit code 0
+== old engine b4219808662a441aad596fd597c7f7a804c1ba55
+info loaded: pending ids from the save [30,324] ctl now [null,null] mine false,false rootName 일반 주주,일반 주주 | "?" labels in state: 0
+info after 30 days: ctl ["c324",null] | "?" labels in state: 0
+exit code 0
+== old engine 6abf256a1fbc548e38f33965e631911f5c739ead
+info loaded: pending ids from the save [30,324] ctl now [null,null] mine false,false rootName 일반 주주,일반 주주 | "?" labels in state: 0
+info after 30 days: ctl ["c324",null] | "?" labels in state: 0
+exit code 0
+== old engine dfab4d94a4e2c859a7d9d071dba9fc0e0cf23a32
+info loaded: pending ids from the save [30,324] ctl now ["?","?"] mine false,false rootName 판정 보류,판정 보류 | "?" labels in state: 2
+info after 30 days: ctl ["?","?"] | "?" labels in state: 2
+exit code 0
+== R1 build (reload)
+info loaded: pending ids from the save [30,324] ctl now ["?","?"] mine false,false rootName 판정 보류,판정 보류 | "?" labels in state: 2
+info after 30 days: ctl ["?","?"] | "?" labels in state: 2
