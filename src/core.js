@@ -208,7 +208,13 @@ const loanOf=c=>c.kd?0:Math.max(0,c.D-c.bond-(c.pa||0));
 const bondSpace=c=>Math.max(0,c.bond-c.bh);
 function seedBonds(){for(const c of S.co){if(c.kd||c.dead||c.bond>0||rnd()>.45)continue;const x=Math.min(c.D*(.2+rnd()*.3),Math.max(0,eq(c)));if(x<5)continue;c.bond=x;c.cpn=S.prime+SPR[rating(c)]+1+nz();c.bmat=S.day+360+(rnd()*3240|0)}}
 function v8fix(){const old=S.v<11,o12=S.v<12;S.v=12;v9pad();if(old)v11mig();bankFix();if(!S.fs)S.fs=[];if(!S.imp)S.imp=[];if(S.ms==null)S.ms=0;if(S.apAll==null)S.apAll=0;if(!S.bseed){seedBonds();S.bseed=1}
-for(const c of S.co)if(c.bh>c.bond){c.bond=c.bh;c.cpn=c.cpn||S.prime+3;c.bmat=c.bmat||S.day+1800}v11prep();v12prep();if(o12)v12mig();CTLQ=null;CTLS=null;ctlAll(undefined,{silent:true})}
+for(const c of S.co)if(c.bh>c.bond){c.bond=c.bh;c.cpn=c.cpn||S.prime+3;c.bmat=c.bmat||S.day+1800}v11prep();v12prep();if(o12)v12mig();
+// RT-PREMERGE-FIX-01-R3-R1: pending control ("?") is saved as ctl null plus the list S.ctlp, so a build without R3 reads a plain
+// "no controller" instead of a label it would keep forever. Loading puts "?" back before the silent re-check below (same result as before saving).
+if(Array.isArray(S.ctlp))for(const id of S.ctlp){const c=S.co[id];if(c&&!c.dead&&c.ctl==null)c.ctl="?"}delete S.ctlp;
+Object.defineProperty(S,"toJSON",{value:ctlSaveForm,enumerable:false,configurable:true,writable:true});
+CTLQ=null;CTLS=null;ctlAll(undefined,{silent:true})}
+function ctlSaveForm(){const p=[],co=S.co.map(c=>{if(c.ctl!=="?")return c;p.push(c.id);return Object.assign({},c,{ctl:null})});const o=Object.assign({},S,{co});if(p.length)o.ctlp=p;return o}
 
 // ---- v9: holding-company sector, countries of incorporation, founding rules, CEO pay ----
 SEC.push(["지주회사",.01]);KS.push(["홀딩스","지주","인베스트먼트"]);SB.push(["Holdings","Group","Partners"]);

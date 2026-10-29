@@ -25,7 +25,7 @@ const closeMdl = () => { mdl = null; mcb = null };
   x.cs = 1e7; const off = EV2.find(e => e.id === 'offer'); const r = off.mk(t); ok(r.a !== x.id, 'U3 offer.mk(target) does not choose the pending company as acquirer (chose ' + r.a + ', pending ' + x.id + ')') }
 // ---------- U4 loan-sale buyer bank is never a pending bank
 { world(104); const B0 = S.co.find(c => !c.dead && c.kd === 1 && !c.priv), PB = S.co.find(c => !c.dead && c.kd === 1 && !c.priv && c !== B0), q = ords()[400], x = ords().find(c => c !== q);
-  setOwn(B0, 'P', 60); ctlAll(); pre(mine(B0) && pend(PB, q), 'U4 my bank and a pending bank'); x.ln = B0.id; x.D = Math.max(x.D, 100); PB.A *= 100; PB.cs = 1e7; ctlAll(); pre(PB.ctl === '?', 'U4 still pending');
+  setOwn(B0, 'P', 60); ctlAll(); pre(mine(B0) && pend(PB, q), 'U4 my bank and a pending bank'); x.ln = B0.id; x.D = Math.max(x.D, 100); PB.A *= 100; PB.cs = 1e7; S.co.find(c => !c.dead && c.kd === 1 && c !== B0 && c !== PB && !c.priv).cs = 1e6; ctlAll();   // a normal buyer bank exists too (smaller assets than the pending one) pre(PB.ctl === '?', 'U4 still pending');
   G.lsell(B0.id, x.id); const f = mcb; pre(typeof f === 'function', 'U4 dialog opened'); if (f) f(); closeMdl(); ok(x.ln !== PB.id, 'U4 loan sale: the buyer is not the pending bank (loan now at ' + x.ln + ', pending ' + PB.id + ')') }
 // ---------- U5 activist-demanded buyback by a pending company
 { world(105); const [x, y] = [ords()[12], ords()[202]]; pre(pend(x, y), 'U5 pending pair'); const r = S.R[0], id = 0; r.s = 'ag'; rvPrep(r); r.gn.agg = 1;
