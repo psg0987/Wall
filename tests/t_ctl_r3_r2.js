@@ -26,11 +26,21 @@ for (const [tag, P, r, q] of [['B1 (no P control)', 10, 10, 20], ['B2 (P is the 
   const res = ['A', 'B', 'C'].map(nb => dense(20, nb, P, r, q)); pre(res.every(Boolean), tag + ' numberings valid');
   const same = res.every(x => JSON.stringify(x.st) === JSON.stringify(res[0].st) && JSON.stringify(x.mine) === JSON.stringify(res[0].mine));
   ok(same, tag + ': 20 identical-structure SCCs under 3 company numberings give the same statuses and P control — A ' + JSON.stringify(res[0].st.map(s => s[0])) + ' / B ' + JSON.stringify(res[1].st.map(s => s[0])) + ' / C ' + JSON.stringify(res[2].st.map(s => s[0])) + ' | P-controlled A ' + res[0].mine.join('') + ' B ' + res[1].mine.join('') + ' C ' + res[2].mine.join('') + ' | ms ' + res.map(x => x.ms).join('/')) }
-// ---------- B3 limit formula and planned node count
+// ---------- B3 limit and planned node count (expectations of the R3-R2 budget rule updated in R3-R3A after that rule was removed)
 { const two = dense(2, 'A', 40, 5, 15), twenty = dense(20, 'A', 40, 5, 15);
   const g2 = two.info.filter(x => x.members && x.members.length === 4), g20 = twenty.info.filter(x => x.members && x.members.length === 4);
   ok(two.st.every(s => s === 'EXACT') && g2.every(x => x.limit === 5000 && x.planned === 2801 && x.nodes === 2801), 'B3 2 cyclic SCCs: limit min(5000, 25000) = 5000, planned DFS nodes 2801 = visited, EXACT ' + JSON.stringify(g2.map(x => [x.limit, x.planned, x.nodes, x.status])));
-  ok(twenty.st.every(s => s === 'APPROX') && g20.every(x => x.limit === 2500 && x.planned === 2801 && x.status === 'BUDGET_EXCEEDED' && !x.nodes), 'B3 20 cyclic SCCs: limit floor(50000/20) = 2500 < planned 2801 -> every SCC APPROX without searching ' + JSON.stringify(g20.slice(0, 2).map(x => [x.limit, x.planned, x.nodes, x.status]))) }
+  // RT-PREMERGE-FIX-01-R3-R3A: the R3-R2 rule (limit floor(50000/K)) was removed in R3-R3; every cyclic SCC has its own 5000-node limit.
+  ok(twenty.st.every(s => s === 'EXACT') && g20.every(x => x.limit === 5000 && x.planned === 2801 && x.nodes === 2801), 'B3 20 cyclic SCCs: each keeps its own limit 5000 >= planned 2801 -> searched and EXACT ' + JSON.stringify(g20.slice(0, 2).map(x => [x.limit, x.planned, x.nodes, x.status])));
+  // B3b/B3c (R3-R3A, opposite cases): a real search limit is still APPROX, with or without 19 unrelated dense SCCs around it
+  const over = (withOthers, kind) => { world(8); const L = ords().slice(0, 90); L.forEach(iso); L.forEach(c => c.ctl = null);
+    const m = kind === 'product' ? L.slice(0, 5) : L.slice(0, 9);
+    if (kind === 'product') for (const c of m) { setOwn(c, 'P', 40); setOwn(c, 'r0', 4); setOwn(c, 'r1', 4); for (const d of m) if (d !== c) setOwn(c, 'c' + d.id, 13) }   // 5 members x 8 candidates: product 32768 > 4096
+    else for (let i = 0; i < 9; i++) { setOwn(m[i], 'P', 30); setOwn(m[(i + 1) % 9], 'c' + m[i].id, 25) }                                                            // 9 members > 8, no previous state
+    if (withOthers) for (let g = 0; g < 19; g++) { const o = L.slice(10 + 4 * g, 14 + 4 * g); for (const c of o) { setOwn(c, 'P', 40); setOwn(c, 'r0', 5); setOwn(c, 'r1', 5); for (const d of o) if (d !== c) setOwn(c, 'c' + d.id, 15) } }
+    ctlAll(); const x = CTLS.find(z => z.members && z.members.includes(m[0].id)) || {}; return { st: m.map(c => (CTLQ[c.id] || {}).st), mine: m.filter(mine).length, status: x.status, product: x.product, limit: x.limit } };
+  for (const kind of ['product', 'size']) { const alone = over(0, kind), crowd = over(1, kind);
+    ok(alone.st.every(s => s === 'APPROX') && alone.status === 'BUDGET_EXCEEDED' && alone.mine === 0 && JSON.stringify(alone) === JSON.stringify(crowd), 'B3' + (kind === 'product' ? 'b candidate product ' + alone.product + ' > 4096' : 'c 9 members > 8') + ': APPROX (BUDGET_EXCEEDED), no P control, same with 19 unrelated SCCs around ' + JSON.stringify(alone)) } }
 // ---------- B4 mixed structures (dense SCCs, 2-cycles with P, a downstream chain) under 3 numberings
 { const run = nb => { world(9); const L = ords().slice(0, 40); L.forEach(iso); L.forEach(c => c.ctl = null); const N = L.length;
     const at = nb === 'A' ? i => L[i] : nb === 'B' ? i => L[N - 1 - i] : i => L[(i * 17) % N];
