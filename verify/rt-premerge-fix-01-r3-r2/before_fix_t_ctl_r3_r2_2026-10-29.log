@@ -1,0 +1,14 @@
+# BEFORE the fix: tests/t_ctl_r3_r2.js on ec22f8e game code (src unchanged) | 2026-10-29 10:20:13 KST
+game sha256 f18695c8f729a1e3 | t_ctl_r3_r2.js
+FAIL B1 (no P control): 20 identical-structure SCCs under 3 company numberings give the same statuses and P control — A ["A","A","A","E","E","E","E","E","E","E","E","E","E","E","E","E","E","E","E","E"] / B ["E","E","E","E","E","E","E","E","E","E","E","E","E","E","E","E","E","A","A","A"] / C ["A","E","E","A","E","E","A","E","E","E","E","E","E","E","E","E","E","E","E","E"] | P-controlled A 00000000000000000000 B 00000000000000000000 C 00000000000000000000 | ms 88/126/86
+FAIL B2 (P is the grounded controller): 20 identical-structure SCCs under 3 company numberings give the same statuses and P control — A ["A","A","A","E","E","E","E","E","E","E","E","E","E","E","E","E","E","E","E","E"] / B ["E","E","E","E","E","E","E","E","E","E","E","E","E","E","E","E","E","A","A","A"] / C ["A","E","E","A","E","E","A","E","E","E","E","E","E","E","E","E","E","E","E","E"] | P-controlled A 00044444444444444444 B 44444444444444444000 C 04404404444444444444 | ms 73/74/76
+FAIL B3 2 cyclic SCCs: limit min(5000, 25000) = 5000, planned DFS nodes 2801 = visited, EXACT [[null,null,2801,"EXACT_UNIQUE"],[null,null,2801,"EXACT_UNIQUE"]]
+FAIL B3 20 cyclic SCCs: limit floor(50000/20) = 2500 < planned 2801 -> every SCC APPROX without searching [[null,null,2801,"EXACT_UNIQUE"],[null,null,2801,"EXACT_UNIQUE"]]
+ok B4 mixed structures under 3 numberings: identical status and control per structure ["EXACT:P","EXACT:P","EXACT:P","EXACT:P","EXACT:P","EXACT:P","EXACT:P","EXACT:P"]
+FAIL L1 lbuy from a pending selling bank: no sale (loan at 122, selling bank 123)
+FAIL L2 lbuy confirmed after the selling bank became pending: no sale
+ok F1 pending companies: no new bond issued in 200 days (control set: 3)
+ok F2 pending companies: no discretionary debt sweep in 200 days (control set: 33)
+ok F3 existing bonds still mature and are repaid (contract): pending 12/12, control 6/6
+ok F4 pending company: futures margin call still paid from its cash (contract, 0.273)
+errs 0 fails 6
