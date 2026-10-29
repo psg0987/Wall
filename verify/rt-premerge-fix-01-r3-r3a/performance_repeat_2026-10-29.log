@@ -1,0 +1,28 @@
+# repeated ctlAll, no ownership change, HEAD c48efcb | 2026-10-29 20:43:11 KST
+== Node 22 (no throttling)
+info AMBIG x1: status after 1st call {"EXACT_MULTI_AMBIG":1}, during repeats {"EXACT_MULTI_AMBIG":1}, pending companies 4/4 | repeated ctlAll median 6.8 ms, max 10.8 ms
+info AMBIG x10: status after 1st call {"EXACT_MULTI_AMBIG":10}, during repeats {"EXACT_MULTI_AMBIG":10}, pending companies 40/40 | repeated ctlAll median 99.0 ms, max 108.3 ms
+info AMBIG x20: status after 1st call {"EXACT_MULTI_AMBIG":20}, during repeats {"EXACT_MULTI_AMBIG":20}, pending companies 80/80 | repeated ctlAll median 104.8 ms, max 150.7 ms
+info AMBIG x50: status after 1st call {"EXACT_MULTI_AMBIG":50}, during repeats {"EXACT_MULTI_AMBIG":50}, pending companies 200/200 | repeated ctlAll median 300.5 ms, max 360.8 ms
+info APPROX x1: status after 1st call {"BUDGET_EXCEEDED":1}, during repeats {"BUDGET_EXCEEDED":1}, pending companies 5/5 | repeated ctlAll median 2.9 ms, max 5.2 ms
+info APPROX x10: status after 1st call {"BUDGET_EXCEEDED":10}, during repeats {"BUDGET_EXCEEDED":10}, pending companies 50/50 | repeated ctlAll median 1.9 ms, max 4.8 ms
+info APPROX x20: status after 1st call {"BUDGET_EXCEEDED":20}, during repeats {"BUDGET_EXCEEDED":20}, pending companies 100/100 | repeated ctlAll median 1.1 ms, max 3.7 ms
+info APPROX x50: status after 1st call {"BUDGET_EXCEEDED":50}, during repeats {"BUDGET_EXCEEDED":50}, pending companies 250/250 | repeated ctlAll median 1.3 ms, max 3.7 ms
+info VERIFIED x1: status after 1st call {"EXACT_UNIQUE":1}, during repeats {"EXACT_PREV_VERIFIED":1}, pending companies 0/4 | repeated ctlAll median 2.8 ms, max 5.9 ms
+info VERIFIED x10: status after 1st call {"EXACT_UNIQUE":10}, during repeats {"EXACT_PREV_VERIFIED":10}, pending companies 0/40 | repeated ctlAll median 3.1 ms, max 4.5 ms
+info VERIFIED x20: status after 1st call {"EXACT_UNIQUE":20}, during repeats {"EXACT_PREV_VERIFIED":20}, pending companies 0/80 | repeated ctlAll median 2.1 ms, max 3.0 ms
+info VERIFIED x50: status after 1st call {"EXACT_UNIQUE":50}, during repeats {"EXACT_PREV_VERIFIED":50}, pending companies 0/200 | repeated ctlAll median 2.4 ms, max 3.7 ms
+== Chromium (Playwright) 412x915, CPU throttled 4x (CDP)
+info AMBIG x1: status after 1st call {"EXACT_MULTI_AMBIG":1}, during repeats {"EXACT_MULTI_AMBIG":1}, pending companies 4/4 | repeated ctlAll median 29.7 ms, max 52.4 ms
+info AMBIG x10: status after 1st call {"EXACT_MULTI_AMBIG":10}, during repeats {"EXACT_MULTI_AMBIG":10}, pending companies 40/40 | repeated ctlAll median 218.0 ms, max 231.4 ms
+info AMBIG x20: status after 1st call {"EXACT_MULTI_AMBIG":20}, during repeats {"EXACT_MULTI_AMBIG":20}, pending companies 80/80 | repeated ctlAll median 226.6 ms, max 313.1 ms
+info AMBIG x50: status after 1st call {"EXACT_MULTI_AMBIG":50}, during repeats {"EXACT_MULTI_AMBIG":50}, pending companies 200/200 | repeated ctlAll median 802.7 ms, max 956.2 ms
+info APPROX x1: status after 1st call {"BUDGET_EXCEEDED":1}, during repeats {"BUDGET_EXCEEDED":1}, pending companies 5/5 | repeated ctlAll median 3.4 ms, max 4.5 ms
+info APPROX x10: status after 1st call {"BUDGET_EXCEEDED":10}, during repeats {"BUDGET_EXCEEDED":10}, pending companies 50/50 | repeated ctlAll median 9.7 ms, max 16.5 ms
+info APPROX x20: status after 1st call {"BUDGET_EXCEEDED":20}, during repeats {"BUDGET_EXCEEDED":20}, pending companies 100/100 | repeated ctlAll median 7.9 ms, max 9.8 ms
+info APPROX x50: status after 1st call {"BUDGET_EXCEEDED":50}, during repeats {"BUDGET_EXCEEDED":50}, pending companies 250/250 | repeated ctlAll median 5.2 ms, max 8.1 ms
+info VERIFIED x1: status after 1st call {"EXACT_UNIQUE":1}, during repeats {"EXACT_PREV_VERIFIED":1}, pending companies 0/4 | repeated ctlAll median 2.3 ms, max 4.7 ms
+info VERIFIED x10: status after 1st call {"EXACT_UNIQUE":10}, during repeats {"EXACT_PREV_VERIFIED":10}, pending companies 0/40 | repeated ctlAll median 8.1 ms, max 12.5 ms
+info VERIFIED x20: status after 1st call {"EXACT_UNIQUE":20}, during repeats {"EXACT_PREV_VERIFIED":20}, pending companies 0/80 | repeated ctlAll median 0.9 ms, max 5.2 ms
+info VERIFIED x50: status after 1st call {"EXACT_UNIQUE":50}, during repeats {"EXACT_PREV_VERIFIED":50}, pending companies 0/200 | repeated ctlAll median 10.5 ms, max 18.4 ms
+page errors: 0

@@ -1,0 +1,40 @@
+# node verify/rt-auto-ux-01/smoke_mobile.js <v24 index of b421980> <v25 index of release-v25> <R3-R3A page, HEAD c48efcb> | 2026-10-29 20:51:33 KST
+branch page r3a_site.html sha256 cfbadf891e40f60c9d4d017bb6001f1333e4848e9c72b5b8785282e39ee03ada
+== v24 save from web_v24_index.html sha256 688a5b5dd6c51dc0c7a7add029965a2be8a6e1e0eda775173d7a95aada3912e4
+ok   v24 save made on day 120: P,B,I,H ON, Q manual OFF, new-control option OFF (full 781KB, export 272KB)
+ok   v24 page: no page error
+ok   S1 v24 full save boots in the branch: day, option, every company ctl/ap/g/pay/sweep/ps equal
+ok   S2 v24 export code imports through 세이브 가져오기: all equal
+ok   S2 page: no page error
+ok   S3 one day after loading: no 자동 경영 flag changed, Q still OFF
+ok   S4 설정 -> 자동경영 일괄 관리 tap opens the page
+ok   S4 rows 5 for 5 controlled companies
+ok   S4 전체 OFF tap: all OFF, no decision run
+ok   S4 전체 ON tap: 5/5 ON, 5 decisions, all equal the rule
+ok   S4 row tap 자동경영 끄기: exactly one company OFF
+ok   S4 layout width 412 and no horizontal scroll (scrollWidth 412, width 412)
+ok   S5 66 companies: taps 다음 x2, 이전 -> pages 1/3 2/3 3/3 2/3, last page 16 rows, 다음 disabled there
+ok   S6 지분 구조도 -> 자동경영 관리 tap opens the page
+ok   S7 거래 주체 = P company buys 60% of XOMX (indirect control, option ON): ON, one decision equal to the rule {"tk":"XOMX","mine":true,"via":60,"ap":1,"calls":1,"rule":true}
+ok   S8 forced distress: ordinary A4R (not A2) {"g":0,"pay":0,"sweep":2,"ps":0}, bank A2 r3, insurer A2 r3, HOLD 0/0/0
+ok   S1-S8 branch page: no page error (blocked Google Fonts request not counted)
+== v25 save from v25_index.html sha256 dc61ae512e18ca840932041f11378f6a9edfa4be0a1a7fd771b78f3cfa1ddfc4
+ok   v25 save made on day 120: P,B,I,H ON, Q manual OFF, new-control option ON (full 781KB, export 272KB)
+ok   v25 page: no page error
+ok   S1 v25 full save boots in the branch: day, option, every company ctl/ap/g/pay/sweep/ps equal
+ok   S2 v25 export code imports through 세이브 가져오기: all equal
+ok   S2 page: no page error
+ok   S3 one day after loading: no 자동 경영 flag changed, Q still OFF
+ok   S4 설정 -> 자동경영 일괄 관리 tap opens the page
+ok   S4 rows 5 for 5 controlled companies
+ok   S4 전체 OFF tap: all OFF, no decision run
+ok   S4 전체 ON tap: 5/5 ON, 5 decisions, all equal the rule
+ok   S4 row tap 자동경영 끄기: exactly one company OFF
+ok   S4 layout width 412 and no horizontal scroll (scrollWidth 412, width 412)
+ok   S5 66 companies: taps 다음 x2, 이전 -> pages 1/3 2/3 3/3 2/3, last page 16 rows, 다음 disabled there
+ok   S6 지분 구조도 -> 자동경영 관리 tap opens the page
+ok   S7 거래 주체 = P company buys 60% of XOMX (indirect control, option ON): ON, one decision equal to the rule {"tk":"XOMX","mine":true,"via":60,"ap":1,"calls":1,"rule":true}
+ok   S8 forced distress: ordinary A4R (not A2) {"g":0,"pay":0,"sweep":2,"ps":0}, bank A2 r3, insurer A2 r3, HOLD 0/0/0
+ok   S1-S8 branch page: no page error (blocked Google Fonts request not counted)
+ALL OK
+exit code 0
