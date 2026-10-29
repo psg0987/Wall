@@ -46,9 +46,9 @@ function ctlAll(founded,opt){
   for(let v=0;v<n;v++)if(comp[v]>=0)for(const w of edges[v])if(comp[w]!==comp[v]&&!dag[comp[v]].has(comp[w])){dag[comp[v]].add(comp[w]);indeg[comp[w]]++}
   const queue=[];for(let i=0;i<groups.length;i++)if(!indeg[i])queue.push(i);
   const result=Array(n).fill(null),Q=Array(n).fill(null),GINFO=[];
-  // RT-PREMERGE-FIX-01-R3-R2: an order-free search budget. The number of cyclic SCCs K is known before any search; every cyclic SCC gets
-  // the same fixed limit min(5000, floor(50000 / K)) DFS nodes, so no SCC uses budget another one left (no dependence on processing order).
-  const nCyc=groups.filter(g=>g.length>1||edges[g[0]].includes(g[0])).length,LIMIT=nCyc?Math.min(5000,Math.floor(50000/nCyc)):5000;
+  // RT-PREMERGE-FIX-01-R3-R3: every cyclic SCC has its own fixed limit of 5000 DFS nodes (plus <= 8 members, <= 4096 candidate combinations).
+  // No limit depends on how many other cycles exist, so unrelated cycles cannot change an SCC's result (R3-R2 divided 50000 by their number).
+  const LIMIT=5000;
   const exact=(id,v)=>{result[id]=v;Q[id]={st:v===null?"EXACT_NONE":"EXACT",poss:[v]}};
   const pending=(id,st,poss)=>{result[id]="?";Q[id]={st,poss:poss||"ANY"}};
   const evalOne=(c,local)=>{const g=new Map();for(const [key,pct] of Object.entries(c.own)){
@@ -106,6 +106,12 @@ function ctlAll(founded,opt){
     // A pending upstream SCC must not be projected as independent null.
     const outsiders=new Set();for(const id of ids)for(const h of reverse[id])if(comp[h]!==gi&&Q[h]&&!["EXACT","EXACT_NONE"].includes(Q[h].st))outsiders.add(h);
     if(outsiders.size){for(const id of ids)pending(id,"DEP","ANY");GINFO.push({members:ids,status:"DEP_UPSTREAM"});continue}
+    // R3-R3 fast path: when the previous labels of the whole SCC are complete (no "?", no missing label) and they are a fixed point that passes
+    // the grounded closure, they are one of the supported solutions and the policy keeps them - the full search would return the same labels
+    // (KEEP), so they are kept at once, even for an SCC over the search limits. Status EXACT_PREV_VERIFIED: uniqueness is not established.
+    // Anything else (incomplete, not a fixed point, not grounded, e.g. phantom control) goes to the normal search and never inherits control.
+    {const prev=ids.map(id=>before[id]);if(prev.every(v=>v===null||(typeof v==="string"&&v!=="?"))){const local=new Map(ids.map((id,j)=>[id,prev[j]]));
+      if(ids.every(id=>evalOne(S.co[id],local)===local.get(id))&&grounded(ids,prev)){for(let j=0;j<ids.length;j++)exact(ids[j],prev[j]);GINFO.push({members:ids,status:"EXACT_PREV_VERIFIED",limit:LIMIT,nodes:0});continue}}}
     const owners=new Set([null]);for(const id of ids)for(const key of Object.keys(S.co[id].own)){
       if(key[0]!=="c")owners.add(key);else {const h=+key.slice(1);if(comp[h]===gi)owners.add("c"+h);else owners.add(result[h]||"c"+h)}
     }
