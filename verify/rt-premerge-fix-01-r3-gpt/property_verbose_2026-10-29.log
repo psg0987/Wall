@@ -1,0 +1,7 @@
+# t_ctl_r3_property.js through the runner with VERBOSE=1 (full output) | 2026-10-29 09:20:47 KST
+---- t_ctl_r3_property.js
+independent randomized cyclic fixtures 60, multi ambiguous checks 44, errs 0, fails 0
+FAIL t_ctl_r3_property.js
+
+1 test file(s) failed
+exit code 1

@@ -1,0 +1,34 @@
+# full suite (28 tests) | HEAD 8026c36ad19dc116ad102cbfb7bc2d9d610174c1 exp/rt-premerge-fix-01-r3-gpt-integration | run alone | 2026-10-29 09:14:59 KST
+PASS t12_sim.js
+PASS t13_ui.js
+PASS t14_advisor.js
+PASS t18_ai_native.js
+PASS t18_ai_web.js
+PASS t_clean_surplus.js
+PASS t_close_spec.js
+PASS t_impair_ui.js
+PASS t_bank_writeoff.js
+PASS t_bank_writeoff_cases.js
+PASS t_bank_writeoff_cashflow.js
+PASS t_reg01_bank_imp_wo.js
+PASS t_r4c_bank_tg.js
+PASS t_fincf01_relief.js
+PASS t_fincf02_issue.js
+PASS t_fincf03_acq.js
+PASS t_fincf02_save01.js
+PASS t_fincf03b_gr.js
+PASS t_auto_a4r.js
+PASS t_auto_ux01.js
+PASS t_premerge_fix01.js
+PASS t_premerge_r2_cycle.js
+PASS t_ctl_r3_failfirst.js
+PASS t_ctl_r3_critical.js
+PASS t_ctl_r3_extra.js
+FAIL t_ctl_r3_property.js
+
+PASS t_ctl_r3_security_gap.js
+PASS t_golden.js
+1 test file(s) failed
+exit code 1
+elapsed 339s
+dist/game.js sha256 25fce8453152523e989bf77a32755618d1af10e76efc90c5e7a961f2d029796d

@@ -1,0 +1,41 @@
+ok R3-01 mutual 60% + null previous: both AMBIG; actual ["?","?"]
+ok R3-01 AMBIG stable on re-evaluation
+ok R3-02 zero-direct-equity fake [P,P] revoked, actual ["?","?"]
+ok R3-02 no phantom P controller persisted
+ok R3-03 R2 three-company control EXACT P/P/P, actual ["P","P","P"]
+ok R3-04 two distinct unresolved shareholders have distinct root tokens ["?c40","?c224"]
+ok R3-04 unresolved root labels render as 판정 보류 [{"value":"판정 보류","error":null},{"value":"판정 보류","error":null}]
+ok R3-04 disclosure scan tolerates distinct unresolved owners null
+ok R3-05 K7 ambiguous q0 propagates to dependent child; actual {"q0":"?","child":"?"}
+ok R3-06 player operation blocked on unresolved controller
+ok R3-06 unresolved company not selected by !ctl neutral checks
+ok R3-06 trade entity reverts to player on unresolved company
+ok R3-07 unresolved firm cannot issue neutral-AI bonds; bond 0
+errs 0 fails 0
+PASS t_ctl_r3_failfirst.js
+ok C1 symmetric K5 upstream unresolved
+ok C1 child P25 vs combined upstream30 must be DEP, not fake exact P
+ok C1 no synthetic ? root group merge
+ok C2 player direct 70% wins regardless of two ambiguous holders
+ok C3 loaded stale P/P revoked before UI/transactions
+ok C3 CTLQ regenerated in v8fix silent load
+ok C4 persisted ? controllers reverified and stay ambiguous on load
+ok C4 CTLQ reasons restored from source not saved
+errs 0 fails 0
+PASS t_ctl_r3_critical.js
+ok E1 K6 direct P 30 / indirect 60 -> P,P
+ok E2 K6 repeated call stable
+ok E3 K5 known valid prior state preserved
+ok E4 K7 4 grounded fixed points (got 4)
+ok E4 no common controller from null K7 start
+ok E5 K7 uncertainty idempotent
+ok E6 200-company reverse control chain resolves in one call
+ok E6 chain <3000ms in Node 1ms
+ok E7 downstream P 70% robust to unresolved upstream
+ok E8 pending root is distinct from exact null
+errs 0 fails 0
+PASS t_ctl_r3_extra.js
+ok fixture AMBIG company
+ok voluntary swap termination prohibited after losing authority
+errs 0 fails 0
+PASS t_ctl_r3_security_gap.js

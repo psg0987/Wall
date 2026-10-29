@@ -1,0 +1,14 @@
+game sha256 25fce8453152523e | audit_r3.js
+info phantom cycle after P sold: A.ctl ? B.ctl ? CTLQ [{"st":"AMBIG","poss":[null,"c324"]},{"st":"AMBIG","poss":["c30",null]}]
+ok   A1 phantom P control removed: both pending, mine false
+ok   A2 teOK resets a pending trading entity to P
+info A3 eAvail(pending A) = 894.531387274536 ; ePay(A.id, 1) = 1
+ok   A4 G.ap on a pending company does nothing (ap stays as saved, no decision)
+ok   A5 120 days: no autopilot decision for pending companies (ap flags kept: 1,1)
+info A6 hqQ growth drift on pending B (ap 0): g 0.04 -> 0.040191 (CHANGED: AI management still acts)
+info A7 white-knight filter !x.ctl for pending A: excluded
+info A8 optCp / loan-sale / event acquirer / activist buyback filters use !mine only: pending A eligible = true
+ok   A9 restore (migrate+v8fix): pending kept, no autopilot, ap unchanged
+ok   A10 old save with phantom P labels: restore re-verifies to pending, no autopilot
+info A11 wrote a save with pending companies 30,324 for the rollback check
+errs 0 fails 0

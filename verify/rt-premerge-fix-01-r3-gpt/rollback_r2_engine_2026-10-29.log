@@ -1,0 +1,5 @@
+# rollback: a save written by the R3 build (pending A=30, B=324) loaded by the R2 engine d8f814f | 2026-10-29 09:22:10 KST
+info rollback engine: after load + v8fix, pending labels "?" on [30,324] mine: false,false S.cd 0
+info root("c30") on old engine = ? | rootName = PNPL 그룹
+info after 30 days on the old engine: pending left [30,324] A.ctl ? B.ctl ?
+exit code 0
