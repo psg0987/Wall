@@ -1,0 +1,16 @@
+# performance, HEAD 08d1841 | 2026-10-29 20:09:45 KST
+== Node 22 (this workspace's CPU, no throttling)
+info K 1 worst-cost SCCs (planned 4681 nodes each): first ctlAll 39.7 ms {"EXACT_UNIQUE":1}, P controls 4/4 | next call 2.9 ms {"EXACT_PREV_VERIFIED":1}
+info K 10 worst-cost SCCs (planned 4681 nodes each): first ctlAll 199.0 ms {"EXACT_UNIQUE":10}, P controls 40/40 | next call 3.2 ms {"EXACT_PREV_VERIFIED":10}
+info K 20 worst-cost SCCs (planned 4681 nodes each): first ctlAll 350.7 ms {"EXACT_UNIQUE":20}, P controls 80/80 | next call 3.7 ms {"EXACT_PREV_VERIFIED":20}
+info K 50 worst-cost SCCs (planned 4681 nodes each): first ctlAll 799.7 ms {"EXACT_UNIQUE":50}, P controls 200/200 | next call 4.8 ms {"EXACT_PREV_VERIFIED":50}
+info K 100 worst-cost SCCs (planned 4681 nodes each): first ctlAll 1469.0 ms {"EXACT_UNIQUE":100}, P controls 400/400 | next call 6.7 ms {"EXACT_PREV_VERIFIED":100}
+info ordinary world (515 companies, no cycle): ctlAll median 0.88 ms, p95 1.91 ms
+== Chromium (Playwright), 412x915, CPU throttled 4x via CDP Emulation.setCPUThrottlingRate
+info K 1 worst-cost SCCs (planned 4681 nodes each): first ctlAll 95.0 ms {"EXACT_UNIQUE":1}, P controls 4/4 | next call 9.9 ms {"EXACT_PREV_VERIFIED":1}
+info K 10 worst-cost SCCs (planned 4681 nodes each): first ctlAll 440.4 ms {"EXACT_UNIQUE":10}, P controls 40/40 | next call 11.5 ms {"EXACT_PREV_VERIFIED":10}
+info K 20 worst-cost SCCs (planned 4681 nodes each): first ctlAll 970.0 ms {"EXACT_UNIQUE":20}, P controls 80/80 | next call 9.2 ms {"EXACT_PREV_VERIFIED":20}
+info K 50 worst-cost SCCs (planned 4681 nodes each): first ctlAll 7584.6 ms {"EXACT_UNIQUE":50}, P controls 200/200 | next call 14.0 ms {"EXACT_PREV_VERIFIED":50}
+info K 100 worst-cost SCCs (planned 4681 nodes each): first ctlAll 4799.9 ms {"EXACT_UNIQUE":100}, P controls 400/400 | next call 11.0 ms {"EXACT_PREV_VERIFIED":100}
+info ordinary world (515 companies, no cycle): ctlAll median 2.10 ms, p95 5.80 ms
+page errors: 0

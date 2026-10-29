@@ -1,0 +1,15 @@
+# AFTER the fix: tests/t_ctl_r3_r3.js on the working tree | 2026-10-29 20:01:49 KST
+game sha256 1170a4a122701750 | t_ctl_r3_r3.js
+ok D1 an 18th unrelated dense SCC: the 17 keep P control (68/68), the new one is solved too (4/4)
+ok D2 20 dense SCCs under 3 numberings: identical statuses and control
+ok D2 every one of the 20 SCCs is solved: P controls all 80 (20/20 groups)
+ok D3 10 dense SCCs give the same result with or without 40 unrelated small cycles (P controls all 40: 10/10 groups)
+ok D3 40 small cycles give the same result with or without the dense SCCs
+ok V1 second call: the previous state is verified and kept without search, status EXACT_PREV_VERIFIED (nodes 0)
+ok V1 a verified previous state is not reported as EXACT_UNIQUE
+ok V2 9-company ring with a verified previous state [P x9]: kept (status EXACT_PREV_VERIFIED, P controls 9/9)
+ok V2b 9-company ring without any P stake but saved as [P x9] (phantom): not verified, P controls none (status BUDGET_EXCEEDED)
+ok V3 restored save with phantom P labels: rejected by the grounded check (?,?)
+ok A1 interrupted ctlAll: no label changed (no partial update)
+ok A2 autopilot (8 decisions) only ever sees the final labels
+errs 0 fails 0
