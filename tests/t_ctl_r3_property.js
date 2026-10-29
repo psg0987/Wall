@@ -35,6 +35,7 @@ for(let j=0;j<60;j++){
  ok(actual.every((v,i)=>v===common[i]),'C'+j+' multi supported common mismatch '+JSON.stringify({actual,common,fps}));
  checked++;
 }
-console.log('independent randomized cyclic fixtures 60, multi ambiguous checks '+checked+', errs '+errs+', fails '+fails);
+console.log('independent randomized cyclic fixtures 60, multi ambiguous checks '+checked);
+console.log('errs '+errs+' fails '+fails);   // RT-PREMERGE-FIX-01-R3-R1: summary in the runner's format (was ", errs N, fails N" on the line above)
 for(const d of details)console.log('FAIL '+d);
 if(errs||fails)process.exitCode=1;

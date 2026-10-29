@@ -1,0 +1,19 @@
+# BEFORE the fix: tests/t_ctl_r3_r1.js on dfab4d9 game code (src unchanged) | 2026-10-29 09:59:35 KST
+game sha256 25fce8453152523e | t_ctl_r3_r1.js
+FAIL U1 hqQ does not change the growth rate of a pending company (g 0.0979)
+FAIL U2 4000 aiEvent calls: pending companies considered 364 times
+FAIL U3 offer.mk(target) does not choose the pending company as acquirer (chose 0, pending 0)
+FAIL U4 loan sale: the buyer is not the pending bank (loan now at 123, pending 123)
+FAIL U5 30 activist demands: buybacks carried out by the pending company 13
+FAIL U6 3000 option trades: the pending company is never the counterparty
+FAIL C1 etfMgr confirmed after control was lost: no purchase (mgr 34, cash change 0)
+FAIL C2 lsell confirmed after the seller bank left my control: no sale
+FAIL C2b lsell confirmed after the loan moved to another bank: no sale
+FAIL C3 lbuy confirmed by a bank that is now pending: no purchase (loan at 122)
+FAIL C4 squeeze-out confirmed after my stake fell to 50%: no purchase (priv 1)
+ok K1 ePay has no blanket authority guard (callers check)
+ok K2 a pending company still closes its quarter (earn ran on day 68, dividend 36.08201679446256)
+FAIL S1 save JSON: no ctl "?"; pending ids in ctlp undefined
+ok S2 the live game still shows them pending after saving
+ok S3 loading restores pending at once (AMBIG/AMBIG), no waiting for a next day
+errs 0 fails 12
