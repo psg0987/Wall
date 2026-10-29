@@ -373,7 +373,7 @@ function swMd(){const o=SWO,cp=swCp(o.e),qt=swQuote(o.e,o.t,o.dir,o.q),room=swRo
 openMd({t:"금리 스왑 ("+eName(o.e)+" 명의)",b:"고정금리와 변동금리를 서로 바꿔 내는 계약이에요. 원금은 오가지 않고, 분기마다 금리 차이만 정산합니다. '고정 받기'는 금리가 내릴 때, '고정 내기'는 오를 때 이익이에요.",
 h:chip("변동금리 기준","t",["P","S","L"],x=>SWT[x][0]+" "+swRate(x).toFixed(2)+"%")+chip("방향","dir",[1,-1],x=>x>0?"고정 받기 (금리 하락 베팅)":"고정 내기 (금리 상승 베팅)")+chip("기간","q",[4,8,12,20],x=>x/4+"년")+chip("명목 원금","N",[50,100,300,1000,3000].filter(v=>v<=room||v===50),x=>F(x))+
 `<div class="card" style="margin-top:10px"><div class="g"><span>상대방</span><span>${cp?esc(cp.tk)+" ("+RT[rating(cp)]+")":"없음"}</span><span>시장 중간값</span><span>${qt.mid.toFixed(2)}%</span><span>제시 고정금리</span><span>${qt.K.toFixed(2)}% <span class="mu">(마진 ${qt.h.toFixed(2)}%p)</span></span><span>분기 정산 예시</span><span>${F(o.N*(qt.K-swRate(o.t))/400*o.dir)}</span><span>한도 (순자산 10배)</span><span>${F(room)}</span></div><div class="mu" style="margin-top:6px">상대방은 반대쪽 손익을 자기 실적에 반영합니다. 스왑은 장부 밖(각주)에만 나와요.</div></div>`,o:[["취소","n"],["계약","y"]]});
-mcb=()=>{const z=SWO,cp2=swCp(z.e),q2=swQuote(z.e,z.t,z.dir,z.q);if(!cp2)return toast("스왑을 받아 줄 금융회사가 없습니다");if(z.N>swRoom(z.e)+1e-9)return toast("명목 원금 한도를 넘습니다");if(!ePay(z.e,z.N*.0005))return toast("수수료가 부족합니다");
+mcb=()=>{const z=SWO;if(z.e!=="P"&&(!S.co[z.e]||!mine(S.co[z.e])))return toast("지배권이 확인된 회사만 신규 계약을 체결할 수 있습니다");const cp2=swCp(z.e),q2=swQuote(z.e,z.t,z.dir,z.q);if(!cp2)return toast("스왑을 받아 줄 금융회사가 없습니다");if(z.N>swRoom(z.e)+1e-9)return toast("명목 원금 한도를 넘습니다");if(!ePay(z.e,z.N*.0005))return toast("수수료가 부족합니다");
 S.irs.push({e:z.e,cp:cp2.id,N:z.N,t:z.t,K:q2.K,dir:z.dir,st:S.day,en:S.day+z.q*90,lp:0,tp:0});rec("금리 스왑",{tk:SWT[z.t][0]},z.N,eName(z.e));L("🔁 "+eName(z.e)+" 금리 스왑 체결: "+F(z.N)+" "+(z.dir>0?"고정 "+q2.K.toFixed(2)+"% 받고 "+SWT[z.t][0]+" 지급":"고정 "+q2.K.toFixed(2)+"% 내고 "+SWT[z.t][0]+" 수취")+" · "+z.q/4+"년 · 상대 "+cp2.tk,1)}}
 function swQ(){if(!S.irs.length)return;S.irs=S.irs.filter(x=>{const cp=S.co[x.cp];if(!cp||cp.dead){L("💥 스왑 상대방 "+(cp?cp.tk:"")+" 파산 — 스왑이 종료됐습니다",x.e==="P"||mine(S.co[x.e]));return false}
 const fl=swRate(x.t),net=x.N*(x.K-fl)/400*x.dir;x.lp=net;x.tp+=net;if(x.e==="P"){S.cash+=net;if(S.cash<0){S.loan-=S.cash;S.cash=0}}else{const c=S.co[x.e];if(!c||c.dead)return false;c.cs+=net;c.swq=(c.swq||0)+net;if(c.cs<0){c.D-=c.cs;c.cs=0}}
@@ -381,7 +381,7 @@ cp.cs-=net;cp.swq=(cp.swq||0)-net;if(cp.cs<0){cp.D-=cp.cs;cp.cs=0}if(Math.abs(ne
 if(x.e==="P"||mine(S.co[x.e]))L("🔁 스왑 정산 "+(net>=0?"+":"")+F(net)+" ("+SWT[x.t][0]+" "+fl.toFixed(2)+"% vs 고정 "+x.K.toFixed(2)+"%)");return S.day<x.en})}
 const swFee=x=>{const fl=swRate(x.t),un=Math.max(0,-x.dir*(x.K-fl))*x.N/400,ql=Math.max(0,(x.en-S.day)/90);return Math.max(.005*x.N,2*un)+(ql>4?x.N*(.01+.005*Math.min(4,ql/4)):0)};
 const swMtm=x=>{const ql=Math.max(0,(x.en-S.day)/90);return x.dir*x.N*(x.K-swMid(x.t,ql))/400*ql};
-G.swEnd=n=>{const x=S.irs[n];if(!x)return;const f=swFee(x);ask("스왑 조기 종료","해지 수수료 "+F(f)+"를 내고 남은 "+Math.max(0,Math.round((x.en-S.day)/90))+"분기를 없앱니다.","종료",()=>{if(!ePay(x.e,f))return toast("수수료가 부족합니다");S.irs.splice(S.irs.indexOf(x),1);L("🔁 금리 스왑 조기 종료 (수수료 "+F(f)+")",1);render()})};
+G.swEnd=n=>{const x=S.irs[n];if(!x)return;const authorized=()=>x.e==="P"||!!(S.co[x.e]&&mine(S.co[x.e]));if(!authorized())return toast("지배권이 확인된 회사만 계약을 조기 종료할 수 있습니다");const f=swFee(x);ask("스왑 조기 종료","해지 수수료 "+F(f)+"를 내고 남은 "+Math.max(0,Math.round((x.en-S.day)/90))+"분기를 없앱니다.","종료",()=>{if(!authorized()||!S.irs.includes(x))return toast("계약 또는 지배권이 변경되어 종료할 수 없습니다");if(!ePay(x.e,f))return toast("수수료가 부족합니다");S.irs.splice(S.irs.indexOf(x),1);L("🔁 금리 스왑 조기 종료 (수수료 "+F(f)+")",1);render()})};
 
 // ===== ETFs =====
 const ETFD=[["KALL","WSR 종합 ETF","ix","ALL",1,.1],["K50","대형 50 ETF","ix","L50",1,.1],["KSML","중소형 ETF","ix","SML",1,.2],...GRP.map((g,k)=>["G"+g[0],g[1]+" 섹터 ETF","ix","G"+k,1,.3]),
@@ -504,7 +504,7 @@ function cTax(c,pre){const h=cPar(c);c.cpar=h?h.id:-1;
 if(pre>0){const u=Math.min(c.nol,pre);c.nol-=u;let tb=pre-u,t=0;if(h&&h.nol>0){const u2=Math.min(h.nol,tb);h.nol-=u2;tb-=u2;const pay=u2*ctax(c);h.cs+=pay;t+=pay;c.ctx=+(pay).toFixed(2)}else c.ctx=0;return t+tb*ctax(c)}
 if(h){const ben=-pre*ctax(h);h.nol-=pre;h.cs-=ben;if(h.cs<0){h.D-=h.cs;h.cs=0}c.ctx=-ben;return -ben}c.ctx=0;c.nol-=pre;return 0}
 // one group owns 100% (by any route) -> the company leaves the exchange
-function privChk(c){if(c.priv||c.dead||pub(c)>.05)return;let r=null;for(const k in c.own){const x=root(k);if(r==null)r=x;else if(x!==r)return}if(!r)return;
+function privChk(c){if(c.priv||c.dead||pub(c)>.05)return;let r=null;for(const k in c.own){const x=root(k);if(r==null)r=x;else if(x!==r)return}if(!r||String(r)[0]==="?")return;
 settleX(c,1);c.priv=1;c.pt=S.day;c.lim=0;eco("🔒 "+c.tk+" "+c.n+" 상장 폐지 — "+rootName(r)+"가 지분 100% 확보 (비상장 전환)");if(r==="P")L("🔒 "+c.tk+" 지분 100% 확보 → 비상장 회사로 전환됐습니다. 경영 탭에서 다시 상장할 수 있어요",1)}
 // squeeze-out: with 90%+ the group may force the remaining shareholders to sell at a 10% premium
 G.sqz=i=>{const c=S.co[i],e=teOK(),k=eKey(e);if(c.priv||c.dead)return;const g=grp(c,"P");if(g<90)return toast("내 그룹 지분이 90% 이상이어야 잔여 지분을 강제 매수할 수 있어요");if(root(k)!=="P")return;

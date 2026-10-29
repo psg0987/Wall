@@ -23,8 +23,8 @@ const smsg=surprise(c),dv=Math.max(0,cp-tax+c.dr)*(c.dban?0:c.pay);c.cs-=dv;payD
 for(const k in c.own)if(k[0]==="c"&&c.own[k]>=20)S.co[+k.slice(1)].eqi+=c.ni*c.own[k]/100;
 c.er={op,it,ga,tax,eq:c.eqi,dr:c.dr,ni:c.ni,dv,d:S.day};(c.eh=c.eh||[]).push(Math.round(c.ni*1e5/c.sh)/10);if(c.eh.length>8)c.eh.shift();woBook(c);c.eqi=0;c.dr=0;if(!c.kd)c.q=Math.max(0,Math.min(.009,(c.q||0)+(c.ps||0)*.0006-(c.ps?0:.0002)));if(c.ap&&mine(c))autop(c);
 const gr=c.A*c.g/4;c.A+=gr;if(c.kd)c.D+=gr;else c.cs-=gr>0?gr:gr*.9;
-if(c.cs<0){c.D-=c.cs;c.cs=0}if(c.bond>0&&S.day>=c.bmat){if(c.bh){S.cash+=c.bh;c.bh=0;L(c.tk+" 회사채 만기 상환",1)}c.bond=0;c.cpn=0}if(!c.kd&&c.bond===0&&!mine(c)&&rnd()<.05&&rating(c)<=4){const x=Math.min(loanOf(c)*.5,Math.max(0,eq(c)));if(x>5){c.bond=x;c.cpn=S.prime+SPR[rating(c)]+1;c.bmat=S.day+1800+(rnd()*1800|0)}}
-if(c.sweep&&!mine(c)||c.sweep===2){const tc=c.A*(c.kd===2?.25:c.kd===1?.08:.06);if(c.cs>tc*1.5&&c.D>0){const x=Math.min(c.kd?c.D:loanOf(c),c.cs-tc);if(x>0){c.cs-=x;c.D-=x}}}
+if(c.cs<0){c.D-=c.cs;c.cs=0}if(c.bond>0&&S.day>=c.bmat){if(c.bh){S.cash+=c.bh;c.bh=0;L(c.tk+" 회사채 만기 상환",1)}c.bond=0;c.cpn=0}if(!c.kd&&c.bond===0&&!mine(c)&&c.ctl!=="?"&&rnd()<.05&&rating(c)<=4){const x=Math.min(loanOf(c)*.5,Math.max(0,eq(c)));if(x>5){c.bond=x;c.cpn=S.prime+SPR[rating(c)]+1;c.bmat=S.day+1800+(rnd()*1800|0)}}
+if(c.ctl!=="?"&&(c.sweep&&!mine(c)||c.sweep===2)){const tc=c.A*(c.kd===2?.25:c.kd===1?.08:.06);if(c.cs>tc*1.5&&c.D>0){const x=Math.min(c.kd?c.D:loanOf(c),c.cs-tc);if(x>0){c.cs-=x;c.D-=x}}}
 if(c.ni<0&&c.D/Math.max(eq(c),1)>(c.kd?12:1.2))c.ds++;else c.ds=0;
 if(c.ds>=4){c.ds=0;const e=eq(c);if(e>-.3*c.A){const a0=c.A;c.A=Math.max(c.A*.2,c.A-(e+.3*c.A));const wd=a0-c.A;if(wd>0)impair(c,wd)}}
 if(eq(c)<(c.kd?0:-.25*c.A)){ch11(c,"자본잠식");if(c.dead)return}
@@ -47,8 +47,8 @@ for(const k of Object.keys(t.pos)){const x=S.co[k],p=x.own["c"+t.id],b=x.bs["c"+
 t.A=0;t.cs=0;t.D=0;t.gw=0;kill(t,1.3,1)}
 function newCo(i,nm,sty){const used=new Set(S.co.map(c=>c.tk)),n=nm||AW[rnd()*AW.length|0]+" "+SB[i][rnd()*3|0],c=addCo(mk(tkGen(used),n,i,40+rnd()*260,1));c.cty=ctyPick(n);hqInit(c,1);S.st.ipo++;eco("🚀 신규 상장 "+c.tk+" "+n+" ("+SEC[i][0]+") 시총 "+F(mc(c))+(sty?" — "+sty:""));return c}
 function ipoTick(){if(S.co.length-S.st.del-S.st.ma>560||rnd()>.35)return;const w=S.d.map((d,k)=>k===HOLD?0:Math.max(.2,1+d*60)*(S.co.some(c=>c.i===k&&!c.dead&&!c.priv)?1:2.5));let r=rnd()*w.reduce((a,b)=>a+b),i=0;while(i<SEC.length-1&&r>w[i]){r-=w[i];i++}if(i===HOLD)i=0;newCo(i)}
-function maTick(){if(rnd()>.5)return;const a=S.co.filter(c=>!c.dead&&!c.priv&&!mine(c)&&rating(c)<=2&&!c.kd).sort((x,y)=>mc(y)-mc(x));if(!a.length)return;const ac=a[rnd()*Math.min(a.length,30)|0];
-const ts=S.co.filter(t=>!t.dead&&t.i===ac.i&&t!==ac&&!t.priv&&!mine(t)&&t.ctl!=="c"+ac.id&&mc(t)<mc(ac)*.25&&t.pill<S.day);if(!ts.length)return;const t=ts[rnd()*ts.length|0],pr=mc(t)*1.3,ao=t.own["c"+ac.id]||0,pay=pr*(100-ao)/100;
+function maTick(){if(rnd()>.5)return;const a=S.co.filter(c=>!c.dead&&!c.priv&&!mine(c)&&c.ctl!=="?"&&rating(c)<=2&&!c.kd).sort((x,y)=>mc(y)-mc(x));if(!a.length)return;const ac=a[rnd()*Math.min(a.length,30)|0];
+const ts=S.co.filter(t=>!t.dead&&t.i===ac.i&&t!==ac&&!t.priv&&!mine(t)&&t.ctl!=="?"&&t.ctl!=="c"+ac.id&&mc(t)<mc(ac)*.25&&t.pill<S.day);if(!ts.length)return;const t=ts[rnd()*ts.length|0],pr=mc(t)*1.3,ao=t.own["c"+ac.id]||0,pay=pr*(100-ao)/100;
 for(const k of Object.keys(t.own)){if(k==="c"+ac.id)continue;const x=payK(t,k,t.own[k]/100*pr);if(k==="P")L("🤝 보유 중인 "+t.tk+" 지분이 인수되어 "+F(x)+" 현금화",1)}
 ac.cs-=pay;if(ac.cs<0){ac.D-=ac.cs;ac.cs=0}S.st.ma++;eco("🤝 "+ac.tk+"가 "+t.tk+" "+t.n+" 인수 (프리미엄 30%, "+F(pay)+")");t.p*=1.3;for(const k of Object.keys(t.own))if(k!=="c"+ac.id)setOwn(t,k,0);absorb(ac,t,pay,pay)}
 // rival buys b% of c, personally (via<0) or through a company it controls (via = company index)
@@ -159,8 +159,8 @@ function callLoan(b,x,f){const amt=loanOf(x)*f;if(amt<1)return 0;let paid=Math.m
 if(need>0&&!x.kd){fsAdd(x,Math.min(.6,need/.75/Math.max(1,x.A)),"대출 회수");const p2=Math.min(x.cs,need);x.cs-=p2;paid+=p2;need-=p2}
 x.D-=paid;b.cs+=paid;b.A-=paid;x.p*=.85;x.tg*=.9;x.lc=S.day+180;if(need>1)ch11(x,"대출 회수");return paid}
 function fsTick(){if(!S.fs)S.fs=[];S.fs=S.fs.filter(f=>f.exp>S.day);
-if(rnd()<.3){const q=S.co.filter(c=>!c.dead&&!c.kd&&!c.priv&&!mine(c)&&rating(c)>=4&&c.A>60),c=q[rnd()*q.length|0];if(c)fsAdd(c,.12,"유동성 위기")}
-S.fs=S.fs.filter(f=>{if(rnd()>.2)return true;const q=S.co.filter(c=>!c.dead&&!c.kd&&!mine(c)&&c.i===f.i&&c.cs>=f.px),c=q[rnd()*q.length|0];if(!c)return true;c.cs-=f.px;c.A+=f.A;eco("⇄ "+c.tk+"가 "+f.s+"의 사업 자산 "+F(f.A)+" 인수");return false})}
+if(rnd()<.3){const q=S.co.filter(c=>!c.dead&&!c.kd&&!c.priv&&!mine(c)&&c.ctl!=="?"&&rating(c)>=4&&c.A>60),c=q[rnd()*q.length|0];if(c)fsAdd(c,.12,"유동성 위기")}
+S.fs=S.fs.filter(f=>{if(rnd()>.2)return true;const q=S.co.filter(c=>!c.dead&&!c.kd&&!mine(c)&&c.ctl!=="?"&&c.i===f.i&&c.cs>=f.px),c=q[rnd()*q.length|0];if(!c)return true;c.cs-=f.px;c.A+=f.A;eco("⇄ "+c.tk+"가 "+f.s+"의 사업 자산 "+F(f.A)+" 인수");return false})}
 function rbank(){if(S.df<2)return;for(const b of S.co){if(b.dead||b.kd!==1||!b.ctl||b.ctl[0]!=="r")continue;const r=S.R[+b.ctl.slice(1)];
 for(const x of S.co){if(x.dead||x.ln!==b.id||!mine(x)||rating(x)<4||eq(x)<=0||(x.lc||0)>S.day||rnd()>.3)continue;x.frz=b.id+1;const p=callLoan(b,x,.5);L("🏦 "+r.n+"이(가) 지배하는 "+b.tk+" 은행이 "+x.tk+"의 대출 "+F(p)+"을 회수하고 신용을 동결했습니다! 거래 은행을 바꾸세요",1)}}}
 function autop(c){const r=rating(c),roa=c.ni*4/Math.max(1,c.A),gap=c.kd?0:S.dg[c.i]-S.cg[c.i];

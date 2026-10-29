@@ -22,43 +22,123 @@ function addCo(c){c.id=S.co.length;S.co.push(c);S.cd=1;if(c.acd==null)c.acd=S.da
 function setOwn(c,k,v){if(v<=1e-6){delete c.own[k];delete c.bs[k];if(k[0]==="c")delete S.co[+k.slice(1)].pos[c.id]}else{c.own[k]=v;if(k[0]==="c")S.co[+k.slice(1)].pos[c.id]=1}S.cd=1;c.oc=1}
 const held=c=>{let t=0;for(const k in c.own)t+=c.own[k];return t};
 const pub=c=>Math.max(0,100-held(c));
-const root=k=>{if(k[0]!=="c")return k;const h=S.co[+k.slice(1)];return h&&h.ctl||k};
-// RT-AUTO-UX-01: detect genuinely new control transitions before the fixed-point calculation.
-// Capture only state already in memory; no save-schema changes or unrelated ON/OFF resets.
-// RT-PREMERGE-FIX-01 (control depth): a sweep is unchanged (companies in id order, a stake held by a company counted under that company's
-// controller). The old loop stopped after 7 sweeps even when the last one still changed something, so a chain of holdings deeper than the
-// sweeps (e.g. 11 levels listed in reverse id order) was left half done. Now the sweeps go on until one changes nothing; where the old loop
-// had settled, the same sweeps run and give the same result. A holding cycle can make the sweeps flip between states forever: when a whole
-// controller state repeats, the companies whose controller differs inside the repeating part have no stable controlling holder, so they get
-// none (null) and stay held at null while the others are swept again; if others start to flip, they join. The held set only grows, so this
-// ends. Very long runs without a repeat (not seen) end the same way at 4 x companies + 20 sweeps, holding what changed after the first
-// companies + 1 sweeps (by then every company outside a cycle has settled).
-// founded: id of a company founded right now (G.fdGo); its first control is a founding, not an acquisition (see below).
-function ctlAll(founded){const before=S.co.map(c=>c.dead?null:c.ctl);for(const c of S.co)if(c.dead)c.ctl=null;
-const N=S.co.length,held=new Set(),snap=()=>S.co.map(c=>c.ctl);
-const sweep=()=>{let ch=0;for(const c of S.co){if(c.dead||held.has(c.id))continue;const g={};for(const k in c.own){const r=root(k);g[r]=(g[r]||0)+c.own[k]}
-let b=null,m=0,m2=0;for(const r in g){const v=g[r];if(v>m){m2=m;m=v;b=r}else if(v>m2)m2=v}
-let n=m>=20&&m>m2+1e-9?b:null;if(n==="c"+c.id)n=null;if(n!==c.ctl){c.ctl=n;ch=1}}return ch};
-for(;;){const states=[snap()],at=new Map([[states[0].join("\u0001"),0]]);let flip=null;
-for(let it=1;sweep();it++){const s=snap(),k=s.join("\u0001");
-if(at.has(k)){flip=states.slice(at.get(k));break}
-if(it>=4*N+20){flip=states.slice(Math.min(states.length-1,N+1));flip.push(s);break}
-at.set(k,it);states.push(s)}
-if(!flip)break;
-let add=0;for(const c of S.co){if(c.dead||held.has(c.id))continue;if(flip.some(s=>s[c.id]!==flip[0][c.id])){held.add(c.id);c.ctl=null;add=1}}
-if(!add)break}
-S.cd=0;
-// A newly controlled company already flagged ON, or covered by the global auto-on-acquire option,
-// receives a decision immediately. Existing manually OFF companies are never affected.
-// RT-PREMERGE-FIX-01: a company founded right now is not an acquisition — it keeps the preset chosen at founding and starts with
-// 자동 경영 as it was created (off); the player turns it on explicitly. Losing and later regaining its control is an acquisition again.
-for(const c of S.co){if(c.dead||c.ctl!=="P"||before[c.id]==="P"||c.id===founded)continue;
-if(S.apAll)c.ap=1;
-if(c.ap)autop(c);
-}}
+// RT-PREMERGE-FIX-01-R3 — experimental control solver, local-only, NOT APPROVED for main.
+let CTLQ=null, CTLS=null;
+const isCtlPending=c=>!!c&&!c.dead&&c.ctl==="?";
+const root=k=>{if(k[0]!=="c")return k;const h=S.co[+k.slice(1)];return h&&h.ctl==="?"?"?c"+h.id:h&&h.ctl||k};
+function ctlAll(founded,opt){
+  opt=opt||{};
+  const before=S.co.map(c=>c.dead?null:c.ctl),n=S.co.length,edges=Array.from({length:n},()=>[]),reverse=Array.from({length:n},()=>[]);
+  for(const target of S.co){if(target.dead)continue;for(const key of Object.keys(target.own))if(key[0]==="c"){
+    const h=+key.slice(1);if(h>=0&&h<n&&S.co[h]&&!S.co[h].dead){edges[h].push(target.id);reverse[target.id].push(h)}
+  }}
+  // Iterative Kosaraju, then an explicit SCC DAG topological sort. No recursion proportional to company count.
+  const seen=new Uint8Array(n),order=[];
+  for(let st=0;st<n;st++){if(seen[st]||S.co[st].dead)continue;seen[st]=1;const stack=[[st,0]];
+    while(stack.length){const e=stack[stack.length-1],v=e[0];if(e[1]<edges[v].length){const w=edges[v][e[1]++];if(!seen[w]){seen[w]=1;stack.push([w,0])}}
+    else{order.push(v);stack.pop()}}
+  }
+  const comp=Array(n).fill(-1),groups=[];
+  for(let i=order.length-1;i>=0;i--){const v=order[i];if(comp[v]>=0)continue;const id=groups.length,part=[],stack=[v];comp[v]=id;
+    while(stack.length){const u=stack.pop();part.push(u);for(const w of reverse[u])if(comp[w]===-1){comp[w]=id;stack.push(w)}}groups.push(part)
+  }
+  const dag=groups.map(()=>new Set()),indeg=groups.map(()=>0);
+  for(let v=0;v<n;v++)if(comp[v]>=0)for(const w of edges[v])if(comp[w]!==comp[v]&&!dag[comp[v]].has(comp[w])){dag[comp[v]].add(comp[w]);indeg[comp[w]]++}
+  const queue=[];for(let i=0;i<groups.length;i++)if(!indeg[i])queue.push(i);
+  const result=Array(n).fill(null),Q=Array(n).fill(null),GINFO=[],budget={used:0,max:50000};
+  const exact=(id,v)=>{result[id]=v;Q[id]={st:v===null?"EXACT_NONE":"EXACT",poss:[v]}};
+  const pending=(id,st,poss)=>{result[id]="?";Q[id]={st,poss:poss||"ANY"}};
+  const evalOne=(c,local)=>{const g=new Map();for(const [key,pct] of Object.entries(c.own)){
+    let r=key;if(key[0]==="c"){const h=+key.slice(1),v=local&&local.has(h)?local.get(h):result[h];r=v==null?key:v}
+    g.set(r,(g.get(r)||0)+pct)
+  }
+    let win=null,max=0,runner=0;for(const [r,pct] of g){if(pct>max){runner=max;max=pct;win=r}else if(pct>runner)runner=pct}
+    return max>=20&&max>runner+1e-9&&win!=="c"+c.id?win:null;
+  };
+  const evalUncertain=(c)=>{const unknown=[];for(const key of Object.keys(c.own))if(key[0]==="c"){
+      const h=+key.slice(1);if(Q[h]&&Q[h].st!=="EXACT"&&Q[h].st!=="EXACT_NONE")unknown.push(h)
+    }
+    const uniq=[...new Set(unknown)];if(!uniq.length)return {label:evalOne(c,null),poss:null};
+    let combinations=1,options=[];
+    for(const h of uniq){let p=Q[h].poss;if(!Array.isArray(p))p=null;
+      // A null possibility means this holding is independently controlled by company h.
+      if(!p){combinations=Infinity;break}
+      const labels=[...new Set(p.map(v=>v===null?"c"+h:v))];options.push(labels);combinations*=labels.length;
+    }
+    if(combinations<=64){const got=new Set(),map=new Map();
+      function visit(i){if(i===uniq.length){got.add(evalOne(c,map));return}for(const value of options[i]){map.set(uniq[i],value);visit(i+1)}}visit(0);
+      if(got.size===1)return {label:[...got][0],poss:null};return {label:"?",poss:[...got]}
+    }
+    // Sound sufficient dominance test: every unresolved share may be assigned to any opponent.
+    let U=0;const assigned=new Map();for(const h of uniq){U+=c.own["c"+h]||0;assigned.set(h,"__unassigned__"+h)}
+    const weights=new Map();for(const [key,pct] of Object.entries(c.own)){
+      let r=key;if(key[0]==="c"){const h=+key.slice(1);if(assigned.has(h))continue;const v=result[h];r=v==null?key:v}
+      weights.set(r,(weights.get(r)||0)+pct)
+    }
+    let winner=null,max=0,second=0;for(const [r,v] of weights){if(v>max){second=max;max=v;winner=r}else if(v>second)second=v}
+    if(max>=20&&max>second+U+1e-9&&winner!=="c"+c.id)return {label:winner,poss:null};
+    if(max+U<20)return {label:null,poss:null};
+    return {label:"?",poss:"ANY"};
+  };
+  const grounded=(ids,values)=>{
+    const local=new Map(ids.map((id,i)=>[id,values[i]])),cert=new Set(ids.filter(id=>local.get(id)===null));
+    for(let round=0;round<ids.length;round++){
+      let changed=false;
+      for(const id of ids){if(cert.has(id))continue;const label=local.get(id),c=S.co[id];let sw=0,other=0;
+        const g=new Map();for(const [key,pct] of Object.entries(c.own)){
+          let r=key,h=-1;if(key[0]==="c"){h=+key.slice(1);const v=local.has(h)?local.get(h):result[h];r=v==null?key:v}
+          g.set(r,(g.get(r)||0)+pct);
+          if(r===label&&(h<0||!local.has(h)||cert.has(h)))sw+=pct;
+        }
+        for(const [r,v] of g)if(r!==label&&v>other)other=v;
+        if(sw>=20&&sw>other+1e-9){cert.add(id);changed=true}
+      }
+      if(!changed)break;
+    }
+    return cert.size===ids.length;
+  };
+  while(queue.length){const gi=queue.shift(),ids=groups[gi];for(const dep of dag[gi])if(!--indeg[dep])queue.push(dep);
+    const cyclic=ids.length>1||edges[ids[0]].includes(ids[0]);
+    if(!cyclic){const id=ids[0],r=evalUncertain(S.co[id]);r.label==="?"?pending(id,"DEP",r.poss):exact(id,r.label);continue}
+    // A pending upstream SCC must not be projected as independent null.
+    const outsiders=new Set();for(const id of ids)for(const h of reverse[id])if(comp[h]!==gi&&Q[h]&&!["EXACT","EXACT_NONE"].includes(Q[h].st))outsiders.add(h);
+    if(outsiders.size){for(const id of ids)pending(id,"DEP","ANY");GINFO.push({members:ids,status:"DEP_UPSTREAM"});continue}
+    const owners=new Set([null]);for(const id of ids)for(const key of Object.keys(S.co[id].own)){
+      if(key[0]!=="c")owners.add(key);else {const h=+key.slice(1);if(comp[h]===gi)owners.add("c"+h);else owners.add(result[h]||"c"+h)}
+    }
+    // All reachable labels are a safe SUPerset; no direct-share pruning is used.
+    const baseDomain=[...owners].filter(x=>x!=="?"),domains=ids.map(id=>baseDomain.filter(x=>x!=="c"+id));
+    const product=domains.reduce((x,d)=>x*d.length,1);
+    if(ids.length>8||product>4096||budget.used+product>budget.max){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"BUDGET_EXCEEDED",product});continue}
+    const fixed=[];let nodes=0,completed=true;const state=[];
+    function visit(i){if(++nodes>5000){completed=false;return}if(i===ids.length){const local=new Map(ids.map((id,j)=>[id,state[j]]));
+        if(ids.every((id)=>evalOne(S.co[id],local)===local.get(id))&&grounded(ids,state))fixed.push(state.slice());return;
+      }
+      for(const v of domains[i]){state[i]=v;visit(i+1);if(!completed)return}
+    }
+    visit(0);budget.used+=nodes;
+    if(!completed){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"BUDGET_EXCEEDED",product,nodes});continue}
+    if(!fixed.length){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"NO_SUPPORTED",product,nodes});continue}
+    const old=ids.map(id=>before[id]),keep=fixed.find(c=>c.every((v,i)=>v===old[i]));
+    for(let i=0;i<ids.length;i++){
+      const poss=[...new Set(fixed.map(x=>x[i]))],value=keep?keep[i]:poss.length===1?poss[0]:"?";
+      value==="?"?pending(ids[i],"AMBIG",poss):exact(ids[i],value)
+    }
+    GINFO.push({members:ids,status:keep?"EXACT_MULTI_KEPT":fixed.length===1?"EXACT_UNIQUE":"EXACT_MULTI_AMBIG",product,nodes,solutions:fixed.length});
+  }
+  // Publish only after every result is computed, never partially during SCC exploration.
+  CTLQ=Q;CTLS=GINFO;
+  for(const c of S.co)c.ctl=c.dead?null:result[c.id];
+  S.cd=0;
+  if(!opt.silent&&typeof autop==="function")for(const c of S.co){
+    if(c.dead||c.ctl!=="P"||before[c.id]==="P"||c.id===founded)continue;
+    if(S.apAll)c.ap=1;if(c.ap)autop(c)
+  }
+}
+
 const grp=(c,r)=>{let t=0;for(const k in c.own)if(root(k)===r)t+=c.own[k];return t};
 const mine=c=>c.ctl==="P"&&!c.dead;
-const rootName=r=>!r?"일반 주주":r==="P"?"나":r[0]==="r"?S.R[+r.slice(1)].n:S.co[+r.slice(1)].tk+" 그룹";
+const rootName=r=>!r?"일반 주주":r[0]==="?"?"판정 보류":r==="P"?"나":r[0]==="r"?S.R[+r.slice(1)].n:S.co[+r.slice(1)]?S.co[+r.slice(1)].tk+" 그룹":"불명확한 주주";
 const hName=k=>k==="P"?"나":k[0]==="r"?S.R[+k.slice(1)].n:S.co[+k.slice(1)].tk;
 function topRival(c,me){let b=0;const g={};for(const k in c.own){const r=root(k);if(r!==me)g[r]=(g[r]||0)+c.own[k]}for(const r in g)if(g[r]>b)b=g[r];return b}
 // ---- valuation ----
@@ -128,7 +208,7 @@ const loanOf=c=>c.kd?0:Math.max(0,c.D-c.bond-(c.pa||0));
 const bondSpace=c=>Math.max(0,c.bond-c.bh);
 function seedBonds(){for(const c of S.co){if(c.kd||c.dead||c.bond>0||rnd()>.45)continue;const x=Math.min(c.D*(.2+rnd()*.3),Math.max(0,eq(c)));if(x<5)continue;c.bond=x;c.cpn=S.prime+SPR[rating(c)]+1+nz();c.bmat=S.day+360+(rnd()*3240|0)}}
 function v8fix(){const old=S.v<11,o12=S.v<12;S.v=12;v9pad();if(old)v11mig();bankFix();if(!S.fs)S.fs=[];if(!S.imp)S.imp=[];if(S.ms==null)S.ms=0;if(S.apAll==null)S.apAll=0;if(!S.bseed){seedBonds();S.bseed=1}
-for(const c of S.co)if(c.bh>c.bond){c.bond=c.bh;c.cpn=c.cpn||S.prime+3;c.bmat=c.bmat||S.day+1800}v11prep();v12prep();if(o12)v12mig()}
+for(const c of S.co)if(c.bh>c.bond){c.bond=c.bh;c.cpn=c.cpn||S.prime+3;c.bmat=c.bmat||S.day+1800}v11prep();v12prep();if(o12)v12mig();CTLQ=null;CTLS=null;ctlAll(undefined,{silent:true})}
 
 // ---- v9: holding-company sector, countries of incorporation, founding rules, CEO pay ----
 SEC.push(["지주회사",.01]);KS.push(["홀딩스","지주","인베스트먼트"]);SB.push(["Holdings","Group","Partners"]);
