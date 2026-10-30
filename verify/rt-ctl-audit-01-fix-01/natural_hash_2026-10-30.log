@@ -1,0 +1,10 @@
+# natural 720-day state hashes, cache OFF then ON (verify/rt-premerge-fix-01-r3-r3b/natural_hash_cache.js) on HEAD 3d19a54 | 2026-10-30 23:34:40 KST
+# reference: 101 1e216748d6ec2b94, 202 bf45152caa43b87d, 303 051019f8206254ef
+game sha256 6a6bf32d5768090e | natural_hash_cache.js
+hash seed 101 1e216748d6ec2b94 pending 0 | cache OFF hits 0 misses 0 evictions 0 size 0
+hash seed 202 bf45152caa43b87d pending 0 | cache OFF hits 0 misses 0 evictions 0 size 0
+hash seed 303 051019f8206254ef pending 0 | cache OFF hits 0 misses 0 evictions 0 size 0
+game sha256 6a6bf32d5768090e | natural_hash_cache.js
+hash seed 101 1e216748d6ec2b94 pending 0 | cache ON hits 0 misses 0 evictions 0 size 0
+hash seed 202 bf45152caa43b87d pending 0 | cache ON hits 0 misses 0 evictions 0 size 0
+hash seed 303 051019f8206254ef pending 0 | cache ON hits 0 misses 0 evictions 0 size 0
