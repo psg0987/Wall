@@ -1,0 +1,22 @@
+game sha256 cfdacb48e3387b92 | t_ctl_r3_r3b.js
+ok C1 same input again: cache hit ([{"hit":0,"miss":1,"evict":0,"size":1},{"hit":0,"miss":2,"evict":0,"size":2},{"hit":1,"miss":2,"evict":0,"size":2}])
+ok C1 cache on and off give the same labels, statuses and possible controllers
+ok C2 a stake inside the SCC changed: miss
+ok C2 cache on/off identical after the change
+ok C3 the outside holder's final label changed (c10 -> P): miss
+ok C3 cache on/off identical after the upstream change
+ok C4 every step identical with cache on/off: ["r0r0r0r0","PPPP","r0r0r0r0","PPPP"]
+ok C4 control follows the stakes each time (no authority kept from the cache): r0r0r0r0 -> PPPP -> r0r0r0r0 -> PPPP
+ok C5 new game: cache emptied (size 0)
+ok C5 restore: the silent re-check uses no entry made before the restore (hits 5 -> 5)
+ok C6 a fifth company joins the cycle: cache on/off identical
+ok C6 a member dies: cache on/off identical, the dead company has no controller
+ok C7 130 cyclic SCCs: cache holds 128, evicted 2
+ok C8 240 active days (cross holdings every 6 days): whole state identical with cache on and off (pending 0, mine 50, hits 2505)
+ok C9 tampering with CTLQ after a hit does not leak into the next hit
+ok C10 359 random changes: cache on/off identical every time (359/359); statuses seen {"EXACT_NONE":197,"EXACT":444,"APPROX":3584,"DEP":83}; cache hits 2698
+ok C10b 6 groups of 3, 399 random changes: cache on/off identical every time (399/399); statuses seen {"EXACT_NONE":750,"EXACT":5782,"AMBIG":638,"DEP":12}
+ok G1 bkSet confirmed after control was lost: asset mix unchanged
+ok G2 ev2Pick after control lost: the decision is not carried out (ran 0) and the event is closed
+ok G2 ev2Pick after control pending: the decision is not carried out (ran 0) and the event is closed
+errs 0 fails 0

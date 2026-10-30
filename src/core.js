@@ -26,6 +26,13 @@ const pub=c=>Math.max(0,100-held(c));
 let CTLQ=null, CTLS=null;
 const isCtlPending=c=>!!c&&!c.dead&&c.ctl==="?";
 const root=k=>{if(k[0]!=="c")return k;const h=S.co[+k.slice(1)];return h&&h.ctl==="?"?"?c"+h.id:h&&h.ctl||k};
+// RT-PREMERGE-FIX-01-R3-R3B: per-SCC memory cache (never saved). The SCC step below reads only: its members, each member's own map (keys,
+// exact stake values, entry order), for a stake held by a company outside the SCC that company's final label in this call (result[h]), the
+// members' previous labels (fast path and KEEP) and the policy constants. The key holds all of these (JSON arrays, so different inputs never
+// share a key), so a hit equals a fresh computation. Stored results are copies; a hit hands out copies. Autopilot and other side effects run
+// after publishing and are never cached. Emptied on a new game (init) and on every restore (v8fix). 128 entries, least recently used dropped.
+const CTL_POLICY="R3-R3B:grounded-closure|keep-verified-prev|common-else-AMBIG|nodes5000|members8|product4096";
+const CTLC={on:true,max:128,map:new Map(),hit:0,miss:0,evict:0,size(){return this.map.size},clear(){this.map.clear()}};
 function ctlAll(founded,opt){
   opt=opt||{};
   const before=S.co.map(c=>c.dead?null:c.ctl),n=S.co.length,edges=Array.from({length:n},()=>[]),reverse=Array.from({length:n},()=>[]);
@@ -100,18 +107,30 @@ function ctlAll(founded,opt){
     }
     return cert.size===ids.length;
   };
+  const ctlKey=ids=>{const inS=new Set(ids),parts=[CTL_POLICY,ids.slice()];
+    for(const id of ids){const c=S.co[id],e=[];for(const [k,v] of Object.entries(c.own)){let ext=null;if(k[0]==="c"){const h=+k.slice(1);if(!inS.has(h))ext=[result[h]===undefined?"u":result[h]===null?"n":"s",result[h]==null?"":result[h]]}e.push([k,String(v),ext])}
+      parts.push([id,c.dead?1:0,before[id]===undefined?["u"]:["v",before[id]],e])}
+    return JSON.stringify(parts)};
   while(queue.length){const gi=queue.shift(),ids=groups[gi];for(const dep of dag[gi])if(!--indeg[dep])queue.push(dep);
     const cyclic=ids.length>1||edges[ids[0]].includes(ids[0]);
     if(!cyclic){const id=ids[0],r=evalUncertain(S.co[id]);r.label==="?"?pending(id,"DEP",r.poss):exact(id,r.label);continue}
     // A pending upstream SCC must not be projected as independent null.
     const outsiders=new Set();for(const id of ids)for(const h of reverse[id])if(comp[h]!==gi&&Q[h]&&!["EXACT","EXACT_NONE"].includes(Q[h].st))outsiders.add(h);
     if(outsiders.size){for(const id of ids)pending(id,"DEP","ANY");GINFO.push({members:ids,status:"DEP_UPSTREAM"});continue}
+    // R3-R3B: canonical member order (ascending id) before the cache key and the SCC step; the step itself re-sorts by candidate-set size.
+    ids.sort((a,b)=>a-b);
+    let ck=null;if(CTLC.on){ck=ctlKey(ids);const h=CTLC.map.get(ck);
+      if(h){CTLC.map.delete(ck);CTLC.map.set(ck,h);CTLC.hit++;for(const [id,r,st,poss] of h.out){result[id]=r;Q[id]={st,poss:Array.isArray(poss)?poss.slice():poss}}
+        GINFO.push(Object.assign({},h.info,{members:h.info.members.slice()}));continue}
+      CTLC.miss++}
+    const g0=GINFO.length;
+    (()=>{
     // R3-R3 fast path: when the previous labels of the whole SCC are complete (no "?", no missing label) and they are a fixed point that passes
     // the grounded closure, they are one of the supported solutions and the policy keeps them - the full search would return the same labels
     // (KEEP), so they are kept at once, even for an SCC over the search limits. Status EXACT_PREV_VERIFIED: uniqueness is not established.
     // Anything else (incomplete, not a fixed point, not grounded, e.g. phantom control) goes to the normal search and never inherits control.
     {const prev=ids.map(id=>before[id]);if(prev.every(v=>v===null||(typeof v==="string"&&v!=="?"))){const local=new Map(ids.map((id,j)=>[id,prev[j]]));
-      if(ids.every(id=>evalOne(S.co[id],local)===local.get(id))&&grounded(ids,prev)){for(let j=0;j<ids.length;j++)exact(ids[j],prev[j]);GINFO.push({members:ids,status:"EXACT_PREV_VERIFIED",limit:LIMIT,nodes:0});continue}}}
+      if(ids.every(id=>evalOne(S.co[id],local)===local.get(id))&&grounded(ids,prev)){for(let j=0;j<ids.length;j++)exact(ids[j],prev[j]);GINFO.push({members:ids,status:"EXACT_PREV_VERIFIED",limit:LIMIT,nodes:0});return}}}
     const owners=new Set([null]);for(const id of ids)for(const key of Object.keys(S.co[id].own)){
       if(key[0]!=="c")owners.add(key);else {const h=+key.slice(1);if(comp[h]===gi)owners.add("c"+h);else owners.add(result[h]||"c"+h)}
     }
@@ -122,7 +141,7 @@ function ctlAll(founded,opt){
     ids.sort((a,b)=>(baseDomain.length-(owners.has("c"+a)?1:0))-(baseDomain.length-(owners.has("c"+b)?1:0))||a-b);
     const domains=ids.map(id=>baseDomain.filter(x=>x!=="c"+id));
     const product=domains.reduce((x,d)=>x*d.length,1);let planned=1;for(let i=0,p=1;i<domains.length;i++){p*=domains[i].length;planned+=p}
-    if(ids.length>8||product>4096||planned>LIMIT){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"BUDGET_EXCEEDED",product,planned,limit:LIMIT});continue}
+    if(ids.length>8||product>4096||planned>LIMIT){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"BUDGET_EXCEEDED",product,planned,limit:LIMIT});return}
     const fixed=[];let nodes=0,completed=true;const state=[];
     function visit(i){if(++nodes>planned){completed=false;return}if(i===ids.length){const local=new Map(ids.map((id,j)=>[id,state[j]]));
         if(ids.every((id)=>evalOne(S.co[id],local)===local.get(id))&&grounded(ids,state))fixed.push(state.slice());return;
@@ -130,14 +149,18 @@ function ctlAll(founded,opt){
       for(const v of domains[i]){state[i]=v;visit(i+1);if(!completed)return}
     }
     visit(0);
-    if(!completed){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"BUDGET_EXCEEDED",product,planned,limit:LIMIT,nodes});continue}
-    if(!fixed.length){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"NO_SUPPORTED",product,planned,limit:LIMIT,nodes});continue}
+    if(!completed){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"BUDGET_EXCEEDED",product,planned,limit:LIMIT,nodes});return}
+    if(!fixed.length){for(const id of ids)pending(id,"APPROX","ANY");GINFO.push({members:ids,status:"NO_SUPPORTED",product,planned,limit:LIMIT,nodes});return}
     const old=ids.map(id=>before[id]),keep=fixed.find(c=>c.every((v,i)=>v===old[i]));
     for(let i=0;i<ids.length;i++){
       const poss=[...new Set(fixed.map(x=>x[i]))],value=keep?keep[i]:poss.length===1?poss[0]:"?";
       value==="?"?pending(ids[i],"AMBIG",poss):exact(ids[i],value)
     }
     GINFO.push({members:ids,status:keep?"EXACT_MULTI_KEPT":fixed.length===1?"EXACT_UNIQUE":"EXACT_MULTI_AMBIG",product,planned,limit:LIMIT,nodes,solutions:fixed.length});
+    })();
+    if(ck!==null){const info=GINFO[GINFO.length-1];if(GINFO.length===g0+1&&info){
+      CTLC.map.set(ck,{out:ids.map(id=>[id,result[id],Q[id].st,Array.isArray(Q[id].poss)?Q[id].poss.slice():Q[id].poss]),info:Object.assign({},info,{members:info.members.slice()})});
+      if(CTLC.map.size>CTLC.max){CTLC.map.delete(CTLC.map.keys().next().value);CTLC.evict++}}}
   }
   // Publish only after every result is computed, never partially during SCC exploration.
   CTLQ=Q;CTLS=GINFO;
@@ -198,7 +221,7 @@ function secUpd(){if(!S.dg)return;SEC.forEach((_,i)=>{let a=0,ag=0;for(const c o
 function migrate(s){if(!s)return null;if(s.v>=7)return s;if(s.v!==6)return null;s.v=7;
 s.cfg={df:s.df,nr:s.R.length,rv:s.R.map(r=>[r.n,r.s]),cash:s.n0,mode:0,goal:0,vol:1,eth:s.cheat,tut:0};
 s.mxd=SEC.map(()=>0);s.mx=null;s.dg=SEC.map(()=>.04);s.cg=SEC.map(()=>.04);s.qs={nw:s.nm,div:0,ctl:0};s.qr=null;s.won=0;s.aiP=s.aiP||"rule";return s}
-function init(cfg){if(typeof cfg==="number")cfg=Object.assign(defCfg(),{df:cfg,cash:DIF[cfg].cash});cfg=cfg||defCfg();const seed=cfg.seed!=null?cfg.seed:(seedOf(cfg.seedT)||newSeed());cfg.seed=seed;_R=mkR(seed,-7);
+function init(cfg){CTLC.clear();if(typeof cfg==="number")cfg=Object.assign(defCfg(),{df:cfg,cash:DIF[cfg].cash});cfg=cfg||defCfg();const seed=cfg.seed!=null?cfg.seed:(seedOf(cfg.seedT)||newSeed());cfg.seed=seed;_R=mkR(seed,-7);
 const df=cfg.df,us=S&&S.us||0,aiP=S&&S.aiP||"rule",used=new Set(),D0=DIF[df];
 S={v:13,seed,y0:2027,spl:1,cfg,gn:String(cfg.gn||"").trim().slice(0,12),day:0,spd:1,acc:0,k:0,df,cheat:cfg.eth?1:0,cash:cfg.cash,n0:cfg.cash,loan:0,loss:0,prime:7.5,gdp:3,mood:0,d:SEC.map(()=>0),mxd:SEC.map(()=>0),mx:null,dg:SEC.map(()=>.04),cg:SEC.map(()=>.04),ix:100,te:"P",ceo:-1,heat:0,imm:0,hon:0,over:0,rank:0,nwh:[cfg.cash],nm:cfg.cash,us,aiP,ai:0,
 tx:[],eco:[],wl:[],al:[],ach:{},fl:{},st:{ipo:0,del:0,ma:0},fd:[],op:[],ft:{q:0,lx:100},gb:0,bp:100,ev:null,nev:120,tut:cfg.tut?0:99,cd:1,co:[],qs:{nw:cfg.cash,div:0,ctl:0},qr:null,won:0,
@@ -226,7 +249,7 @@ for(const c of S.co)if(c.bh>c.bond){c.bond=c.bh;c.cpn=c.cpn||S.prime+3;c.bmat=c.
 // "no controller" instead of a label it would keep forever. Loading puts "?" back before the silent re-check below (same result as before saving).
 if(Array.isArray(S.ctlp))for(const id of S.ctlp){const c=S.co[id];if(c&&!c.dead&&c.ctl==null)c.ctl="?"}delete S.ctlp;
 Object.defineProperty(S,"toJSON",{value:ctlSaveForm,enumerable:false,configurable:true,writable:true});
-CTLQ=null;CTLS=null;ctlAll(undefined,{silent:true})}
+CTLQ=null;CTLS=null;CTLC.clear();ctlAll(undefined,{silent:true})}
 function ctlSaveForm(){const p=[],co=S.co.map(c=>{if(c.ctl!=="?")return c;p.push(c.id);return Object.assign({},c,{ctl:null})});const o=Object.assign({},S,{co});if(p.length)o.ctlp=p;return o}
 
 // ---- v9: holding-company sector, countries of incorporation, founding rules, CEO pay ----

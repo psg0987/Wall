@@ -56,6 +56,18 @@ const st = () => { const c = C(); return c ? { hit: c.hit, miss: c.miss, evict: 
 { world(509); const m = ords().slice(0, 4); m.forEach(iso); m.forEach(c => c.ctl = null); k7(m); ctlAll(); ctlAll(); const p = CTLQ[m[0].id].poss; if (Array.isArray(p)) p.push('TAMPER'); CTLQ[m[0].id].st = 'TAMPER';
   ctlAll(); ok(CTLQ[m[0].id].st === 'AMBIG' && !(CTLQ[m[0].id].poss || []).includes('TAMPER'), 'C9 tampering with CTLQ after a hit does not leak into the next hit') }
 
+// ---------- C10 (added after the fix) fuzz: 12 companies, random cross holdings changed 400 times; cache on/off compared after every change
+{ world(510); const m = ords().slice(0, 12); m.forEach(iso); m.forEach(c => c.ctl = null); const R = mul(99), keys = ['P', 'r0', 'r1', 'r2']; let same = 0, n = 0; const seen = {};
+  for (let it = 0; it < 400; it++) { const a = m[R() * 12 | 0], b = m[R() * 12 | 0]; if (a === b) continue; const k = R() < .6 ? 'c' + b.id : keys[R() * 4 | 0];
+    setOwn(a, k, R() < .2 ? 0 : 5 + (R() * 9 | 0) * 5); if (held(a) > 100) setOwn(a, k, 0); const r = onOff(); n++; if (r.a === r.b) same++; for (const c of m) { const q = CTLQ[c.id]; if (q) seen[q.st] = (seen[q.st] || 0) + 1 } }
+  ok(same === n && n > 300, 'C10 ' + n + ' random changes: cache on/off identical every time (' + same + '/' + n + '); statuses seen ' + JSON.stringify(seen) + '; cache hits ' + (C() && C().hit)) }
+
+{ world(520); const all = ords().slice(0, 18); all.forEach(iso); all.forEach(c => c.ctl = null); const G = [0, 1, 2, 3, 4, 5].map(g => all.slice(3 * g, 3 * g + 3)), R = mul(77), keys = ['P', 'r0', 'r1'];
+  let same = 0, n = 0; const seen = {};
+  for (let it = 0; it < 600; it++) { const g = G[R() * 6 | 0], a = g[R() * 3 | 0], b = g[R() * 3 | 0]; if (a === b) continue; const k = R() < .55 ? 'c' + b.id : keys[R() * 3 | 0];
+    setOwn(a, k, R() < .15 ? 0 : 10 + (R() * 9 | 0) * 5); if (held(a) > 100) setOwn(a, k, 0); const r = onOff(); n++; if (r.a === r.b) same++; for (const c of all) { const q = CTLQ[c.id]; if (q) seen[q.st] = (seen[q.st] || 0) + 1 } }
+  ok(same === n && n > 350 && seen.AMBIG > 0 && seen.EXACT > 0, 'C10b 6 groups of 3, ' + n + ' random changes: cache on/off identical every time (' + same + '/' + n + '); statuses seen ' + JSON.stringify(seen)) }
+
 // ---------- G1 G.bkSet confirmed after control of the bank was lost
 { world(511); const b = S.co.find(c => !c.dead && c.kd === 1 && !c.priv); setOwn(b, 'P', 60); ctlAll(); pre(mine(b), 'G1 my bank'); const k = Object.keys(b.ba)[0], ba = JSON.stringify(b.ba);
   G.bkSet(b.id, k); const o = NMd; pre(!!o && typeof o.go === 'function', 'G1 dialog opened'); setOwn(b, 'P', 0); ctlAll(); if (o) o.go(Math.round(b.ba[k] * 100) === 30 ? 40 : 30); mdl = null;

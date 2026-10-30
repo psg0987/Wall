@@ -624,7 +624,8 @@ L0.A-=face;L0.cs+=px;B0.A+=face;x.ln=b;rec("대출 인수",x,px,B0.tk);eco("🏦
 G.bkAlloc=(i,k)=>{const c=S.co[i];if(!mine(c)||c.kd!==1)return;if(k==="auto"){c.bm=1;toast("자산 배분을 경기에 맞춰 자동으로 조정합니다")}else{c.bm=0;c.ba=Object.assign({},BAP[k]);toast("자산 배분: "+{safe:"보수적",bal:"균형",agg:"공격적"}[k])}render()};
 G.bkSet=(i,k)=>{const c=S.co[i];if(!mine(c)||c.kd!==1)return;const r=BAK.find(x=>x[0]===k);numModal({t:c.tk+" "+r[1]+" 비중",b:r[3]+". 다른 항목은 비율대로 줄어들어 합계 100%를 맞춥니다.",min:0,max:90,step:1,val:Math.round(c.ba[k]*100),u:"%",chips:[0,5,10,20,30,50],
 pv:x=>{const o=Object.assign({},c.ba),rest=1-o[k];o[k]=x/100;for(const z in o)if(z!==k)o[z]=rest>0?o[z]/rest*(1-x/100):(1-x/100)/4;const cc=Object.assign({},c,{ba:o});return "예상 BIS 비율 "+bisOf(cc).toFixed(1)+"% (8% 미만이면 대출 제한)"},
-go:x=>{const rest=1-c.ba[k];c.bm=0;c.ba[k]=x/100;for(const z in c.ba)if(z!==k)c.ba[z]=rest>0?c.ba[z]/rest*(1-x/100):(1-x/100)/4;L(c.tk+" "+r[1]+" 비중 "+x+"%",1);render()}})};
+go:x=>{if(!mine(c)||c.kd!==1)return toast("지배권이 바뀌어 적용할 수 없습니다");   // R3-R3B: re-check at confirm
+const rest=1-c.ba[k];c.bm=0;c.ba[k]=x/100;for(const z in c.ba)if(z!==k)c.ba[z]=rest>0?c.ba[z]/rest*(1-x/100):(1-x/100)/4;L(c.tk+" "+r[1]+" 비중 "+x+"%",1);render()}})};
 
 // ---- v12 events: 30 company events with sliders and live odds, decision rights, AI companies' events, delayed consequences ----
 // who decides: the player as CEO decides; a controlling owner who is not CEO sees management's plan and may intervene (board vote);
@@ -734,6 +735,7 @@ const sl=e.sl?e.sl(ev.x):null,pr=e.pr(c,ev.x,ev.v);mdl={t:(ev.m==="int"?"🗳 ":
 `<div id="evp" class="card mu" style="line-height:1.6;white-space:normal">${pr.map((t,j)=>"<b>"+esc(e.o[j]?e.o[j][0]:"")+"</b> — "+esc(t)).join("<br>")}</div><div class="mu">분류: ${EVC[e.cat]} · ${ev.m==="int"?"이사회 승인을 받아 직접 결정합니다":"CEO로서 직접 결정합니다"}</div>`,o:e.o.map(o=>[o[0],o[1]]),ev2:1};S.sp0=S.spd||S.sp0;S.spd=0}
 G.evSl=v=>{const ev=S.ev2;if(!ev)return;ev.v=+v;const e=EV2.find(z=>z.id===ev.id),c=S.co[ev.c],sl=e.sl(ev.x),a=$("evv"),p=$("evp");if(a)a.textContent=(+v).toFixed(sl.step<1?1:0)+sl.u;if(p)p.innerHTML=e.pr(c,ev.x,+v).map((t,j)=>"<b>"+esc(e.o[j]?e.o[j][0]:"")+"</b> — "+esc(t)).join("<br>")};
 G.ev2Pick=k=>{const ev=S.ev2;if(!ev)return closeMd();const e=EV2.find(z=>z.id===ev.id),c=S.co[ev.c];if(!e||!c||c.dead){S.ev2=null;closeMd();return render()}
+if(!mine(c)){S.ev2=null;closeMd();toast(c.tk+" 지배권이 바뀌어 이 결정은 취소됐어요");return render()}   // R3-R3B: the event belongs to my company; no decision once control is gone or pending
 if(ev.m==="own"){if(k==="int"){if(rnd()<evInt(c)){ev.m="int";evMd();return render()}const[a,v]=e.ai(c,ev.x);S.ev2=null;closeMd();const t=e.go(c,ev.x,a,v);L("🗳 이사회가 개입을 거부해 경영진 안대로 진행: "+t,1);return render()}const[a,v]=e.ai(c,ev.x);S.ev2=null;closeMd();L("📋 경영진 결정: "+e.go(c,ev.x,a,v),1);return render()}
 S.ev2=null;closeMd();const t=e.go(c,ev.x,k,ev.v);S.cst&&(S.cst.evd++);L("⚡ "+t,1);render()};
 // AI-run companies live through the same events (management decides); holders of a minority stake hear about it
