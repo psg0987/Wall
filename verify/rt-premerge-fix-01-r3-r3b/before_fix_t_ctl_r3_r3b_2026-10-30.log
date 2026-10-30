@@ -1,0 +1,22 @@
+# BEFORE the fix: tests/t_ctl_r3_r3b.js on 0a12344 game code (src unchanged) | 2026-10-30 20:58:42 KST
+game sha256 a296341a7b18cbcb | t_ctl_r3_r3b.js
+FAIL C1 same input again: cache hit ([null,null,null])
+ok C1 cache on and off give the same labels, statuses and possible controllers
+FAIL C2 a stake inside the SCC changed: miss
+ok C2 cache on/off identical after the change
+FAIL C3 the outside holder's final label changed (c10 -> P): miss
+ok C3 cache on/off identical after the upstream change
+ok C4 every step identical with cache on/off: ["r0r0r0r0","PPPP","r0r0r0r0","PPPP"]
+ok C4 control follows the stakes each time (no authority kept from the cache): r0r0r0r0 -> PPPP -> r0r0r0r0 -> PPPP
+ERR precondition C5 cache filled
+FAIL C5 new game: cache emptied (size null)
+FAIL C5 restore: the silent re-check uses no entry made before the restore (hits 0 -> null)
+ok C6 a fifth company joins the cycle: cache on/off identical
+ok C6 a member dies: cache on/off identical, the dead company has no controller
+FAIL C7 130 cyclic SCCs: cache holds 128, evicted null
+FAIL C8 240 active days (cross holdings every 6 days): whole state identical with cache on and off (pending 0, mine 50, hits 0)
+ok C9 tampering with CTLQ after a hit does not leak into the next hit
+FAIL G1 bkSet confirmed after control was lost: asset mix unchanged
+FAIL G2 ev2Pick after control lost: the decision is not carried out (ran 1) and the event is closed
+FAIL G2 ev2Pick after control pending: the decision is not carried out (ran 1) and the event is closed
+errs 1 fails 10
