@@ -16,6 +16,7 @@ ok C8 240 active days (cross holdings every 6 days): whole state identical with 
 ok C9 tampering with CTLQ after a hit does not leak into the next hit
 ok C10 359 random changes: cache on/off identical every time (359/359); statuses seen {"EXACT_NONE":197,"EXACT":444,"APPROX":3584,"DEP":83}; cache hits 2698
 ok C10b 6 groups of 3, 399 random changes: cache on/off identical every time (399/399); statuses seen {"EXACT_NONE":750,"EXACT":5782,"AMBIG":638,"DEP":12}
+ok C11 P->?->P->?->P->? identical with cache on/off and labels follow the stakes: ???? -> PPPP -> ???? -> PPPP -> ???? (cache hits during the steps 3)
 ok G1 bkSet confirmed after control was lost: asset mix unchanged
 ok G2 ev2Pick after control lost: the decision is not carried out (ran 0) and the event is closed
 ok G2 ev2Pick after control pending: the decision is not carried out (ran 0) and the event is closed

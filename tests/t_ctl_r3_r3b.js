@@ -68,6 +68,12 @@ const st = () => { const c = C(); return c ? { hit: c.hit, miss: c.miss, evict: 
     setOwn(a, k, R() < .15 ? 0 : 10 + (R() * 9 | 0) * 5); if (held(a) > 100) setOwn(a, k, 0); const r = onOff(); n++; if (r.a === r.b) same++; for (const c of all) { const q = CTLQ[c.id]; if (q) seen[q.st] = (seen[q.st] || 0) + 1 } }
   ok(same === n && n > 350 && seen.AMBIG > 0 && seen.EXACT > 0, 'C10b 6 groups of 3, ' + n + ' random changes: cache on/off identical every time (' + same + '/' + n + '); statuses seen ' + JSON.stringify(seen)) }
 
+// ---------- C11 (added after the fix) real P -> ? -> P -> ? transitions, stakes put back to the exact earlier values each time
+{ world(511); const m = ords().slice(0, 4); m.forEach(iso); m.forEach(c => c.ctl = null); const put = f => { m.forEach(iso); f(m) }; put(dense); ctlAll(); pre(m.every(mine), 'C11 P controls first');
+  const seq = []; let hits0 = C().hit; for (const f of [k7, dense, k7, dense, k7]) { put(f); const r = onOff(); seq.push([r.a === r.b, m.map(c => c.ctl === 'P' ? 'P' : c.ctl === '?' ? '?' : 'x').join('')]) }
+  const hits = C().hit - hits0;
+  ok(seq.every(x => x[0]) && seq.map(x => x[1]).join(' ') === '???? PPPP ???? PPPP ????', 'C11 P->?->P->?->P->? identical with cache on/off and labels follow the stakes: ' + seq.map(x => x[1]).join(' -> ') + ' (cache hits during the steps ' + hits + ')') }
+
 // ---------- G1 G.bkSet confirmed after control of the bank was lost
 { world(511); const b = S.co.find(c => !c.dead && c.kd === 1 && !c.priv); setOwn(b, 'P', 60); ctlAll(); pre(mine(b), 'G1 my bank'); const k = Object.keys(b.ba)[0], ba = JSON.stringify(b.ba);
   G.bkSet(b.id, k); const o = NMd; pre(!!o && typeof o.go === 'function', 'G1 dialog opened'); setOwn(b, 'P', 0); ctlAll(); if (o) o.go(Math.round(b.ba[k] * 100) === 30 ? 40 : 30); mdl = null;
