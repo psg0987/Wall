@@ -1,0 +1,52 @@
+# node verify/rt-ctl-prefinal-smoke-01/smoke_prefinal.js <branch site page, HEAD 8583552, src = 8583552> | Chromium (Playwright) 412x915 mobile EMULATION, not a Galaxy device | 2026-10-31 08:12:27 KST
+page pf_site.html sha256 6210eb304260ed13e9128a5a6a5d1ebbb0eb1e426607c4c14e8529db3f9130bd
+== A 자동경영 (seed 20261031)
+ok   A1 설정 → 자동경영 일괄 관리 tap opens the page
+ok   A1 전체 ON tap: 5/5 ON, 5 decisions, each equal to the A4R rule; toast "지배 회사 5곳 자동경영 켜짐 · 앞으로 새로 지배하는 회사는 꺼진 상태로 시작합니다"
+ok   A1 전체 OFF tap: 0 ON, no decision run; toast "지배 회사 5곳 자동경영 꺼짐+1"
+ok   A2 회사 화면 경영 탭 "자동 경영: 꺼짐" tap → ON, one decision (= rule), button now "자동 경영: 켜짐", toast "TSLR 자동 경영 켜짐+3"
+ok   A2 tap again → OFF, no decision run
+ok   A2 관리 화면 행 "자동경영 켜기" tap → exactly one ON, one decision (= rule)
+ok   A3 "새로 지배하는 회사 자동경영 켜기" tap → option ON (S.apAll 0 → 1)
+ok   A3 option ON: 인수 탭 "+50%" 공개매수 tap on FPRA → controlled (P 100%, private 1), 자동경영 ON, decisions 1 (= rule)
+ok   A3 "새로 지배하는 회사 자동경영 끄기" tap → option OFF
+ok   A3 option OFF: 인수 탭 "+50%" 공개매수 tap on RILD → controlled (P 100%, private 1), 자동경영 OFF, decisions 0
+info A4 save: 7 controlled, 2 자동경영 ON, option 0, full 613KB, export 144KB
+ok   A page: no page error 
+ok   A4 재시작(자동 저장에서 부팅): day, option, every company ctl/ap/g/pay/sweep/ps/bank equal
+ok   A4 3 days after boot: no 자동경영 flag changed, option kept
+ok   A4 boot page: no page error
+ok   A4 세이브 가져오기 (코드 붙여넣기 → 불러오기 tap): all equal
+ok   A4 import page: no page error
+== C CEO 사건창 저장 → CEO가 아닌 상태로 복원 (seed 20261032)
+ok   C0 경영 탭 "내가 CEO 취임" tap → CEO of ORCX
+ok   C0 사건창 opened in CEO mode: "⚡ 임원 스캔들 · ORCX" options [즉시 해임 / 사과와 쇄신안 / 회사가 옹호]
+ok   C0 resigned as CEO while the window is open (G.mg call), control kept, saved event still in CEO mode {"ceo":-1,"mine":true,"m":"ceo"}
+ok   C page: no page error
+info C1 after boot: {"ceo":-1,"mine":true,"ev2":"ceo"}, window {"t":"⚡ 임원 스캔들 · ORCX","o":["즉시 해임","사과와 쇄신안","회사가 옹호"],"text":"⚡ 임원 스캔들 · ORCX ORCX 고위 임원의 부적절한 처신이 언론에 보도됐습니다. 여론이 들끓고 있어요. 즉시 해임 — 해임: 주가 −2%, 비용 2억, 새 경영진으로 체질 개선 사과와 쇄신안 — 사과·쇄신: 주가 −4%, 준법 비용 회사가 옹호 — 옹호: 50% 잠잠해지지만 50%는 더 커져 −12% 분류: 노무·인사 · CEO로서 직접 결정합니다 즉시 해임 사과와 쇄신안 회사가 옹호"}
+ok   C1 재시작: not CEO, control kept, the saved event window reopens (mode stored as ceo)
+ok   C1 tap "회사가 옹호" (old CEO option): not carried out, window switches to the controlling-holder route [경영진에게 맡기기 / 개입한다 (98%)], toast "ORCX CEO가 아니어서 지배주주로서 다시 결정해요+1"
+ok   C1 "경영진에게 맡기기" tap → management plan "sorry" carried out once, event closed [["sorry",0]]
+ok   C1 page: no page error
+info C2 import: {"ceo":-1,"mine":true,"ev2":"ceo","md":null,"spd":0}
+ok   C2 세이브 가져오기: window reopened NO, old CEO key via G.ev2Pick not carried out (event "own")
+ok   C2 page: no page error
+info C3 slot: {"ceo":-1,"mine":true,"ev2":"ceo","md":null,"spd":0}
+ok   C3 슬롯 불러오기 (G.ld): window reopened NO, old CEO key via G.ev2Pick not carried out (event "own")
+ok   C3 page: no page error
+== D/E 판정 보류 은행 (seed 20261033)
+ok   D0 pending banks JPMX (largest bank) and its pair; my company PNPL borrows from bank #130
+ok   D1 "은행 변경" button found on tab o
+info D1 bank list rows: ["JPMX JPM Morgana 판정 보류 · 신용 AA · 자산 4,231억 ›","BOAX Bank of Americana 판정 보류 · 신용 AA · 자산 3,311억 ›","CITX Citigrup 중립 · 신용 A · 자산 2,478억 ›","WFCX Wells Fargone 중립 · 신용 A · 자산 2,310억 ›","KBFN 케이비금융 중립 · 신용 BBB · 자산 1,677억 ›","SHFN 신환금융 중립 · 신용 A · 자산 1,522억 ›","WRFN 우릐금융 중립 · 신용 A · 자산 972억 ›","HNFN 하나로금융 중립 · 신용 BBB · 자산 766억 ›","CBZY 대성금융 중립 · 신용 BBB · 자산 703억 ›","DLBF Hyper Bank 중립 · 신용 BBB · 자산 684억 ›","HSBX HSBZ Holdings 중립 · 신용 BBB · 자산 639억 ›","SXZV 로얄은행 중립 · 신용 A · 자산 549억 ›"]
+ok   D1 은행 목록: pending JPMX row "JPMX JPM Morgana 판정 보류 · 신용 AA · 자산 4,231억 ›", neutral row "CITX Citigrup 중립 · 신용 A · 자산 2,478억 ›"
+ok   D2 tap the pending bank row: refused, toast "JPMX 은행은 지배권 판정 보류 중이라 새 거래 은행으로 고를 수 없어요", bank/freeze/cash/debt unchanged [130,0,587.525487,4457.063496]
+ok   D3 tap the neutral bank row: changed to CITX (fee from cash 22.285)
+ok   D4 경영 탭 "(내 은행)으로 변경" buttons do not include the pending bank: []
+info E current bank pending: ["경영 탭 거래 은행: JPMX","개요 탭 차입 현황: 차입 현황 은행 변경 거래 은행 JPMX 부채/자본 0.75배 신용등급 A 대출 여력 1,515억"]
+info E current bank neutral: ["경영 탭 거래 은행: CITX","개요 탭 차입 현황: 차입 현황 은행 변경 거래 은행 CITX 부채/자본 0.75배 신용등급 A 대출 여력 1,515억"]
+info E current bank rival (fixture r0 60%): ["경영 탭 거래 은행: WFCX · 라이벌이 지배하는 은행이라 대출을 회수당할 수 있어요","개요 탭 차입 현황: 차입 현황 은행 변경 거래 은행 WFCX 부채/자본 0.75배 신용등급 A 대출 여력 1,515억"]
+info E current bank mine (fixture P 60%): ["경영 탭 거래 은행: KBFN · 내 은행","개요 탭 차입 현황: 차입 현황 은행 변경 거래 은행 KBFN 부채/자본 0.75배 신용등급 A 대출 여력 1,515억"]
+ok   E recorded (company screen, visible text only): a pending current bank shows NO 판정 보류 note — ticker only, same as a neutral bank; the rival bank gets a warning, my bank gets "내 은행"
+ok   D/E page: no page error
+ALL OK
+exit 0

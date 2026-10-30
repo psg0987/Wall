@@ -1,0 +1,34 @@
+# node (run.py, working tree = 8583552 src) verify/rt-ctl-prefinal-smoke-01/bankfix_repro.js | 2026-10-31 08:14:15 KST
+game sha256 6a6bf32d5768090e | bankfix_repro.js
+== P1 bankFix after a neutral bank dies (seeds 701..710)
+seed 701: WFCX died, 57 borrowers -> 12 to pending JPMX/BOAX (expected share by assets 32%); loan face 13063.9 of 65236.3; pending loan book 3870.0/2937.0 -> 3870.0/2937.0; pending assets A 3870.0/2937.0 -> 3870.0/2937.0; freezes reset 57/57; pending still ?,?
+seed 702: WFCX died, 53 borrowers -> 21 to pending JPMX/BOAX (expected share by assets 35%); loan face 20803.7 of 56176.8; pending loan book 5137.0/2601.0 -> 5137.0/2601.0; pending assets A 5137.0/2601.0 -> 5137.0/2601.0; freezes reset 53/53; pending still ?,?
+seed 703: WFCX died, 51 borrowers -> 19 to pending JPMX/BOAX (expected share by assets 35%); loan face 14210.2 of 45872.9; pending loan book 5195.0/2911.0 -> 5195.0/2911.0; pending assets A 5195.0/2911.0 -> 5195.0/2911.0; freezes reset 51/51; pending still ?,?
+seed 704: WFCX died, 74 borrowers -> 29 to pending JPMX/BOAX (expected share by assets 31%); loan face 45769.2 of 85121.8; pending loan book 3232.0/3215.0 -> 3232.0/3215.0; pending assets A 3232.0/3215.0 -> 3232.0/3215.0; freezes reset 74/74; pending still ?,?
+seed 705: WFCX died, 66 borrowers -> 21 to pending JPMX/BOAX (expected share by assets 31%); loan face 19796.6 of 81834.3; pending loan book 3416.0/2694.0 -> 3416.0/2694.0; pending assets A 3416.0/2694.0 -> 3416.0/2694.0; freezes reset 66/66; pending still ?,?
+seed 706: WFCX died, 49 borrowers -> 24 to pending JPMX/BOAX (expected share by assets 35%); loan face 29738.7 of 59150.7; pending loan book 4621.0/4080.0 -> 4621.0/4080.0; pending assets A 4621.0/4080.0 -> 4621.0/4080.0; freezes reset 49/49; pending still ?,?
+seed 707: WFCX died, 58 borrowers -> 21 to pending JPMX/BOAX (expected share by assets 37%); loan face 19897.2 of 60039.7; pending loan book 4166.0/3166.0 -> 4166.0/3166.0; pending assets A 4166.0/3166.0 -> 4166.0/3166.0; freezes reset 58/58; pending still ?,?
+seed 708: WFCX died, 55 borrowers -> 23 to pending JPMX/BOAX (expected share by assets 34%); loan face 18568.7 of 51878.3; pending loan book 4066.0/3157.0 -> 4066.0/3157.0; pending assets A 4066.0/3157.0 -> 4066.0/3157.0; freezes reset 55/55; pending still ?,?
+seed 709: WFCX died, 66 borrowers -> 24 to pending BOAX/JPMX (expected share by assets 35%); loan face 26890.1 of 75013.9; pending loan book 3856.0/3743.0 -> 3856.0/3743.0; pending assets A 3856.0/3743.0 -> 3856.0/3743.0; freezes reset 66/66; pending still ?,?
+seed 710: CITX died, 50 borrowers -> 15 to pending JPMX/BOAX (expected share by assets 34%); loan face 20247.7 of 64626.3; pending loan book 4000.0/3475.0 -> 4000.0/3475.0; pending assets A 4000.0/3475.0 -> 4000.0/3475.0; freezes reset 50/50; pending still ?,?
+P1 total: 209/579 borrowers and 228985.8 of 644951.0 loan face moved to a pending bank
+== P2 BSF.bankFail (failing bank fixed to the largest neutral bank, seeds 711..715)
+seed 711: WFCX failed (dead 1), 39 borrowers -> 16 to pending, 4 to the failing bank itself (re-assigned at the next monthly bankFix)
+  after the next bankFix: 2/4 of those to pending
+seed 712: BOAX failed (dead 1), 69 borrowers -> 23 to pending, 4 to the failing bank itself (re-assigned at the next monthly bankFix)
+  after the next bankFix: 1/4 of those to pending
+seed 713: WFCX failed (dead 1), 55 borrowers -> 17 to pending, 9 to the failing bank itself (re-assigned at the next monthly bankFix)
+  after the next bankFix: 1/9 of those to pending
+seed 714: CITX failed (dead 1), 43 borrowers -> 10 to pending, 4 to the failing bank itself (re-assigned at the next monthly bankFix)
+  after the next bankFix: 1/4 of those to pending
+seed 715: WFCX failed (dead 1), 56 borrowers -> 16 to pending, 5 to the failing bank itself (re-assigned at the next monthly bankFix)
+  after the next bankFix: 3/5 of those to pending
+== P1 on restore (v8fix): a borrower whose bank is dead in the save
+seed 721: 40 borrowers of dead KBFN re-assigned on restore: 9 to pending, pending after restore ?,?
+== Effect: a borrower moved to a pending bank goes to chapter 11 (existing loan-to-own rule)
+seed 731: PNPL (loan 6783.0) at pending BOAX -> chapter 11: write-off from bank A 1308.2, pending bank stake 0.0 -> 71.5%, borrower ctl "?" (CTLQ {"st":"DEP","poss":["c122","c123"]})
+== How often pickBank runs in natural play (seeds 101/202/303 x 720 days, no player action; natural runs have no pending company)
+seed 101: pickBank calls 17, to a pending bank 0, banks alive 23
+seed 202: pickBank calls 113, to a pending bank 0, banks alive 21
+seed 303: pickBank calls 14, to a pending bank 0, banks alive 22
+errs 0 fails 0
