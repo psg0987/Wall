@@ -1,0 +1,21 @@
+# existing loans at a pending bank, 400 days, base 7e357e1 vs working tree (fix) | 2026-10-30 23:27:50 KST
+== before (run_test_on_rev.py 7e357e1)
+game of 7e357e1 sha256 cfdacb48e3387b92 | test verify/rt-ctl-audit-01-fix-01/loan_hash.js sha256 3a9c4546c612c9ca
+seed 621 pending banks ?,? borrowers PNPL,MCSF,ALPB,ORCX,ADBO at JPMX
+  pending days of JPMX: 400/400; borrowers debt 3740.1,2279.6,2058.7,2098.2,2107.6 -> 3489.1,2279.6,1853.0,2098.2,1960.6; bank 122,122,122,122,122; frz 0,0,0,0,0
+  state hash f74cb0e939e499f8
+seed 622 pending banks ?,? borrowers PNPL,MCSF,ALPB,ORCX,ADBO at JPMX
+  pending days of JPMX: 400/400; borrowers debt 3106.7,3334.6,4341.6,2208.2,2305.5 -> 3106.7,3334.6,4341.6,2208.2,2305.5; bank 122,122,122,122,122; frz 0,0,0,0,0
+  state hash 75b3403bd44fe9ae
+errs 0 fails 0
+exit code 0
+== after (run.py, working tree)
+game sha256 6a6bf32d5768090e | loan_hash.js
+seed 621 pending banks ?,? borrowers PNPL,MCSF,ALPB,ORCX,ADBO at JPMX
+  pending days of JPMX: 400/400; borrowers debt 3740.1,2279.6,2058.7,2098.2,2107.6 -> 3489.1,2279.6,1853.0,2098.2,1960.6; bank 122,122,122,122,122; frz 0,0,0,0,0
+  state hash f74cb0e939e499f8
+seed 622 pending banks ?,? borrowers PNPL,MCSF,ALPB,ORCX,ADBO at JPMX
+  pending days of JPMX: 400/400; borrowers debt 3106.7,3334.6,4341.6,2208.2,2305.5 -> 3106.7,3334.6,4341.6,2208.2,2305.5; bank 122,122,122,122,122; frz 0,0,0,0,0
+  state hash 75b3403bd44fe9ae
+errs 0 fails 0
+== diff of the outputs below the header lines: none (identical)

@@ -736,6 +736,7 @@ const sl=e.sl?e.sl(ev.x):null,pr=e.pr(c,ev.x,ev.v);mdl={t:(ev.m==="int"?"🗳 ":
 G.evSl=v=>{const ev=S.ev2;if(!ev)return;ev.v=+v;const e=EV2.find(z=>z.id===ev.id),c=S.co[ev.c],sl=e.sl(ev.x),a=$("evv"),p=$("evp");if(a)a.textContent=(+v).toFixed(sl.step<1?1:0)+sl.u;if(p)p.innerHTML=e.pr(c,ev.x,+v).map((t,j)=>"<b>"+esc(e.o[j]?e.o[j][0]:"")+"</b> — "+esc(t)).join("<br>")};
 G.ev2Pick=k=>{const ev=S.ev2;if(!ev)return closeMd();const e=EV2.find(z=>z.id===ev.id),c=S.co[ev.c];if(!e||!c||c.dead){S.ev2=null;closeMd();return render()}
 if(!mine(c)){S.ev2=null;closeMd();toast(c.tk+" 지배권이 바뀌어 이 결정은 취소됐어요");return render()}   // R3-R3B: the event belongs to my company; no decision once control is gone or pending
+if(ev.m==="ceo"&&evWho(c)!=="ceo"){ev.m="own";evMd();toast(c.tk+" CEO가 아니어서 지배주주로서 다시 결정해요");return render()}   // RT-CTL-AUDIT-01-FIX-01: no CEO-mode decision without the CEO right
 if(ev.m==="own"){if(k==="int"){if(rnd()<evInt(c)){ev.m="int";evMd();return render()}const[a,v]=e.ai(c,ev.x);S.ev2=null;closeMd();const t=e.go(c,ev.x,a,v);L("🗳 이사회가 개입을 거부해 경영진 안대로 진행: "+t,1);return render()}const[a,v]=e.ai(c,ev.x);S.ev2=null;closeMd();L("📋 경영진 결정: "+e.go(c,ev.x,a,v),1);return render()}
 S.ev2=null;closeMd();const t=e.go(c,ev.x,k,ev.v);S.cst&&(S.cst.evd++);L("⚡ "+t,1);render()};
 // AI-run companies live through the same events (management decides); holders of a minority stake hear about it

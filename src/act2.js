@@ -187,7 +187,7 @@ G.lcall=(b,x)=>{const B0=S.co[b],c=S.co[x];if(!mine(B0)||B0.kd!==1)return toast(
 if(rating(c)<4)return toast("신용 BBB 이상인 회사의 대출은 회수할 수 없어요");if(eq(c)<=0)return toast("자본잠식 상태라 법정관리 보호를 받습니다");if((c.lc||0)>S.day)return toast("최근에 회수했습니다 ("+(c.lc-S.day)+"일 뒤 가능)");
 const p=callLoan(B0,c,.5);S.fl.call=1;L("🏦 "+B0.tk+" 은행이 "+c.tk+" 대출 "+F(p)+" 회수"+(c.dead?" — 결국 상장폐지":held(c)<.1?" — 법정관리 돌입":""),1);render()};
 G.frz=(b,x)=>{const B0=S.co[b],c=S.co[x];if(!mine(B0)||c.ln!==b||mine(c))return;c.frz=c.frz?0:b+1;L(c.tk+" 신용 "+(c.frz?"동결":"동결 해제")+" ("+B0.tk+" 은행)",1);render()};
-G.chbank=(i,b)=>{const c=S.co[i],B0=S.co[b];if(!mine(c)||!B0||B0.dead||B0.kd!==1||c.ln===b)return;const fee=loanOf(c)*.005;c.cs-=fee;if(c.cs<0){c.D-=c.cs;c.cs=0}c.ln=b;c.frz=0;L(c.tk+" 거래 은행을 "+B0.tk+"(으)로 변경 (수수료 "+F(fee)+")",1);render()};
+G.chbank=(i,b)=>{const c=S.co[i],B0=S.co[b];if(!mine(c)||!B0||B0.dead||B0.kd!==1||c.ln===b)return;if(B0.ctl==="?")return toast(B0.tk+" 은행은 지배권 판정 보류 중이라 새 거래 은행으로 고를 수 없어요");const fee=loanOf(c)*.005;c.cs-=fee;if(c.cs<0){c.D-=c.cs;c.cs=0}c.ln=b;c.frz=0;L(c.tk+" 거래 은행을 "+B0.tk+"(으)로 변경 (수수료 "+F(fee)+")",1);render()};
 G.loanbook=b=>{lbId=b;sel=-1;pg="loan";render()};
 G.sf=(k,v)=>{scf[k]=v;render()};
 G.sfp=n=>{scf=Object.assign(scf0(),[{ext:10,ctl:"none",sort:1},{cash:50,sort:2},{per:12,rt:2,sort:3},{rt:-4,sort:2}][n]);render()};
@@ -255,7 +255,7 @@ G.xdiv=i=>{const c=S.co[i];if(!mine(c))return;let to=null;if((c.own.P||0)>0)to="
 if(to==null)return toast("배당을 받을 내 그룹 주주가 없습니다");mvInit();MV.fr=i;MV.to=to;MV.how="div";mvFix();sel=-1;pg="xf";render()};
 G.bkPick=i=>{const c=S.co[i];if(!mine(c)||c.kd)return;const bs=banks().filter(b=>b.id!==c.ln).sort((a,b)=>(mine(b)-mine(a))||b.A-a.A).slice(0,12);
 openMd({t:"거래 은행 변경",b:"대출을 다른 은행으로 옮깁니다. 수수료는 대출의 0.5% ("+F(loanOf(c)*.005)+"). 라이벌이 지배하는 은행은 대출을 회수할 수 있어요.",
-h:bs.map(b=>`<div class="sr" onclick="G.bkGo(${i},${b.id})"><div><b>${esc(b.tk)} ${esc(b.n)}</b><div class="mu">${mine(b)?"내 은행":b.ctl&&b.ctl[0]==="r"?"⚠ 라이벌 지배":"중립"} · 신용 ${RT[rating(b)]} · 자산 ${F(b.A)}</div></div><span class="mu">›</span></div>`).join("")||'<p class="mu">옮길 수 있는 은행이 없습니다.</p>',o:[["닫기","n"]]})};
+h:bs.map(b=>`<div class="sr" onclick="G.bkGo(${i},${b.id})"><div><b>${esc(b.tk)} ${esc(b.n)}</b><div class="mu">${mine(b)?"내 은행":b.ctl==="?"?"판정 보류":b.ctl&&b.ctl[0]==="r"?"⚠ 라이벌 지배":"중립"} · 신용 ${RT[rating(b)]} · 자산 ${F(b.A)}</div></div><span class="mu">›</span></div>`).join("")||'<p class="mu">옮길 수 있는 은행이 없습니다.</p>',o:[["닫기","n"]]})};
 G.bkGo=(i,b)=>{closeMd();G.chbank(i,b)};
 // save backup: gzip + base64 when the browser supports CompressionStream
 async function packS(strip){const js=strip?JSON.stringify(S,(k,v)=>k==="hr"||k==="hv"||k==="fq"||k==="IX"||k==="hm"||k==="w10"||k==="wd"?undefined:v):JSON.stringify(S);if(typeof CompressionStream==="function"){const st=new Blob([js]).stream().pipeThrough(new CompressionStream("gzip")),u=new Uint8Array(await new Response(st).arrayBuffer());let s="";for(let k=0;k<u.length;k+=8192)s+=String.fromCharCode.apply(null,u.subarray(k,k+8192));return "WSR1:"+btoa(s)}
