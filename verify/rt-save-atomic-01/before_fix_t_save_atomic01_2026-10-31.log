@@ -1,0 +1,32 @@
+game sha256 bb6b6a9504f3c3fa | t_save_atomic01.js
+FAIL R1 imp: B restored while A was packing; after A's pack completes the local save is [901,21] (B [902,40], before the gate opened [901,20]); told "세이브를 불러왔어요 · 2027년 2월 11일"
+FAIL R1 ld: B restored while A was packing; after A's pack completes the local save is [901,21] (B [902,40], before the gate opened [901,20]); told "슬롯 4을 불러왔습니다"
+FAIL R1 fLoad: B restored while A was packing; after A's pack completes the local save is [901,21] (B [902,40], before the gate opened [901,20]); told "파일을 불러왔어요 · 2027년 2월 11일"
+FAIL R1 cLoad: B restored while A was packing; after A's pack completes the local save is [901,21] (B [902,40], before the gate opened [901,20]); told "클라우드 1을 불러왔어요 · 2027년 2월 11일"
+FAIL R2 Android: andPause / saveNow wrote day 25 at once; the older pack that completes later does not overwrite it (local [901,20], want [901,25])
+FAIL R3 second save() during a pack is not lost: local [901,20], want [901,23]
+FAIL F1 imp: told "불러오기 실패: Cannot read properties of null (reading 'bond')"; old game, control results, screen and speed kept false; local save kept true; after an autosave / restart still A false; runs on S.cm is not iterable
+FAIL F1 ld: told "불러오기에 실패했습니다"; old game, control results, screen and speed kept false; local save kept true; after an autosave / restart still A false; runs on S.cm is not iterable; threw Cannot read properties of undefined (reading 'reduce')
+FAIL F1 fLoad: told "세이브 파일이 아니에요"; old game, control results, screen and speed kept false; local save kept true; after an autosave / restart still A false; runs on S.cm is not iterable
+ok F1 cLoad: told "불러오기 실패: 복원 오류"; old game, control results, screen and speed kept true; local save kept true; after an autosave / restart still A true; runs on true
+FAIL F2 imp: told "불러오기 실패: forced evMd"; old game, control results, screen and speed kept false; local save kept true; after an autosave / restart still A false; runs on true
+FAIL F2 ld: told "불러오기에 실패했습니다"; old game, control results, screen and speed kept false; local save kept true; after an autosave / restart still A false; runs on true
+FAIL F2 fLoad: told "세이브 파일이 아니에요"; old game, control results, screen and speed kept false; local save kept true; after an autosave / restart still A false; runs on true
+FAIL F2 cLoad: told "불러오기 실패: 오류"; old game, control results, screen and speed kept false; local save kept true; after an autosave / restart still A false; runs on true
+FAIL F3 imp: told "세이브를 불러왔어요 · 2027년 2월 11일"; old game, control results, screen and speed kept false; local save kept false; after an autosave / restart still A false; runs on true
+FAIL F3 ld: told "슬롯 4을 불러왔습니다"; old game, control results, screen and speed kept false; local save kept true; after an autosave / restart still A false; runs on true
+FAIL F3 fLoad: told "파일을 불러왔어요 · 2027년 2월 11일"; old game, control results, screen and speed kept false; local save kept false; after an autosave / restart still A false; runs on true
+FAIL F3 cLoad: told "클라우드 1을 불러왔어요 · 2027년 2월 11일"; old game, control results, screen and speed kept false; local save kept false; after an autosave / restart still A false; runs on true
+FAIL F4 imp render throws after the restore: told "세이브를 불러왔어요 · 2027년 2월 11일 | 불러오기 실패: forced render", game [902,40], local [902,40]
+FAIL F4 ld render throws after the restore: told "슬롯 4을 불러왔습니다", game [902,40], local [901,20], threw forced render
+FAIL F4 fLoad render throws after the restore: told "파일을 불러왔어요 · 2027년 2월 11일 | 세이브 파일이 아니에요", game [902,40], local [902,40]
+FAIL F4 cLoad render throws after the restore: told "클라우드 1을 불러왔어요 · 2027년 2월 11일 | 불러오기 실패: 오류", game [902,40], local [902,40]
+FAIL S imp: local save when "세이브를 불러왔어요 · 2027년 1월 11일" was shown: [901,20] (want [903,10]); window restored, paused, speed 3 kept {"ev2":"own","win":true,"spd":0,"sp0":3}
+ok S imp: decided once (ran 1), event closed, speed 3
+FAIL S ld: local save when "슬롯 4을 불러왔습니다" was shown: [901,20] (want [903,10]); window restored, paused, speed 3 kept {"ev2":"own","win":true,"spd":0,"sp0":3}
+ok S ld: decided once (ran 1), event closed, speed 3
+FAIL S fLoad: local save when "파일을 불러왔어요 · 2027년 1월 11일" was shown: [901,20] (want [903,10]); window restored, paused, speed 3 kept {"ev2":"own","win":true,"spd":0,"sp0":3}
+ok S fLoad: decided once (ran 1), event closed, speed 3
+FAIL S cLoad: local save when "클라우드 1을 불러왔어요 · 2027년 1월 11일" was shown: [901,20] (want [903,10]); window restored, paused, speed 3 kept {"ev2":"own","win":true,"spd":0,"sp0":3}
+ok S cLoad: decided once (ran 1), event closed, speed 3
+errs 0 fails 25
