@@ -27,7 +27,7 @@ const local = async () => { const x = stGet('raider7'); if (!x) return null; con
     // put the reference game back for the next case (old game advanced 3 days in the check above)
     world(901, 20); await save(); await tick() }
   // ---------- L1 normal restore
-  { useCloud(cloud(B)); sel = 7; pg = 'auto'; lastToast = ''; const S0 = S; await G.cLoad(1); await tick(); cldInit = C0;
+  { useCloud(cloud(B)); sel = 7; pg = 'auto'; lastToast = ''; const S0 = S; await G.cLoad(1); for (let w = 0; w < 100 && saving; w++) await new Promise(r => setTimeout(r, 10)); await tick(); cldInit = C0;
     const st = { toast: lastToast, swapped: S !== S0, id: [S.seed, S.day], sel, pg, mdl: !!mdl, local: await local() };
     ok(/불러왔어요/.test(st.toast) && st.swapped && JSON.stringify(st.id) === JSON.stringify(Bid) && st.sel === -1 && st.pg === '' && !st.mdl && JSON.stringify(st.local) === JSON.stringify(Bid), 'L1 normal: cloud game loaded and saved locally, screen reset ' + JSON.stringify(st));
     let runs = true; try { for (let d = 0; d < 3; d++) { step(); if (S.ev2) S.ev2 = null; mdl = null } } catch (e) { runs = e.message } ok(runs === true, 'L1 the loaded game runs (3 days) ' + runs);

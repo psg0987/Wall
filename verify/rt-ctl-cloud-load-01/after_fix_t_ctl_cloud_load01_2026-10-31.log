@@ -1,0 +1,14 @@
+game sha256 bb6b6a9504f3c3fa | t_ctl_cloud_load01.js
+ok L1 normal: cloud game loaded and saved locally, screen reset {"toast":"클라우드 1을 불러왔어요 · 2027년 2월 11일","swapped":true,"id":[902,40],"sel":-1,"pg":"","mdl":false,"local":[902,40]}
+ok L1 the loaded game runs (3 days) true
+ok L2 network error on get: toast "불러오기 실패: unavailable"; game kept true, local save kept true, autosave after still the old game true, game runs on true, screen kept true
+ok L3 missing piece: toast "불러오기 실패: 조각 누락"; game kept true, local save kept true, autosave after still the old game true, game runs on true, screen kept true
+ok L4 garbled code: toast "불러오기 실패: 5"; game kept true, local save kept true, autosave after still the old game true, game runs on true, screen kept true
+ok L5 JSON that is not a save: toast "불러오기 실패: 형식 오류"; game kept true, local save kept true, autosave after still the old game true, game runs on true, screen kept true
+ok L6 save with no companies: toast "불러오기 실패: 형식 오류"; game kept true, local save kept true, autosave after still the old game true, game runs on true, screen kept true
+ok L7 save that breaks during restore (v8fix): toast "불러오기 실패: 복원 오류"; game kept true, local save kept true, autosave after still the old game true, game runs on true, screen kept true
+ok L8 empty slot: toast "빈 슬롯이에요"; game kept true, local save kept true, autosave after still the old game true, game runs on true, screen kept true
+ok L9 no cloud on this screen: toast "이 화면에서는 클라우드 저장을 쓸 수 없어요"; game kept true, local save kept true, autosave after still the old game true, game runs on true, screen kept true
+ok L10 event window restored as the controlling-holder window, paused, nothing carried out {"ev2":["scandal","own"],"win":true,"keys":"mg,int","spd":0,"sp0":3,"ran":0,"toast":"클라우드 1을 불러왔어요 · 2027년 1월 11일"}
+ok L10 경영진에게 맡기기 → carried out once, closed, speed back to 3; 5 more days: carried out 1 time(s) {"ran":1,"ev2":false,"win":false,"spd":3}
+errs 0 fails 0

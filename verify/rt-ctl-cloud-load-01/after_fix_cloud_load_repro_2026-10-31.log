@@ -1,0 +1,5 @@
+# node (run.py, working tree with the fix) verify/rt-ctl-prefinal-fix-02/cloud_load_repro.js | 2026-10-31 10:41:25 KST
+game sha256 bb6b6a9504f3c3fa | cloud_load_repro.js
+save day 30 seed 851 | after G.cLoad: S replaced true, day 30 seed 851, toast "클라우드 1을 불러왔어요 · 2027년 2월 1일", sel -1 pg "" (reset would be -1 / ""), autosave written false
+typeof col inside the game scope: function (the global col function); in G.cLoad the name is the Firestore collection object
+errs 0 fails 0

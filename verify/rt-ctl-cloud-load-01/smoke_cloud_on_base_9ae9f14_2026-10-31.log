@@ -1,0 +1,16 @@
+# SAME cloud smoke on the BASE page (9ae9f14, before the fix), mock cloud | 2026-10-31 10:40:13 KST
+page base_9ae9_site.html sha256 d8502f36479c3348632a48b19671af14301bda6ea30075f2f277e3baa2e70119
+ok   K1 open CEO-mode event, paused (speed 3 kept), CEO resigned, control kept {"m":"ceo","spd":0,"sp0":3,"ceo":-1,"id":[20261041,20]}
+ok   K1 설정 → 클라우드 목록 보기 → 클라우드 1 저장 taps: mock cloud has 3 docs, toast "클라우드 1에 저장했어요 (197KB)+3"
+ok   K1 page: no page error 
+FAIL K2 클라우드 목록 보기 → 클라우드 1 불러오기 taps: cloud game [20261041,20] (local game was [20261042,20]), window [null], paused, nothing carried out, toast "불러오기 실패: 오류"
+FAIL K2 the autosave after the load holds the cloud game [20261042,20]
+locator.scrollIntoViewIfNeeded: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('button', { name: '경영진에게 맡기기' }).first()[22m
+
+    at tapText (/home/claude/wall/verify/rt-ctl-cloud-load-01/smoke_cloud.js:23:97)
+    at /home/claude/wall/verify/rt-ctl-cloud-load-01/smoke_cloud.js:47:9 {
+  name: 'TimeoutError'
+}
+exit 2
