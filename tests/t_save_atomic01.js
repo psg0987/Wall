@@ -25,6 +25,10 @@ const PATHS = {
   ld: async t => { localStorage.setItem('r6s4', t); await G.ld(4) },
   fLoad: async t => { const n = toasts.length; G.fLoad({ files: [{ __t: t }] }); for (let k = 0; k < 400 && toasts.length === n; k++) await sleep(5) },
   cLoad: async t => { cldInit = async () => cloudOf(t); try { await G.cLoad(1) } finally { cldInit = C0 } } };
+// game content without S.k: S.k is the screen-refresh counter that every render() advances (changed after the fix: the rollback redraws the old screen)
+// local save holds the same game content as L0 (S.k aside; a rollback re-writes the old game, changed after the fix)
+const sameLocal = async L0 => { const x = stGet('raider7'); if (x === L0) return true; try { const a = await loadStr(L0), b = await loadStr(x); delete a.k; delete b.k; return JSON.stringify(a) === JSON.stringify(b) } catch (e) { return false } };
+const jk = () => JSON.stringify(S, (k, v) => k === 'k' && v === S.k ? undefined : v);
 const OKMSG = /불러왔/, FAILMSG = /실패|호환되지|형식|아니에요/;
 // gate: the next packS call snapshots S at once (as packS does) but completes only when the gate opens
 let gateOpen = null; const pk0 = packS; function gateNext() { let open; const g = new Promise(r => open = r); let used = false; packS = async function () { const p = pk0.apply(this, arguments); if (!used) { used = true; packS = pk0; await g } return p }; gateOpen = open }
@@ -34,10 +38,10 @@ let gateOpen = null; const pk0 = packS; function gateNext() { let open; const g 
     const e = EV2.find(z => z.id !== 'offer' && z.el(c) && z.o && z.o.length >= 2 && !z.sl) || EV2.find(z => z.id !== 'offer' && z.o && z.o.length >= 2 && !z.sl);
     S.ev2 = { id: e.id, c: c.id, x: e.mk(c), v: 0, m: 'ceo' }; S.spd = 0; S.sp0 = 3; S.ceo = -1 } const E = await packS(1), Eid = id(S), Eev = S.ev2.id;
   const freshA = async () => { world(901, 20); S.spd = 2; await save(); await settle(); toasts = []; pre(JSON.stringify(await localId()) === JSON.stringify(id(S)), 'local save holds game A ' + JSON.stringify(id(S))); return id(S) };
-  // ---------- R1 race per path
-  for (const [name, run] of Object.entries(PATHS)) { const Aid = await freshA(); step(); gateNext(); save(); /* A's autosave is packing */ await run(B); await settle();
-    const after = await localId(); gateOpen(); await settle(); const fin = await localId(); const told = toasts.map(x => x.m).join(' | ');
-    ok(OKMSG.test(told) && JSON.stringify(id(S)) === JSON.stringify(Bid) && JSON.stringify(fin) === JSON.stringify(Bid), 'R1 ' + name + ': B restored while A was packing; after A\'s pack completes the local save is ' + JSON.stringify(fin) + ' (B ' + JSON.stringify(Bid) + ', before the gate opened ' + JSON.stringify(after) + '); told "' + told + '"') }
+  // ---------- R1 race per path (changed after the fix: the gate opens 60 ms into the restore, because the restore now waits for A's pack)
+  for (const [name, run] of Object.entries(PATHS)) { const Aid = await freshA(); step(); gateNext(); save(); /* A's autosave is packing */ const pr = run(B); await sleep(60);
+    const after = await localId(); gateOpen(); await pr; await settle(); const fin = await localId(); const told = toasts.map(x => x.m).join(' | ');
+    ok(OKMSG.test(told) && JSON.stringify(id(S)) === JSON.stringify(Bid) && JSON.stringify(fin) === JSON.stringify(Bid), 'R1 ' + name + ': B restored while A was packing; after A\'s pack completes the local save is ' + JSON.stringify(fin) + ' (B ' + JSON.stringify(Bid) + ', 60 ms into the restore ' + JSON.stringify(after) + '); told "' + told + '"') }
   // ---------- R2 Android synchronous saveNow vs an older async pack
   { await freshA(); const store = {}; global.Android = { load: k => store[k] || null, save: (k, v) => { store[k] = v; return true } }; global.window = { Android: global.Android }; try {
       gateNext(); save(); for (let d = 0; d < 5; d++) step(); const newer = id(S); if (typeof window.andPause === 'function') window.andPause(); else saveNow(); const atPause = JSON.parse(store.raider7 || 'null'); gateOpen(); await settle();
@@ -51,11 +55,11 @@ let gateOpen = null; const pk0 = packS; function gateNext() { let open; const g 
     F3: [B, () => { const s0 = localStorage.setItem; localStorage.setItem = (k, v) => { if (k === 'raider7') throw new Error('quota'); return s0(k, v) }; return () => { localStorage.setItem = s0 } }],
     F4: [B, () => { const r0 = render; let n = 0; render = function () { if (S.seed === 902 && n++ === 0) throw new Error('forced render'); return r0.apply(this, arguments) }; return () => { render = r0 } }] };
   for (const [fk, [code, arm]] of Object.entries(inject)) for (const [name, run] of Object.entries(PATHS)) {
-    const Aid = await freshA(); sel = 7; pg = 'auto'; mdl = null; const S0 = S, j0 = JSON.stringify(S), q0 = CTLQ, g0 = CTLS, spd0 = S.spd, L0 = stGet('raider7');
+    const Aid = await freshA(); sel = 7; pg = 'auto'; mdl = null; const S0 = S, j0 = jk(), q0 = CTLQ, g0 = CTLS, spd0 = S.spd, L0 = stGet('raider7');
     const undo = arm(); let thrown = null; try { await run(code) } catch (e) { thrown = e.message || String(e) } finally { undo() } await settle();
     const told = toasts.map(x => x.m).join(' | '), now = id(S), local1 = await localId();
     if (fk === 'F4') { ok(OKMSG.test(told) && !FAILMSG.test(told) && JSON.stringify(now) === JSON.stringify(Bid) && JSON.stringify(local1) === JSON.stringify(Bid), fk + ' ' + name + ' render throws after the restore: told "' + told + '", game ' + JSON.stringify(now) + ', local ' + JSON.stringify(local1) + (thrown ? ', threw ' + thrown : '')); continue }
-    const kept = S === S0 && JSON.stringify(S) === j0 && CTLQ === q0 && CTLS === g0 && sel === 7 && pg === 'auto' && !mdl && S.spd === spd0, l1 = stGet('raider7') === L0;
+    const kept = S === S0 && jk() === j0 && CTLQ === q0 && CTLS === g0 && sel === 7 && pg === 'auto' && !mdl && S.spd === spd0, l1 = await sameLocal(L0);
     await save(); await settle(); const l2 = JSON.stringify(await localId()) === JSON.stringify(Aid); let runs = true; try { for (let d = 0; d < 2; d++) { step(); if (S.ev2) S.ev2 = null; mdl = null } } catch (e) { runs = e.message }
     ok(FAILMSG.test(told) && !OKMSG.test(told) && kept && l1 && l2 && runs === true && !thrown, fk + ' ' + name + ': told "' + told + '"; old game, control results, screen and speed kept ' + kept + '; local save kept ' + l1 + '; after an autosave / restart still A ' + l2 + '; runs on ' + runs + (thrown ? '; threw ' + thrown : '')) }
   // ---------- S success per path: local save holds the new game when success is shown; open CEO event

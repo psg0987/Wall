@@ -1190,11 +1190,10 @@ G.cSave=async k=>{const c=await cldInit();if(!c)return toast("이 화면에서�
 const m={n,d:ds(),w:Math.round(nw()),t:Date.now(),v:12};await col.doc("s"+k).set(m);(CLDM=CLDM||{})[k]=m;toast("클라우드 "+k+"에 저장했어요 ("+Math.round(t.length/1024)+"KB)");render()}catch(e){toast("저장 실패: "+(e&&e.code||"오류"))}};
 G.cLoad=async k=>{const c=await cldInit();if(!c)return toast("이 화면에서는 클라우드 저장을 쓸 수 없어요");try{const cc=c.db.collection("data/users/"+c.uid),m=await cc.doc("s"+k).get();if(!m.exists)return toast("빈 슬롯이에요");const d=m.data();let t="";for(let j=0;j<d.n;j++){const p=await cc.doc("s"+k+"p"+j).get();if(!p.exists)throw{code:"조각 누락"};t+=p.data().x}
 // RT-CTL-CLOUD-LOAD-01: the collection was named col and hid the screen function col(), so every load threw after S had been replaced.
-// The game is swapped only for the restore steps; if they fail, the previous game (and its control results) comes back and nothing is saved.
-const s=migrate(await unpackS(t));if(!s||!Array.isArray(s.co)||!s.co.length)throw{code:"형식 오류"};const S0=S,q0=CTLQ,g0=CTLS;S=s;try{v8fix();S.bgs=0;col();secUpd()}catch(e2){S=S0;CTLQ=q0;CTLS=g0;CTLC.clear();col();throw{code:"복원 오류"}}
-sel=-1;pg="";tab="h";mdl=null;if(S.ev2)evMd();save();toast("클라우드 "+k+"을 불러왔어요 · "+ds());render()}catch(e){toast("불러오기 실패: "+(e&&e.code||"오류"))}};
+// RT-SAVE-ATOMIC-01: the swap, event window and device write go through rsCommit (all or nothing); success is told after the write.
+const s=migrate(await unpackS(t));if(!s||!Array.isArray(s.co)||!s.co.length)throw{code:"형식 오류"};await rsCommit(s,1);toast("클라우드 "+k+"을 불러왔어요 · "+ds())}catch(e){toast("불러오기 실패: "+(e&&e.code||"오류"))}};
 G.fSave=async()=>{try{const dl=typeof claude!=="undefined"&&claude.use?await claude.use("downloads"):null,t=await packS(1);if(!dl)return G.exp();await dl.save({filename:"raider-save-"+((S.y0||2027)+Math.floor(S.day/360))+"-"+(Math.floor(S.day%360/30)+1)+".txt",data:t})}catch(e){if(e&&e.code==="declined")return;toast("파일 저장 실패: "+(e&&e.code||"오류"))}};
-G.fLoad=inp=>{const f=inp.files&&inp.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const s=migrate(await unpackS(String(r.result)));if(!s||!Array.isArray(s.co))throw 0;S=s;v8fix();S.bgs=0;col();secUpd();sel=-1;pg="";tab="h";mdl=null;if(S.ev2)evMd();save();toast("파일을 불러왔어요 · "+ds());render()}catch(e){toast("세이브 파일이 아니에요")}};r.readAsText(f)};
+G.fLoad=inp=>{const f=inp.files&&inp.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const s=migrate(await unpackS(String(r.result)));if(!s||!Array.isArray(s.co)||!s.co.length)throw 0;await rsCommit(s,1);toast("파일을 불러왔어요 · "+ds())}catch(e){toast(e&&e.code?"불러오기 실패: "+e.code:"세이브 파일이 아니에요")}};r.readAsText(f)};   // RT-SAVE-ATOMIC-01: all or nothing
 // ---- challenge (10): weekly seed, shared leaderboard (db), live race (room), same-world duel on one device ----
 const wkKey=()=>Math.floor((Date.now()/864e5+3)/7);
 const chlSeed=w=>mix32(w,20271)&0x3fffffff;
@@ -1716,9 +1715,25 @@ const stApp=()=>typeof window!=="undefined"&&window.Android&&typeof Android.load
 function stGet(k){try{if(stApp()){const v=Android.load(k);if(v)return v}}catch(e){}try{return localStorage.getItem(k)}catch(e){return null}}
 function stSet(k,v){try{if(stApp()&&Android.save(k,v))return true}catch(e){}try{localStorage.setItem(k,v);return true}catch(e){return false}}
 async function loadStr(x){return migrate(x[0]==="{"?JSON.parse(x):await unpackS(x))}
-let saving=0;async function save(){if(saving||!S)return;saving=1;try{stSet("raider7",await packS())}catch(e){}saving=0}
-function saveNow(){try{if(stApp())stSet("raider7",JSON.stringify(S));else save()}catch(e){}}
-function gameLoop(){if(S.over||!S.spd||mdl||pg==="new")return;S.acc+=S.spd/4;let n=0;const t0=Date.now();while(S.acc>=1&&n<40){S.acc-=1;n++;step();if(mdl||S.over)break;if(n>=4&&Date.now()-t0>170)break}if(S.acc>16)S.acc=16;if(mdl||S.over)render();else live()}
+// RT-SAVE-ATOMIC-01: one pack at a time. A save asked for during a pack is kept and answered after it (it was dropped). A pack whose game was
+// replaced while it was packing is not written; the current game is packed instead. Every write takes a number when its snapshot is taken, and a
+// write never lands after a newer one (Android saveNow writes at once). save() resolves true once the current game is on the device.
+let saving=0,svQ=null,svN=0,svW=0;
+function save(){if(!S)return Promise.resolve(false);if(saving){if(!svQ){let r;const p=new Promise(x=>r=x);svQ={p,r}}return svQ.p}saving=1;return svRun()}
+async function svRun(){let ok=false;for(let k=0;k<4;k++){const g=S,n=++svN;let t=null;try{t=await packS()}catch(e){}if(S!==g)continue;if(t==null)break;if(n<=svW){ok=true;break}try{ok=!!stSet("raider7",t)}catch(e){ok=false}if(ok)svW=n;break}
+saving=0;const q=svQ;svQ=null;if(q)q.r(await save());return ok}
+function saveNow(){try{if(stApp()){const n=++svN;if(stSet("raider7",JSON.stringify(S)))svW=n}else save()}catch(e){}}
+// RT-SAVE-ATOMIC-01: a restored game replaces the current one only as a whole. It must pass the restore steps, open its saved event window and be
+// written to the device; otherwise the previous game, its control results, the window and the screen come back (nothing of it is kept) and the
+// caller tells the player it failed. full = the reset 세이브 가져오기 / 파일 / 클라우드 always did (S.bgs, secUpd, home tab); 슬롯 keeps its own.
+// The game loop waits (RSB) while the write is in progress; nothing of the new game is drawn before the write lands, so a failure leaves the old
+// screen as it is. Drawing the screen after the write cannot undo a finished restore.
+let RSB=0;
+async function rsCommit(s,full){const S0=S,q0=CTLQ,g0=CTLS,m0=mdl,c0=mcb;let w=0;RSB=1;S=s;
+try{v8fix();if(full)S.bgs=0;col();if(full)secUpd();mdl=null;if(S.ev2)evMd();w=1;if(!await save())throw{code:"기기에 저장하지 못했어요"}}
+catch(e){S=S0;CTLQ=q0;CTLS=g0;CTLC.clear();mdl=m0;mcb=c0;RSB=0;try{col()}catch(e3){}if(w)save();throw e&&e.code?e:{code:"복원 오류"}}
+RSB=0;sel=-1;pg="";if(full)tab="h";try{render()}catch(e){}}
+function gameLoop(){if(RSB||S.over||!S.spd||mdl||pg==="new")return;S.acc+=S.spd/4;let n=0;const t0=Date.now();while(S.acc>=1&&n<40){S.acc-=1;n++;step();if(mdl||S.over)break;if(n>=4&&Date.now()-t0>170)break}if(S.acc>16)S.acc=16;if(mdl||S.over)render();else live()}
 function bootRest(){if(!S){init(defCfg());boot1=1}v8fix();if(S.bgs)S.bgs=0;col();secUpd();
 if(boot1){NG=defCfg();NG.first=1;pg="new";S.spd=0}
 else if(S.ev&&EV[S.ev.id]){const e=EV[S.ev.id],c=S.co[S.ev.c];mdl={t:e.t,b:e.b.replace("{c}",c?c.tk+" "+c.n:"").replace("{x}",F(S.ev.x)),o:e.o,ev:1}}else if(S.ev2){evMd()}else if(S.tut<TUT.length&&!S.over){mdl=tutMd();if(S.spd){S.sp0=S.spd;S.spd=0}}

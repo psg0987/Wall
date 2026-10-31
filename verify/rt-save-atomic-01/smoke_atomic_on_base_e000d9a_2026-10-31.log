@@ -1,0 +1,14 @@
+# SAME atomic smoke on the BASE page (e000d9a, before the fix) | 2026-10-31 11:19:44 KST
+page base_e000_site.html sha256 244eb3b3747e5caf7ac6cce98889d99644f7d56552aacd7d71e536849977f138
+FAIL B1 A [20261051,20] packing, B pasted → "세이브를 불러왔어요 · 2027년 1월 21일"; reload right after: [20261051,20], reload 2 s later: [20261051,20] (want B [20261052,20])
+ok   B1 page: no page error 
+FAIL B2 broken save pasted → "불러오기 실패: Cannot read properties of null (reading 'bond')", game A kept false; after the 8-second autosave timer and a reload: [null,null] (want A [20261051,20])
+FAIL B2 page: no page error pageerror Cannot read properties of null (reading 'bond')
+FAIL B3 설정 → 슬롯 3 불러오기 tap → "슬롯 3을 불러왔습니다"; reload right after: [20261051,20] (want [20261052,20])
+ok   B3 page: no page error 
+FAIL B4 파일 가져오기 with the event window failing → "세이브 파일이 아니에요", game [20261053,20], reload: [20261051,20] (want A [20261051,20])
+ok   B5 파일 가져오기 → "파일을 불러왔어요 · 2027년 1월 21일": event window restored (controlling holder), paused, speed 3 kept {"id":[20261053,20],"m":"own","win":true,"spd":0,"sp0":3}
+ok   B5 경영진에게 맡기기 tap → carried out once {"goes":["sorry"],"ev2":false,"spd":3}; reload: no event, no window {"ev2":false,"md":false}
+ok   B4/B5 page: no page error 
+5 FAIL
+exit 1

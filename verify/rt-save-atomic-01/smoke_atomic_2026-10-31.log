@@ -1,0 +1,14 @@
+# node verify/rt-save-atomic-01/smoke_atomic.js <branch site page, working tree with the fix> | Chromium 412x915 EMULATION | 2026-10-31 11:20:46 KST
+page sa_site.html sha256 5ea2bfa34e9d365059b2741c63ff2bbf6865530d7dea144e4a5cb5cc923dc93c
+ok   B1 A [20261051,20] packing, B pasted → "세이브를 불러왔어요 · 2027년 1월 21일"; reload right after: [20261052,20], reload 2 s later: [20261052,20] (want B [20261052,20])
+ok   B1 page: no page error 
+ok   B2 broken save pasted → "불러오기 실패: 복원 오류", game A kept true; after the 8-second autosave timer and a reload: [20261051,20] (want A [20261051,20])
+ok   B2 page: no page error 
+ok   B3 설정 → 슬롯 3 불러오기 tap → "슬롯 3을 불러왔습니다"; reload right after: [20261052,20] (want [20261052,20])
+ok   B3 page: no page error 
+ok   B4 파일 가져오기 with the event window failing → "불러오기 실패: 복원 오류", game [20261051,20], reload: [20261051,20] (want A [20261051,20])
+ok   B5 파일 가져오기 → "파일을 불러왔어요 · 2027년 1월 21일": event window restored (controlling holder), paused, speed 3 kept {"id":[20261053,20],"m":"own","win":true,"spd":0,"sp0":3}
+ok   B5 경영진에게 맡기기 tap → carried out once {"goes":["sorry"],"ev2":false,"spd":3}; reload: no event, no window {"ev2":false,"md":false}
+ok   B4/B5 page: no page error 
+ALL OK
+exit 0

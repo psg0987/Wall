@@ -125,7 +125,7 @@ G.col=()=>{S.us=S.us?0:1;col();render()};G.cheat=()=>{S.cheat=S.cheat?0:1;render
 G.ai=()=>{if(!aiOn())return toast(aiErr({code:S.aiP==="claude"?"na":"off"}));S.ai=S.ai?0:1;if(S.ai)aiTick(true);render()};
 G.q=v=>{$("sr").innerHTML=srch(v)};
 G.sv=async n=>{try{const t=await packS();if(!stSet("r6s"+n,t))throw 0;stSet("r6m"+n,JSON.stringify({d:ds(),w:Math.round(nw())}));toast("슬롯 "+n+"에 저장했습니다")}catch(e){toast("저장 실패: 저장 공간이 부족합니다")}render()};
-G.ld=async n=>{try{const x=stGet("r6s"+n);if(!x)return toast("빈 슬롯입니다");const s=await loadStr(x);if(!s)return toast("호환되지 않는 저장 데이터입니다");S=s;v8fix();col();sel=-1;pg="";mdl=null;if(S.ev2)evMd();toast("슬롯 "+n+"을 불러왔습니다")}catch(e){toast("불러오기에 실패했습니다")}render()};
+G.ld=async n=>{try{const x=stGet("r6s"+n);if(!x)return toast("빈 슬롯입니다");const s=await loadStr(x);if(!s||!Array.isArray(s.co)||!s.co.length)return toast("호환되지 않는 저장 데이터입니다");await rsCommit(s,0);toast("슬롯 "+n+"을 불러왔습니다")}catch(e){toast("불러오기에 실패했습니다")}try{render()}catch(e){}};   // RT-SAVE-ATOMIC-01: all or nothing
 let NG=null,ngPrev=0,mnT=0;
 G.reset=()=>G.newGame();
 G.newGame=()=>{NG=JSON.parse(JSON.stringify(S&&S.cfg||defCfg()));NG.tut=0;NG.first=0;ngPrev=S?S.spd:0;if(S)S.spd=0;sel=-1;pg="new";G.menu(0);render()};
@@ -266,7 +266,7 @@ G.exp=async()=>{try{const t=await packS(1);let ok=false;if(window.Android&&Andro
 if(ok)toast("세이브 코드를 복사했어요 ("+Math.max(1,Math.round(t.length/1024))+"KB). 메모장이나 나와의 채팅에 붙여 넣어 두세요");
 else openMd({t:"세이브 코드",b:"아래 코드를 길게 눌러 전체 선택한 뒤 복사하세요.",h:`<textarea class="in" id="xpt" readonly style="min-height:160px">${esc(t)}</textarea>`,o:[["닫기","n"]]})}catch(e){toast("내보내기 실패: "+(e&&e.message||e))}};
 G.imp=()=>{openMd({t:"세이브 가져오기",b:"복사해 둔 세이브 코드(WSR1:로 시작)를 붙여 넣으세요. 지금 게임은 이 세이브로 바뀝니다.",h:`<textarea class="in" id="ipt" style="min-height:140px" placeholder="WSR1:..." aria-label="세이브 코드"></textarea>`,o:[["취소","n"],["불러오기","y"]]});
-mcb=async()=>{const el=$("ipt"),t=el?el.value:"";if(!t.trim())return toast("세이브 코드를 붙여 넣어 주세요");try{const s=migrate(await unpackS(t));if(!s||!Array.isArray(s.co)||!s.co.length)throw new Error("세이브 형식이 아니에요");S=s;v8fix();S.bgs=0;col();secUpd();sel=-1;pg="";tab="h";mdl=null;if(S.ev2)evMd();save();toast("세이브를 불러왔어요 · "+ds());render()}catch(e){toast("불러오기 실패: "+(e&&e.message||e))}}};
+mcb=async()=>{const el=$("ipt"),t=el?el.value:"";if(!t.trim())return toast("세이브 코드를 붙여 넣어 주세요");try{const s=migrate(await unpackS(t));if(!s||!Array.isArray(s.co)||!s.co.length)throw new Error("세이브 형식이 아니에요");await rsCommit(s,1);toast("세이브를 불러왔어요 · "+ds())}catch(e){toast("불러오기 실패: "+(e&&(e.message||e.code)||e))}}};   // RT-SAVE-ATOMIC-01: all or nothing
 // Android app hooks (called from the APK's Activity)
 let bk0=0;
 function andQuit(){const t=Date.now();if(t-bk0<2000){try{saveNow()}catch(e){}if(window.Android&&Android.exit)Android.exit()}else{bk0=t;toast("뒤로 버튼을 한 번 더 누르면 종료돼요")}}
