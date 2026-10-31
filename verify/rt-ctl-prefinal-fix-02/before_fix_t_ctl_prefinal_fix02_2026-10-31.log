@@ -1,0 +1,34 @@
+game sha256 6a6bf32d5768090e | t_ctl_prefinal_fix02.js
+FAIL F1a window drawn after resigning: controlling-holder options [fire,sorry,def], no CEO wording
+ok F1b CEO: CEO window [fire,sorry,def]
+ok F1c approved intervention, not CEO: player options kept [fire,sorry,def]
+ok F1d own mode unchanged [mg,int]
+FAIL F2 imp (ceo-resigned): saved event window restored [], paused, nothing carried out {"ev2":["scandal",3,"ceo"],"win":false,"keys":"","spd":0,"sp0":3,"ran":0}
+FAIL F2 imp (own): saved event window restored [], paused, nothing carried out {"ev2":["scandal",3,"own"],"win":false,"keys":"","spd":0,"sp0":3,"ran":0}
+ok F2 imp save without an event: no window, speed as saved (3)
+FAIL F2 ld (ceo-resigned): saved event window restored [], paused, nothing carried out {"ev2":["scandal",3,"ceo"],"win":false,"keys":"","spd":0,"sp0":3,"ran":0}
+FAIL F2 ld (own): saved event window restored [], paused, nothing carried out {"ev2":["scandal",3,"own"],"win":false,"keys":"","spd":0,"sp0":3,"ran":0}
+ok F2 ld save without an event: no window, speed as saved (3)
+FAIL F2 fLoad (ceo-resigned): saved event window restored [], paused, nothing carried out {"ev2":["scandal",3,"ceo"],"win":false,"keys":"","spd":0,"sp0":3,"ran":0}
+FAIL F2 fLoad (own): saved event window restored [], paused, nothing carried out {"ev2":["scandal",3,"own"],"win":false,"keys":"","spd":0,"sp0":3,"ran":0}
+ok F2 fLoad save without an event: no window, speed as saved (3)
+FAIL F2 cLoad (ceo-resigned): saved event window restored [], paused, nothing carried out {"ev2":["scandal",3,"ceo"],"win":false,"keys":"","spd":0,"sp0":3,"ran":0}
+FAIL F2 cLoad (own): saved event window restored [], paused, nothing carried out {"ev2":["scandal",3,"own"],"win":false,"keys":"","spd":0,"sp0":3,"ran":0}
+ok F2 cLoad save without an event: no window, speed as saved (3)
+info F3 {"pending":["JPMX","차입 현황 은행 변경 거래 은행 JPMX "],"neutral":["BOAX","차입 현황 은행 변경 거래 은행 BOAX "],"rival":["KBFN · 라이벌이 지배하는 은행이라 대출을 회수당할 수 있어요","차입 현황 은행 변경 거래 은행 KBFN "],"mine":["CITX · 내 은행","차입 현황 은행 변경 거래 은행 CITX "]}
+FAIL F3 pending current bank: 경영 탭 "JPMX", 개요 탭 차입 현황 shows 지배권 판정 보류
+ok F3 neutral / rival / own wording unchanged
+ok F3 drawing the screen changes no financial value
+FAIL F5a seed 831: borrowers pointing at a dead bank after bankFail: 15/83 (to the failing bank itself: 15)
+ok F5b seed 831: borrowers' debt and cash, other banks' assets and cash unchanged by the re-assignment
+FAIL F5a seed 832: borrowers pointing at a dead bank after bankFail: 22/105 (to the failing bank itself: 22)
+ok F5b seed 832: borrowers' debt and cash, other banks' assets and cash unchanged by the re-assignment
+FAIL F5a seed 833: borrowers pointing at a dead bank after bankFail: 17/82 (to the failing bank itself: 17)
+ok F5b seed 833: borrowers' debt and cash, other banks' assets and cash unchanged by the re-assignment
+FAIL F5a seed 834: borrowers pointing at a dead bank after bankFail: 16/93 (to the failing bank itself: 16)
+ok F5b seed 834: borrowers' debt and cash, other banks' assets and cash unchanged by the re-assignment
+FAIL F5a seed 835: borrowers pointing at a dead bank after bankFail: 23/116 (to the failing bank itself: 23)
+ok F5b seed 835: borrowers' debt and cash, other banks' assets and cash unchanged by the re-assignment
+FAIL F5c no live bank left: borrowers have no lending bank (-1): 0/64
+ok F5c next monthly bankFix with no bank: still -1, screen shows "없음", credit room computes (null)
+errs 0 fails 16
