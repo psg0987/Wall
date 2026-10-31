@@ -237,7 +237,7 @@ ctlAll();secUpd();v8fix();for(const c of S.co)dscScan(c,1)}
 
 // ---- v8: lenders (c.ln), bonds (c.bond/cpn/bmat), player advances (c.pa), productivity (c.ps/q), autopilot (c.ap) ----
 const banks=()=>S.co.filter(c=>c.kd===1&&!c.dead);
-function pickBank(){const b=banks();if(!b.length)return -1;let t=0;for(const x of b)t+=x.A;let r=rnd()*t;for(const x of b){r-=x.A;if(r<=0)return x.id}return b[0].id}
+function pickBank(ex){const b=banks().filter(x=>x!==ex);if(!b.length)return -1;let t=0;for(const x of b)t+=x.A;let r=rnd()*t;for(const x of b){r-=x.A;if(r<=0)return x.id}return b[0].id}
 function v8prep(c){if(c.bond==null){c.bond=0;c.cpn=0;c.bmat=0;c.pa=0;c.frz=0;c.lc=0;c.ps=0;c.q=0;c.ap=0;c.er=null}if(c.ln==null)c.ln=c.kd?-1:pickBank();if(c.woq==null)c.woq=0;if(c.ncq==null)c.ncq=0;if(c.cfd==null)c.cfd=S.day;if(c.eqq==null)c.eqq=0;if(c.isd==null)c.isd=S.day;if(c.acd==null)c.acd=S.day}
 function bankFix(){for(const c of S.co){v8prep(c);if(!c.kd&&!c.dead&&(c.ln<0||!S.co[c.ln]||S.co[c.ln].dead)){c.ln=pickBank();c.frz=0}}}
 const loanOf=c=>c.kd?0:Math.max(0,c.D-c.bond-(c.pa||0));

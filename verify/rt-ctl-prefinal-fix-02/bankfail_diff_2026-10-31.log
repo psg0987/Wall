@@ -1,0 +1,58 @@
+# verify/rt-ctl-prefinal-fix-02/bankfail_diff.js on base a909cbb (run_test_on_rev.py) and on the fix (run.py, working tree) | 2026-10-31 09:48:02 KST
+== BASE a909cbb
+game of a909cbb sha256 6a6bf32d5768090e | test verify/rt-ctl-prefinal-fix-02/bankfail_diff.js sha256 cf0d00495df416ec
+seed 861 day 30: WFCX failed, 57 borrowers; random numbers used by bankFail 58; borrowers -> dead bank 3, -> -1 0, all companies pointing at a dead bank 3
+  assignment 93430954c42f | after event: cash 499.33 | borrowers D 68419.15 cs 8499.28 | live banks 21 A 19445.06 cs 1556.72 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  later days with companies pointing at a dead bank (day:count, first 40): 31:3 32:3 33:3 34:3 35:3 36:3 37:3 38:3 39:3 40:3 41:3 42:3 43:3 44:3 45:3 46:3 47:3 48:3 49:3 50:3 51:3 52:3 53:3 54:3 55:3 56:3 57:3 58:3 59:3
+  day 360: cash 492.00 | borrowers D 67160.66 cs 10658.09 | live banks 22 A 20491.74 cs 1787.13 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  state hash 2b9491f9aba9623d
+seed 862 day 30: WFCX failed, 71 borrowers; random numbers used by bankFail 72; borrowers -> dead bank 7, -> -1 0, all companies pointing at a dead bank 7
+  assignment 37f498a2fb81 | after event: cash 499.33 | borrowers D 114713.19 cs 15054.01 | live banks 21 A 22241.23 cs 1782.08 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  later days with companies pointing at a dead bank (day:count, first 40): 31:7 32:7 33:7 34:7 35:7 36:7 37:7 38:7 39:7 40:7 41:7 42:7 43:7 44:7 45:7 46:7 47:7 48:7 49:7 50:7 51:7 52:7 53:7 54:7 55:7 56:7 57:7 58:7 59:7
+  day 360: cash 492.00 | borrowers D 111699.08 cs 17017.81 | live banks 21 A 23203.61 cs 1998.29 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  state hash b5d2771a190e3417
+seed 863 day 30: BOAX failed, 83 borrowers; random numbers used by bankFail 84; borrowers -> dead bank 16, -> -1 0, all companies pointing at a dead bank 16
+  assignment ae2aec3b4b9e | after event: cash 499.33 | borrowers D 99458.38 cs 12695.43 | live banks 21 A 18711.74 cs 1510.07 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  later days with companies pointing at a dead bank (day:count, first 40): 31:16 32:16 33:16 34:16 35:16 36:16 37:16 38:16 39:16 40:16 41:16 42:16 43:16 44:16 45:16 46:16 47:16 48:16 49:16 50:16 51:16 52:16 53:16 54:16 55:16 56:16 57:16 58:16 59:16
+  day 360: cash 492.00 | borrowers D 98202.66 cs 14424.99 | live banks 21 A 19519.21 cs 1679.33 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  state hash 5ff9c42aedc9e185
+seed 864 day 30: BOAX failed, 63 borrowers; random numbers used by bankFail 64; borrowers -> dead bank 7, -> -1 0, all companies pointing at a dead bank 7
+  assignment a2d9fb938afd | after event: cash 499.33 | borrowers D 95414.14 cs 12965.37 | live banks 21 A 21299.22 cs 1716.68 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  later days with companies pointing at a dead bank (day:count, first 40): 31:7 32:7 33:7 34:7 35:7 36:7 37:7 38:7 39:7 40:7 41:7 42:7 43:7 44:7 45:7 46:7 47:7 48:7 49:7 50:7 51:7 52:7 53:7 54:7 55:7 56:7 57:7 58:7 59:7
+  day 360: cash 492.00 | borrowers D 93763.19 cs 14073.39 | live banks 22 A 22448.88 cs 1914.24 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  state hash 2a511639da93af1c
+seed 865 day 30: BOAX failed, 53 borrowers; random numbers used by bankFail 54; borrowers -> dead bank 3, -> -1 0, all companies pointing at a dead bank 3
+  assignment 7808dccadc5d | after event: cash 499.33 | borrowers D 80279.15 cs 11257.94 | live banks 21 A 20218.54 cs 1628.25 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  later days with companies pointing at a dead bank (day:count, first 40): 31:3 32:3 33:3 34:3 35:3 36:3 37:3 38:3 39:3 40:3 41:3 42:3 43:3 44:3 45:3 46:3 47:3 48:3 49:3 50:3 51:3 52:3 53:3 54:3 55:3 56:3 57:3 58:3 59:3
+  day 360: cash 492.00 | borrowers D 78085.41 cs 12213.26 | live banks 21 A 21124.00 cs 1831.53 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  state hash 3a93b3b8abcae88e
+errs 0 fails 0
+exit code 0
+== FIX (working tree)
+game sha256 35110e7919b9d6a6 | bankfail_diff.js
+seed 861 day 30: WFCX failed, 57 borrowers; random numbers used by bankFail 58; borrowers -> dead bank 0, -> -1 0, all companies pointing at a dead bank 0
+  assignment a88fff6931e3 | after event: cash 499.33 | borrowers D 68419.15 cs 8499.28 | live banks 21 A 19445.06 cs 1556.72 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  later days with companies pointing at a dead bank (day:count, first 40): none
+  day 360: cash 492.00 | borrowers D 67160.66 cs 10658.09 | live banks 22 A 20491.74 cs 1787.13 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  state hash 13ea1889e504e0c7
+seed 862 day 30: WFCX failed, 71 borrowers; random numbers used by bankFail 72; borrowers -> dead bank 0, -> -1 0, all companies pointing at a dead bank 0
+  assignment ea9e555a8991 | after event: cash 499.33 | borrowers D 114713.19 cs 15054.01 | live banks 21 A 22241.23 cs 1782.08 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  later days with companies pointing at a dead bank (day:count, first 40): none
+  day 360: cash 492.00 | borrowers D 111699.06 cs 17017.84 | live banks 21 A 23203.61 cs 1998.29 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  state hash ec2dd90e81e4d789
+seed 863 day 30: BOAX failed, 83 borrowers; random numbers used by bankFail 84; borrowers -> dead bank 0, -> -1 0, all companies pointing at a dead bank 0
+  assignment 6a61643b48b1 | after event: cash 499.33 | borrowers D 99458.38 cs 12695.43 | live banks 21 A 18711.74 cs 1510.07 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  later days with companies pointing at a dead bank (day:count, first 40): none
+  day 360: cash 492.00 | borrowers D 98202.66 cs 14424.99 | live banks 21 A 19519.21 cs 1679.30 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  state hash 9c36bf07cf75ee0a
+seed 864 day 30: BOAX failed, 63 borrowers; random numbers used by bankFail 64; borrowers -> dead bank 0, -> -1 0, all companies pointing at a dead bank 0
+  assignment 7cc898c649c7 | after event: cash 499.33 | borrowers D 95414.14 cs 12965.37 | live banks 21 A 21299.22 cs 1716.68 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  later days with companies pointing at a dead bank (day:count, first 40): none
+  day 360: cash 492.00 | borrowers D 93763.19 cs 14083.55 | live banks 22 A 22448.88 cs 1914.24 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  state hash e26c397e0fcbd85f
+seed 865 day 30: BOAX failed, 53 borrowers; random numbers used by bankFail 54; borrowers -> dead bank 0, -> -1 0, all companies pointing at a dead bank 0
+  assignment 8d9d97e906af | after event: cash 499.33 | borrowers D 80279.15 cs 11257.94 | live banks 21 A 20218.54 cs 1628.25 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  later days with companies pointing at a dead bank (day:count, first 40): none
+  day 360: cash 492.00 | borrowers D 78085.41 cs 12213.26 | live banks 21 A 21124.00 cs 1831.53 woq 0.00 | ch11 total 0 | bank stakes in companies 0.00
+  state hash 40c4754e94112418
+errs 0 fails 0

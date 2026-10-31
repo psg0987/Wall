@@ -1,0 +1,38 @@
+game sha256 35110e7919b9d6a6 | t_ctl_prefinal_fix02.js
+ok F1a window drawn after resigning: controlling-holder options [mg,int], no CEO wording
+ok F1b CEO: CEO window [fire,sorry,def]
+ok F1c approved intervention, not CEO: player options kept [fire,sorry,def]
+ok F1d own mode unchanged [mg,int]
+ok F2 imp (ceo-resigned): saved event window restored [mg,int], paused, nothing carried out {"ev2":["scandal",3,"own"],"win":true,"keys":"mg,int","spd":0,"sp0":3,"ran":0}
+ok F2 imp (ceo-resigned): 경영진에게 맡기기 → carried out once, event closed, speed back to 3 {"ran":1,"ev2":false,"win":false,"spd":3}
+ok F2 imp (own): saved event window restored [mg,int], paused, nothing carried out {"ev2":["scandal",3,"own"],"win":true,"keys":"mg,int","spd":0,"sp0":3,"ran":0}
+ok F2 imp (own): 경영진에게 맡기기 → carried out once, event closed, speed back to 3 {"ran":1,"ev2":false,"win":false,"spd":3}
+ok F2 imp save without an event: no window, speed as saved (3)
+ok F2 ld (ceo-resigned): saved event window restored [mg,int], paused, nothing carried out {"ev2":["scandal",3,"own"],"win":true,"keys":"mg,int","spd":0,"sp0":3,"ran":0}
+ok F2 ld (ceo-resigned): 경영진에게 맡기기 → carried out once, event closed, speed back to 3 {"ran":1,"ev2":false,"win":false,"spd":3}
+ok F2 ld (own): saved event window restored [mg,int], paused, nothing carried out {"ev2":["scandal",3,"own"],"win":true,"keys":"mg,int","spd":0,"sp0":3,"ran":0}
+ok F2 ld (own): 경영진에게 맡기기 → carried out once, event closed, speed back to 3 {"ran":1,"ev2":false,"win":false,"spd":3}
+ok F2 ld save without an event: no window, speed as saved (3)
+ok F2 fLoad (ceo-resigned): saved event window restored [mg,int], paused, nothing carried out {"ev2":["scandal",3,"own"],"win":true,"keys":"mg,int","spd":0,"sp0":3,"ran":0}
+ok F2 fLoad (ceo-resigned): 경영진에게 맡기기 → carried out once, event closed, speed back to 3 {"ran":1,"ev2":false,"win":false,"spd":3}
+ok F2 fLoad (own): saved event window restored [mg,int], paused, nothing carried out {"ev2":["scandal",3,"own"],"win":true,"keys":"mg,int","spd":0,"sp0":3,"ran":0}
+ok F2 fLoad (own): 경영진에게 맡기기 → carried out once, event closed, speed back to 3 {"ran":1,"ev2":false,"win":false,"spd":3}
+ok F2 fLoad save without an event: no window, speed as saved (3)
+ok F2e 60 days with the restored window open: the same event is still waiting (scandal)
+info F3 {"pending":["JPMX · 지배권 판정 보류","차입 현황 은행 변경 거래 은행 JPMX 지배권 판정 보류 "],"neutral":["BOAX","차입 현황 은행 변경 거래 은행 BOAX "],"rival":["KBFN · 라이벌이 지배하는 은행이라 대출을 회수당할 수 있어요","차입 현황 은행 변경 거래 은행 KBFN "],"mine":["CITX · 내 은행","차입 현황 은행 변경 거래 은행 CITX "]}
+ok F3 pending current bank: 경영 탭 "JPMX · 지배권 판정 보류", 개요 탭 차입 현황 shows 지배권 판정 보류
+ok F3 neutral / rival / own wording unchanged
+ok F3 drawing the screen changes no financial value
+ok F5a seed 831: borrowers pointing at a dead bank after bankFail: 0/83 (to the failing bank itself: 0)
+ok F5b seed 831: borrowers' debt and cash, other banks' assets and cash unchanged by the re-assignment
+ok F5a seed 832: borrowers pointing at a dead bank after bankFail: 0/105 (to the failing bank itself: 0)
+ok F5b seed 832: borrowers' debt and cash, other banks' assets and cash unchanged by the re-assignment
+ok F5a seed 833: borrowers pointing at a dead bank after bankFail: 0/82 (to the failing bank itself: 0)
+ok F5b seed 833: borrowers' debt and cash, other banks' assets and cash unchanged by the re-assignment
+ok F5a seed 834: borrowers pointing at a dead bank after bankFail: 0/93 (to the failing bank itself: 0)
+ok F5b seed 834: borrowers' debt and cash, other banks' assets and cash unchanged by the re-assignment
+ok F5a seed 835: borrowers pointing at a dead bank after bankFail: 0/116 (to the failing bank itself: 0)
+ok F5b seed 835: borrowers' debt and cash, other banks' assets and cash unchanged by the re-assignment
+ok F5c no live bank left: borrowers have no lending bank (-1): 64/64
+ok F5c next monthly bankFix with no bank: still -1, screen shows "없음", credit room computes (null)
+errs 0 fails 0

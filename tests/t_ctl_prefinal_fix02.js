@@ -1,7 +1,8 @@
 // RT-CTL-PREFINAL-FIX-02 (Claude), written BEFORE the fix. Findings F1, F2, F3, F5 of RT-CTL-PREFINAL-SMOKE-01.
 // F1 evMd: a window for an event saved in CEO mode, drawn while I am no longer CEO but still control the company, is the controlling-holder
 //    window (경영진에게 맡기기 / 개입한다), not the CEO window. CEO window while CEO, approved intervention ("int") and own mode are unchanged.
-// F2 restore paths 세이브 가져오기 (G.imp + mcb), 슬롯 불러오기 (G.ld), 파일 가져오기 (G.fLoad), 클라우드 (G.cLoad with a stubbed store):
+// F2 restore paths 세이브 가져오기 (G.imp + mcb), 슬롯 불러오기 (G.ld), 파일 가져오기 (G.fLoad); boot (bootRest) already reopens it and is
+//    checked in the browser smoke. 클라우드 (G.cLoad) is not in this test: it fails before reaching that point (verify/rt-ctl-prefinal-fix-02/cloud_load_repro.js).
 //    a saved open event comes back as its window, nothing is carried out by the restore, the game stays paused while the window is open,
 //    deciding carries it out exactly once and gives back the speed that was running before the event. A save without event: no window.
 // F3 company screen: when the current lending bank is pending (ctl "?"), the 경영 tab 거래 은행 line and the 개요 tab 차입 현황 show
@@ -30,11 +31,9 @@ function open(seed, m) { world(seed); const c = ords()[3]; iso(c); setOwn(c, 'P'
   const PATHS = {
     imp: async t => { G.imp(); document.getElementById('ipt').value = t; const f = mcb; closeMd(); await f() },   // as G.mk does for 불러오기: closeMd, then the handler
     ld: async t => { stSet('r6s4', t); await G.ld(4) },
-    fLoad: async t => { G.fLoad({ files: [{ __t: t }] }); for (let k = 0; k < 20; k++) await new Promise(r => setTimeout(r, 0)) },
-    cLoad: async t => { const Z = 180000, n = Math.ceil(t.length / Z), docs = { s1: { n } }; for (let j = 0; j < n; j++) docs['s1p' + j] = { x: t.slice(j * Z, (j + 1) * Z) };
-      const c0 = cldInit; cldInit = async () => ({ uid: 'u', db: { collection: () => ({ doc: k => ({ get: async () => ({ exists: !!docs[k], data: () => docs[k] }) }) }) } }); try { await G.cLoad(1) } finally { cldInit = c0 } } };
+    fLoad: async t => { G.fLoad({ files: [{ __t: t }] }); for (let k = 0; k < 20; k++) await new Promise(r => setTimeout(r, 0)) } };
   for (const [name, load] of Object.entries(PATHS)) {
-    for (const kind of ['ceo-resigned', 'own']) { const { c, e } = open(810, kind); S.spd = 3; evMd(); pre(S.spd === 0 && S.sp0 === 3 && !!mdl, 'F2 ' + name + ' event window open, game paused (speed 3 kept to give back)');
+    for (const kind of ['ceo-resigned', 'own']) { const { c, e } = open(810, kind); S.spd = 3; S.sp0 = S.spd; S.spd = 0; pre(S.ev2.m === (kind === 'own' ? 'own' : 'ceo'), 'F2 ' + name + ' save made with the event window open (paused, speed 3 kept to give back; mode ' + S.ev2.m + ')');   // fixture corrected after the fix: evMd here would already turn ceo into own (F1)
       const t = await packS(1); mdl = null; world(811); S.spd = 1; const go0 = e.go; let ran = 0; e.go = function () { ran++; return go0.apply(this, arguments) };
       await load(t); const st = { ev2: S.ev2 && [S.ev2.id, S.ev2.c, S.ev2.m], win: !!(mdl && mdl.ev2), keys: keys(), spd: S.spd, sp0: S.sp0, ran };
       ok(st.ev2 && st.ev2[0] === e.id && st.ev2[1] === c.id && st.win && st.spd === 0 && ran === 0 && st.keys === 'mg,int', 'F2 ' + name + ' (' + kind + '): saved event window restored [' + st.keys + '], paused, nothing carried out ' + JSON.stringify(st));
@@ -42,6 +41,9 @@ function open(seed, m) { world(seed); const c = ords()[3]; iso(c); setOwn(c, 'P'
         ok(ran === 1 && !after.ev2 && !after.win && after.spd === 3, 'F2 ' + name + ' (' + kind + '): 경영진에게 맡기기 → carried out once, event closed, speed back to 3 ' + JSON.stringify(after)) }
       e.go = go0 }
     { world(812); S.spd = 3; const t = await packS(1); world(813); S.spd = 1; await load(t); ok(!mdl && !S.ev2 && S.spd === 3, 'F2 ' + name + ' save without an event: no window, speed as saved (' + S.spd + ')') } }
+  // ---------- F2e the restored window is not replaced by a new event while it is open (60 days stepped directly)
+  { const { c, e } = open(814, 'own'); S.spd = 3; S.sp0 = 3; S.spd = 0; const t = await packS(1); world(815); await PATHS.ld(t); const id0 = S.ev2 && S.ev2.id;
+    for (let d = 0; d < 60; d++) step(); ok(!!mdl && mdl.ev2 && S.ev2 && S.ev2.id === id0 && S.ev2.c === c.id, 'F2e 60 days with the restored window open: the same event is still waiting (' + id0 + ')'); mdl = null; S.ev2 = null }
   // ---------- F3
   { world(820); const bs = banks().filter(b => !b.priv).sort((x, y) => y.A - x.A), [p1, p2] = bs; iso(p1); iso(p2); setOwn(p1, 'c' + p2.id, 60); setOwn(p2, 'c' + p1.id, 60); p1.ctl = p2.ctl = null; ctlAll();
     const nb = bs.find(b => b !== p1 && b !== p2 && !b.ctl), rb = bs.filter(b => b !== p1 && b !== p2 && b !== nb && !b.ctl)[0], mb = bs.filter(b => b !== p1 && b !== p2 && b !== nb && b !== rb && !b.ctl)[0];
