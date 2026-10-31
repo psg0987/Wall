@@ -1,0 +1,10 @@
+# natural 720-day state hashes, cache OFF then ON on HEAD 924d4fd | 2026-10-31 10:48:31 KST
+# reference after RT-CTL-PREFINAL-FIX-02: 101 1e216748d6ec2b94, 202 0d4491041fef0226, 303 051019f8206254ef
+game sha256 bb6b6a9504f3c3fa | natural_hash_cache.js
+hash seed 101 1e216748d6ec2b94 pending 0 | cache OFF hits 0 misses 0 evictions 0 size 0
+hash seed 202 0d4491041fef0226 pending 0 | cache OFF hits 0 misses 0 evictions 0 size 0
+hash seed 303 051019f8206254ef pending 0 | cache OFF hits 0 misses 0 evictions 0 size 0
+game sha256 bb6b6a9504f3c3fa | natural_hash_cache.js
+hash seed 101 1e216748d6ec2b94 pending 0 | cache ON hits 0 misses 0 evictions 0 size 0
+hash seed 202 0d4491041fef0226 pending 0 | cache ON hits 0 misses 0 evictions 0 size 0
+hash seed 303 051019f8206254ef pending 0 | cache ON hits 0 misses 0 evictions 0 size 0

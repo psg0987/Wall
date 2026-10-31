@@ -1,0 +1,9 @@
+# node verify/rt-premerge-fix-01-r3-gpt/smoke_restore.js <branch page, HEAD 924d4fd> <tmp> | 2026-10-31 10:48:31 KST
+ok   save made with A, B pending (ctl "?"), ap 1/1
+ok   R1 boot from autosave: pending kept (AMBIG/AMBIG), mine false, g/pay/ap unchanged (no autopilot on restore), no page error
+ok   R2 save slot (G.ld): pending kept (AMBIG/AMBIG), mine false, g/pay/ap unchanged (no autopilot on restore), no page error
+ok   R3 save code import: pending kept (AMBIG/AMBIG), mine false, g/pay/ap unchanged (no autopilot on restore), no page error
+ok   R4 file import (input type=file -> G.fLoad): pending kept (AMBIG/AMBIG), mine false, g/pay/ap unchanged (no autopilot on restore), no page error
+NOT RUN R5 cloud restore (needs network and an account)
+ALL OK
+exit 0
