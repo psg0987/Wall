@@ -1,0 +1,17 @@
+# verify/rt-ctl-prefinal-fix-02/natural_202_diff.js on base a909cbb and on the fix | 2026-10-31 10:02:32 KST
+== BASE a909cbb
+game of a909cbb sha256 6a6bf32d5768090e | test verify/rt-ctl-prefinal-fix-02/natural_202_diff.js sha256 f52c134d00a46fc0
+bankFail day 446: BOAX, borrowers 86, random numbers 87, to the failing bank itself 10, to -1 0, assignment 3d3ae6e3360e
+days with companies pointing at a dead bank (day:count): 4 days, first 446:10 447:10 448:10 449:10
+day 720 totals: player cash 484.00, net worth 484.00, live banks 21 A 23453.76 cs 2138.50, companies alive 514 debt 591263.61 cash 87820.09, chapter-11 count 0, delisted 1
+hash seed 202 bf45152caa43b87d
+errs 0 fails 0
+exit code 0
+== FIX
+game sha256 35110e7919b9d6a6 | natural_202_diff.js
+bankFail day 446: BOAX, borrowers 86, random numbers 87, to the failing bank itself 0, to -1 0, assignment 15979b6a4be4
+days with companies pointing at a dead bank (day:count): none
+day 720 totals: player cash 484.00, net worth 484.00, live banks 21 A 23453.76 cs 2138.50, companies alive 514 debt 591263.66 cash 87820.03, chapter-11 count 0, delisted 1
+hash seed 202 0d4491041fef0226
+errs 0 fails 0
+== daily state hashes: first differing day 446 (the bankFail day), 275 differing days (446..720); days 1..445 identical

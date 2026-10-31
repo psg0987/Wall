@@ -1,0 +1,36 @@
+# SAME smoke on the BASE page (a909cbb, before the fix) | 2026-10-31 10:06:12 KST
+page base_a909_site.html sha256 6210eb304260ed13e9128a5a6a5d1ebbb0eb1e426607c4c14e8529db3f9130bd
+== A 자동경영 (seed 20261031)
+ok   A1 설정 → 자동경영 일괄 관리 tap opens the page
+ok   A1 전체 ON tap: 5/5 ON, 5 decisions, each equal to the A4R rule; toast "지배 회사 5곳 자동경영 켜짐 · 앞으로 새로 지배하는 회사는 꺼진 상태로 시작합니다"
+ok   A1 전체 OFF tap: 0 ON, no decision run; toast "지배 회사 5곳 자동경영 꺼짐+1"
+ok   A2 회사 화면 경영 탭 "자동 경영: 꺼짐" tap → ON, one decision (= rule), button now "자동 경영: 켜짐", toast "TSLR 자동 경영 켜짐+3"
+ok   A2 tap again → OFF, no decision run
+ok   A2 관리 화면 행 "자동경영 켜기" tap → exactly one ON, one decision (= rule)
+ok   A3 "새로 지배하는 회사 자동경영 켜기" tap → option ON (S.apAll 0 → 1)
+ok   A3 option ON: 인수 탭 "+50%" 공개매수 tap on FPRA → controlled (P 100%, private 1), 자동경영 ON, decisions 1 (= rule)
+ok   A3 "새로 지배하는 회사 자동경영 끄기" tap → option OFF
+ok   A3 option OFF: 인수 탭 "+50%" 공개매수 tap on RILD → controlled (P 100%, private 1), 자동경영 OFF, decisions 0
+info A4 save: 7 controlled, 2 자동경영 ON, option 0, full 613KB, export 144KB
+ok   A page: no page error 
+ok   A4 재시작(자동 저장에서 부팅): day, option, every company ctl/ap/g/pay/sweep/ps/bank equal
+ok   A4 3 days after boot: no 자동경영 flag changed, option kept
+ok   A4 boot page: no page error
+ok   A4 세이브 가져오기 (코드 붙여넣기 → 불러오기 tap): all equal
+ok   A4 import page: no page error
+== C CEO 사건창 저장 → CEO가 아닌 상태로 복원, 4 paths (seed 20261032)
+ok   C0 경영 탭 "내가 CEO 취임" tap → CEO of ORCX
+ok   C0 사건창 opened in CEO mode, game paused (speed 0, 3 kept): "⚡ 임원 스캔들 · ORCX" [즉시 해임 / 사과와 쇄신안 / 회사가 옹호]
+ok   C0 resigned as CEO while the window is open (G.mg call), control kept, saved mode still ceo {"ceo":-1,"mine":true,"m":"ceo"}
+ok   C page: no page error
+FAIL C1 재시작 (자동 저장에서 부팅): window restored as the controlling-holder window [즉시 해임 / 사과와 쇄신안 / 회사가 옹호], no CEO wording, paused (speed 0, 3 kept), nothing carried out by the restore
+ok   C1 재시작 (자동 저장에서 부팅): 1.5 s later the game has not moved (day 0 → 0) and the same event is waiting
+locator.scrollIntoViewIfNeeded: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('button', { name: '경영진에게 맡기기' }).first()[22m
+
+    at tapText (/home/claude/wall/verify/rt-ctl-prefinal-fix-02/smoke_fix02.js:39:99)
+    at /home/claude/wall/verify/rt-ctl-prefinal-fix-02/smoke_fix02.js:118:11 {
+  name: 'TimeoutError'
+}
+exit 2
