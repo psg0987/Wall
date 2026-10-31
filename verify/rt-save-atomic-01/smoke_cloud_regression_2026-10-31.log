@@ -1,0 +1,15 @@
+# node verify/rt-ctl-cloud-load-01/smoke_cloud.js <branch page, HEAD 0ba0438> | MOCK cloud | 2026-10-31 11:28:31 KST
+page sa_site.html sha256 5ea2bfa34e9d365059b2741c63ff2bbf6865530d7dea144e4a5cb5cc923dc93c
+ok   K1 open CEO-mode event, paused (speed 3 kept), CEO resigned, control kept {"m":"ceo","spd":0,"sp0":3,"ceo":-1,"id":[20261041,20]}
+ok   K1 설정 → 클라우드 목록 보기 → 클라우드 1 저장 taps: mock cloud has 3 docs, toast "클라우드 1에 저장했어요 (197KB)+3"
+ok   K1 page: no page error 
+ok   K2 클라우드 목록 보기 → 클라우드 1 불러오기 taps: cloud game [20261041,20] (local game was [20261042,20]), window [경영진에게 맡기기 / 개입한다 (98%)], paused, nothing carried out, toast "클라우드 1을 불러왔어요 · 2027년 1월 21일"
+ok   K2 the autosave after the load holds the cloud game [20261041,20]
+ok   K2 경영진에게 맡기기 tap → management plan "sorry" carried out once, event closed, speed 3, 1.2 s of play: still once {"goes":[["sorry",0]],"ev2":false,"md":false,"spd":3}
+ok   K2 page: no page error 
+ok   K3 클라우드 2 불러오기 tap: toast "불러오기 실패: 조각 누락", game unchanged true, local save unchanged [20261043,20]
+ok   K3 클라우드 3 불러오기 tap: toast "불러오기 실패: 복원 오류+1", game unchanged true, local save unchanged [20261043,20]
+ok   K3 after the page's 8-second autosave timer: local save still the old game [20261043,20], running game [20261043,20]
+ok   K3 page: no page error 
+ALL OK
+exit 0
