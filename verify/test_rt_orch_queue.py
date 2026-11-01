@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -406,6 +407,67 @@ class QueueTests(unittest.TestCase):
             conn.close()
         with self.assertRaisesRegex(QueueBlocked,'QUEUE_ID_MISMATCH'):
             self.q.snapshot()
+
+
+
+    def test_cloned_database_same_id_different_path_is_denied(self):
+        self.q.stage(task())
+        copied=str(Path(self.tmp.name)/'copied.sqlite3')
+        shutil.copyfile(self.db,copied)
+        with self.assertRaisesRegex(QueueBlocked,'QUEUE_PATH_MISMATCH'):
+            OfflineQueue(copied,self.queue_id)
+
+    def test_runtime_db_copy_path_is_denied(self):
+        copied=str(Path(self.tmp.name)/'copied.sqlite3')
+        shutil.copyfile(self.db,copied)
+        self.q.path=copied
+        with self.assertRaisesRegex(QueueBlocked,'QUEUE_PATH_MISMATCH'):
+            self.q.claim_for_simulation('worker')
+
+    def test_identity_must_be_rechecked_under_write_transaction(self):
+        # The connection identity is valid, then another connection tampers
+        # with the DB ID before BEGIN IMMEDIATE. The in-tx check must refuse.
+        original=self.q._connect
+        conn=original()
+        attacker=sqlite3.connect(self.db)
+        try:
+            attacker.execute("UPDATE control SET value=? WHERE key='queue_id'",
+                             ('rt-orch-08-another-queue',))
+            attacker.commit()
+        finally:
+            attacker.close()
+        self.q._connect=lambda:conn
+        try:
+            with self.assertRaisesRegex(QueueBlocked,'QUEUE_ID_MISMATCH'):
+                self.q.stage(task())
+        finally:
+            self.q._connect=original
+            conn.close()
+        check=sqlite3.connect(self.db)
+        try:
+            self.assertEqual(check.execute('SELECT COUNT(*) FROM tasks').fetchone()[0],0)
+        finally:
+            check.close()
+
+    def test_invalid_halt_control_is_fail_closed(self):
+        conn=sqlite3.connect(self.db)
+        try:
+            conn.execute("UPDATE control SET value='unknown' WHERE key='halted'")
+            conn.commit()
+        finally:
+            conn.close()
+        with self.assertRaisesRegex(QueueBlocked,'INVALID_HALT_CONTROL'):
+            self.q.claim_for_simulation('worker')
+
+    def test_missing_halt_control_is_fail_closed(self):
+        conn=sqlite3.connect(self.db)
+        try:
+            conn.execute("DELETE FROM control WHERE key='halted'")
+            conn.commit()
+        finally:
+            conn.close()
+        with self.assertRaisesRegex(QueueBlocked,'INVALID_HALT_CONTROL'):
+            self.q.claim_for_simulation('worker')
 
 
 
