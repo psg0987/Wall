@@ -31,7 +31,9 @@ function open(seed, m) { world(seed); const c = ords()[3]; iso(c); setOwn(c, 'P'
   const PATHS = {
     imp: async t => { G.imp(); document.getElementById('ipt').value = t; const f = mcb; closeMd(); await f() },   // as G.mk does for 불러오기: closeMd, then the handler
     ld: async t => { stSet('r6s4', t); await G.ld(4) },
-    fLoad: async t => { G.fLoad({ files: [{ __t: t }] }); for (let k = 0; k < 20; k++) await new Promise(r => setTimeout(r, 0)) } };
+    // RT-SAVE-ATOMIC-02 (harness only): G.fLoad returns nothing, and since RT-SAVE-ATOMIC-01 the restore waits for the device write; wait until it has
+    // finished (RSB 0) instead of 20 zero-timeouts, so the next case does not start while this restore is still committing.
+    fLoad: async t => { G.fLoad({ files: [{ __t: t }] }); for (let k = 0; k < 20; k++) await new Promise(r => setTimeout(r, 0)); for (let k = 0; k < 600 && typeof RSB !== 'undefined' && RSB; k++) await new Promise(r => setTimeout(r, 5)) } };
   for (const [name, load] of Object.entries(PATHS)) {
     for (const kind of ['ceo-resigned', 'own']) { const { c, e } = open(810, kind); S.spd = 3; S.sp0 = S.spd; S.spd = 0; pre(S.ev2.m === (kind === 'own' ? 'own' : 'ceo'), 'F2 ' + name + ' save made with the event window open (paused, speed 3 kept to give back; mode ' + S.ev2.m + ')');   // fixture corrected after the fix: evMd here would already turn ceo into own (F1)
       const t = await packS(1); mdl = null; world(811); S.spd = 1; const go0 = e.go; let ran = 0; e.go = function () { ran++; return go0.apply(this, arguments) };
