@@ -1,6 +1,6 @@
 // ---- UI part 2: pages, tabs, modal, live updates, boot ----
 const hd=t=>`<div class="row" style="margin-bottom:6px">${B("‹ 뒤로","G.back()")}<b style="font-size:16px">${t}</b><span style="width:64px"></span></div>`;
-const MENU=[["st","◔","계좌 명세서"],["hx","↺","거래 내역"],["mv","↕","일일 급등락"],["sc","▤","섹터"],["scr","⌕","종목 검색기"],["fs","⇄","자산 매물"],["dv","∑","파생상품"],["ix","📈","지수 · 차트"],["bk","📖","개념서"],["fd","＋","회사 설립"],["xf","⇆","자금 이동"],["rv","♜","라이벌·그룹"],["ac","★","미션·업적"],["ai","◎","AI 시장 생태계"],["adv","?","AI 참모"],["hof","♛","명예의 전당"],["new","↻","새 게임"],["help","i","게임 방법"],["set","⚙","설정"]];
+const MENU=[["st","◔","계좌 명세서"],["hx","↺","거래 내역"],["mv","↕","일일 급등락"],["sc","▤","섹터"],["scr","⌕","종목 검색기"],["fs","⇄","자산 매물"],["dv","∑","파생상품"],["ix","📈","지수 · 차트"],["bk","📖","개념서"],["fd","＋","회사 설립"],["xf","⇆","자금 이동"],["rv","♜","라이벌·그룹"],["ac","★","미션·업적"],["ai","◎","AI 시장 생태계"],["adv","?","AI 참모"],["hof","♛","명예의 전당"],["new","↻","새 게임"],["help","i","게임 안내"],["set","⚙","설정"]];
 function page6(){
 if(pg==="menu")return B("✕ 닫기","G.back()")+MENU.map(([k,i,t])=>`<div class="mi" onclick="G.pg('${k}')"><span class="ic">${i}</span><span class="lb">${t}</span></div>`).join("");
 if(pg==="search")return hd("종목 검색")+`<input class="in" id="qi" placeholder="티커 또는 회사명" autocomplete="off" oninput="G.q(this.value)"><div id="sr">${srch("")}</div>`;
