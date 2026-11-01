@@ -14,7 +14,7 @@ from test_rt_orch_evidence import FakeReader, BASE, HEAD, BRANCH
 def entry():
     return {"pr_number": 13, "issue_number": 123, "head_sha": HEAD,
             "branch": BRANCH, "risk_class": "C1",
-            "allowed_paths": ["verify/rt_orch_evidence.py"]}
+            "allowed_paths": ["src/ui2.js"]}
 
 
 class PolicyReader(FakeReader):
@@ -25,6 +25,7 @@ class PolicyReader(FakeReader):
         self.manifest_missing = False
         self.manifest_data_override = None
         self.manifest_paths = []
+        self.files[0]["filename"] = "src/ui2.js"
 
     def object(self, path):
         if path.startswith("/contents/"):
@@ -115,6 +116,67 @@ class TrustedGuardTests(unittest.TestCase):
     def test_non_draft_pr_is_blocked(self):
         r = PolicyReader(); r.pr["draft"] = False
         self.blocked("PR_NOT_OPEN_DRAFT", r)
+
+
+
+    def test_c1_safe_baseline_path_contract(self):
+        from rt_orch_trusted_guard import c1_safe_path
+        for path in ("src/ui1.js", "src/ui2.js", "tests/t_c1_ui.js", "tests/t13_ui.js"):
+            with self.subTest(allow=path):
+                self.assertTrue(c1_safe_path(path))
+        for path in (
+            "verify/rt-orch-approved-prs.json",
+            "verify/rt_orch_trusted_guard.py",
+            "verify/test_rt_orch_trusted_guard.py",
+            "verify/rt_orch_gate.py",
+            ".github/workflows/ci.yml",
+            ".github/CODEOWNERS",
+            "src/core.js",
+            "src/sim.js",
+            "src/act1.js",
+            "src/act2.js",
+            "src/base_v5.js",
+            "src/head.html",
+            "tests/run.py",
+            "tests/stub.js",
+            "tests/golden.json",
+            "tests/t_golden.js",
+            "tests/tfoo.js.txt",
+            "android/app/build.gradle",
+            "build/build.py",
+            "native/index.js",
+            "index.html",
+            "docs/MODEL.md",
+            "tests/../tests/t_c1.js",
+        ):
+            with self.subTest(block=path):
+                self.assertFalse(c1_safe_path(path))
+
+    def test_manifest_cannot_authorize_its_own_modification(self):
+        r = PolicyReader()
+        r.policy["approvals"][0]["allowed_paths"] = ["verify/rt-orch-approved-prs.json"]
+        self.blocked("UNSAFE_APPROVED_PATHS", r)
+
+    def test_manifest_cannot_authorize_verifier_modification(self):
+        r = PolicyReader()
+        r.policy["approvals"][0]["allowed_paths"] = ["verify/rt_orch_trusted_guard.py"]
+        self.blocked("UNSAFE_APPROVED_PATHS", r)
+
+    def test_manifest_cannot_authorize_finance_engine_modification(self):
+        r = PolicyReader()
+        r.policy["approvals"][0]["allowed_paths"] = ["src/sim.js"]
+        self.blocked("UNSAFE_APPROVED_PATHS", r)
+
+    def test_good_approved_test_file(self):
+        r = PolicyReader()
+        r.policy["approvals"][0]["allowed_paths"] = ["tests/t_new_ui.js"]
+        r.files[0]["filename"] = "tests/t_new_ui.js"
+        self.assertEqual(run(r)["verdict"], "PASS")
+
+    def test_test_file_disguised_as_json_blocked(self):
+        r = PolicyReader()
+        r.policy["approvals"][0]["allowed_paths"] = ["tests/t_fake.js.json"]
+        self.blocked("UNSAFE_APPROVED_PATHS", r)
 
 
 if __name__ == "__main__":
