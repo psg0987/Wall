@@ -125,7 +125,7 @@ document.querySelectorAll("[data-pp]").forEach(x=>{const c=S.co[x.dataset.pp];if
 document.querySelectorAll("[data-pc]").forEach(x=>{const c=S.co[x.dataset.pc];if(c){const p=chg(c)*100;x.className="mu num "+(p>=0?"up":"dn");x.textContent=P1(p)}});
 if(sel>=0){const c=S.co[sel],p=chg(c)*100,a=$("sp1"),b=$("sp2");if(a){a.className="big "+(p>=0?"up":"dn");a.textContent=W(c.p);b.innerHTML="오늘 "+P1((c.c1||0)*100)+" · 10일 "+P1(p)+"<br>시총 "+F(mc(c))}}
 S.k++;if(S.k%8===0)misChk();if(RM&&S.k%40===0)tape();if(sel<0&&!pg&&tab!=="m"&&!mdl&&S.k%24===0)render()}
-function tape(){const t=$("tkt");if(!t||!S)return;const hs=S.co.filter(c=>!c.dead&&!c.priv&&(c.own.P||mine(c))).slice(0,8),mv=S.co.filter(c=>!c.dead&&!c.priv).sort((a,b)=>Math.abs(chg(b))-Math.abs(chg(a))).slice(0,8),set=[...new Set([...hs,...mv])];
+function tape(){const t=$("tkt");if(!t||!S||RSB)return;const hs=S.co.filter(c=>!c.dead&&!c.priv&&(c.own.P||mine(c))).slice(0,8),mv=S.co.filter(c=>!c.dead&&!c.priv).sort((a,b)=>Math.abs(chg(b))-Math.abs(chg(a))).slice(0,8),set=[...new Set([...hs,...mv])];
 const it=tapeIx()+set.map(c=>{const p=chg(c)*100;return `<span class="ti"><b>${esc(c.tk)}</b> ${W(c.p)} <i class="${p>=0?"up":"dn"}">${p>=0?"▲":"▼"}${Math.abs(p).toFixed(1)}%</i></span>`}).join("")+`<span class="ti">${esc(S.log[0]||"")}</span>`;
 t.innerHTML=RM?`<span class="ti">${esc(S.log[0]||"")}</span>`:it+it;if(!RM)t.style.animationDuration=Math.max(24,set.length*3.5)+"s"}
 // ---- v12 core: seeded world, 30 countries, alert center, new state ----
@@ -1713,7 +1713,12 @@ document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;const m=$("mn
 let boot1=0;
 const stApp=()=>typeof window!=="undefined"&&window.Android&&typeof Android.load==="function";
 function stGet(k){try{if(stApp()){const v=Android.load(k);if(v)return v}}catch(e){}try{return localStorage.getItem(k)}catch(e){return null}}
-function stSet(k,v){try{if(stApp()&&Android.save(k,v))return true}catch(e){}try{localStorage.setItem(k,v);return true}catch(e){return false}}
+function stSet(k,v){let nat=0;try{if(stApp()){nat=1;if(Android.save(k,v))return true}}catch(e){}
+// RT-SAVE-ATOMIC-02: stGet reads the native copy first. When the native write failed but a native copy exists, a localStorage copy would never be
+// read back (a restart shows the old native copy), so the write is reported as failed instead. No native copy (or a key the native side refuses):
+// localStorage as before, and stGet falls back to it.
+if(nat){try{if(Android.load(k))return false}catch(e){}}
+try{localStorage.setItem(k,v);return true}catch(e){return false}}
 async function loadStr(x){return migrate(x[0]==="{"?JSON.parse(x):await unpackS(x))}
 // RT-SAVE-ATOMIC-01: one pack at a time. A save asked for during a pack is kept and answered after it (it was dropped). A pack whose game was
 // replaced while it was packing is not written; the current game is packed instead. Every write takes a number when its snapshot is taken, and a
@@ -1729,7 +1734,12 @@ function saveNow(){try{if(stApp()){const n=++svN;if(stSet("raider7",JSON.stringi
 // The game loop waits (RSB) while the write is in progress; nothing of the new game is drawn before the write lands, so a failure leaves the old
 // screen as it is. Drawing the screen after the write cannot undo a finished restore.
 let RSB=0;
-async function rsCommit(s,full){const S0=S,q0=CTLQ,g0=CTLS,m0=mdl,c0=mcb;let w=0;RSB=1;S=s;
+// RT-SAVE-ATOMIC-02: a second restore while one is committing is refused (the first one finishes as itself). While committing, the screen still
+// shows the old game but S is the new one, so player input is held back in the capture phase (no tap, key or form change reaches a handler);
+// Android back is ignored; the ticker is not redrawn. Input comes back when the commit ends (success or failure).
+if(typeof document!=="undefined"&&document.addEventListener)for(const t of ["click","dblclick","input","change","keydown","submit","touchstart","touchend","pointerdown"])
+document.addEventListener(t,e=>{if(!RSB)return;e.stopImmediatePropagation();if(e.cancelable&&t!=="touchstart")e.preventDefault();if(t==="click"||t==="touchend")toast("불러오는 중이에요")},true);
+async function rsCommit(s,full){if(RSB)throw{code:"다른 불러오기가 진행 중이에요"};const S0=S,q0=CTLQ,g0=CTLS,m0=mdl,c0=mcb;let w=0;RSB=1;S=s;
 try{v8fix();if(full)S.bgs=0;col();if(full)secUpd();mdl=null;if(S.ev2)evMd();w=1;if(!await save())throw{code:"기기에 저장하지 못했어요"}}
 catch(e){S=S0;CTLQ=q0;CTLS=g0;CTLC.clear();mdl=m0;mcb=c0;RSB=0;try{col()}catch(e3){}if(w)save();throw e&&e.code?e:{code:"복원 오류"}}
 RSB=0;sel=-1;pg="";if(full)tab="h";try{render()}catch(e){}}

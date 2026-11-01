@@ -1,0 +1,11 @@
+game sha256 7f11b45060df268b | t_save_atomic02.js
+ok N1 imp (Android.save false, native A): told "불러오기 실패: 기기에 저장하지 못했어요", game [911,20], restart reads [911,20]
+ok N1 ld (Android.save false, native A): told "불러오기에 실패했습니다", game [911,20], restart reads [911,20]
+ok N1 fLoad (Android.save false, native A): told "불러오기 실패: 기기에 저장하지 못했어요", game [911,20], restart reads [911,20]
+ok N1 cLoad (Android.save false, native A): told "불러오기 실패: 기기에 저장하지 못했어요", game [911,20], restart reads [911,20]
+ok N2 G.sv(1) with Android.save false and an older native slot [911,20]: told "저장 실패: 저장 공간이 부족합니다", slot read back [911,20], game [911,25]
+ok N3 save() resolved false and the restart reads [911,20] (game [911,23])
+ok N4 native write ok + read back true; native copy wins on read true; key the native side refuses → localStorage, read back true; web localStorage true
+ok N5 slot 5 asked while B commits (game during the commit [912,30]): told "불러오기에 실패했습니다 | 세이브를 불러왔어요 · 2027년 2월 1일", game [912,30], local [912,30] (want B [912,30], slot refused)
+ok N6 G.mk(불러오기): renders at the tap [{"a":true,"rsb":false}] show the old game; renders during the commit 0; game now [912,30]
+errs 0 fails 0

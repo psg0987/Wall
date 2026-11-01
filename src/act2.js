@@ -271,7 +271,7 @@ mcb=async()=>{const el=$("ipt"),t=el?el.value:"";if(!t.trim())return toast("세�
 let bk0=0;
 function andQuit(){const t=Date.now();if(t-bk0<2000){try{saveNow()}catch(e){}if(window.Android&&Android.exit)Android.exit()}else{bk0=t;toast("뒤로 버튼을 한 번 더 누르면 종료돼요")}}
 if(typeof window!=="undefined"){
-window.andBack=()=>{const m=$("mn");if(m&&!m.hidden){G.menu(0);return}if(mdl){if(!mdl.ev&&!mdl.tut)G.mk(0);return}if(pg==="new"){if(NG&&!NG.first)G.ngCancel();else andQuit();return}if(sel>=0||pg){G.back();return}if(tab!=="h"){G.go("h");return}andQuit()};
+window.andBack=()=>{if(RSB)return;const m=$("mn");if(m&&!m.hidden){G.menu(0);return}if(mdl){if(!mdl.ev&&!mdl.tut)G.mk(0);return}if(pg==="new"){if(NG&&!NG.first)G.ngCancel();else andQuit();return}if(sel>=0||pg){G.back();return}if(tab!=="h"){G.go("h");return}andQuit()};
 window.andPause=()=>{try{if(S&&S.spd&&!S.over){S.bgs=S.spd;S.spd=0}saveNow()}catch(e){}};
 window.andResume=()=>{try{if(S&&S.bgs){S.spd=S.bgs;S.bgs=0;render()}}catch(e){}}}
 

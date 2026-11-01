@@ -1,0 +1,14 @@
+# node verify/rt-save-atomic-02/smoke_atomic02.js <branch site page, working tree with the fix> | Chromium 412x915 EMULATION, Android = JS stub | 2026-11-01 09:05:28 KST
+page sa2_site.html sha256 cdc25eea56860fa1e1a36a1705ea3b2bab416aad9b4d58e5aa9f7c3cce3a4fa1
+info I1 during the hold: {"rsb":true,"seed":20261062}; taps: tender true, 3× true; renders while committing []
+ok   I1 taps on the old screen while B commits: told "불러오는 중이에요 | 불러오는 중이에요 | 세이브를 불러왔어요 · 2027년 1월 21일"; game {"id":[20261062,20],"cash":10000000,"T":"{}","priv":0,"spd":0,"apAll":0} vs saved B {"id":[20261062,20],"cash":10000000,"T":"{}","priv":0,"spd":0,"apAll":0}; local {"id":[20261062,20],"cash":10000000,"T":"{}","priv":0,"spd":0}
+ok   I1 after the restore a tap works again (3× → speed 3)
+ok   I1 page: no page error 
+info I2 during the hold: {"rsb":true,"seed":20261062}; taps: tender true, 3× true; renders while committing []
+ok   I2 device write fails, taps during the commit: told "불러오는 중이에요 | 불러오는 중이에요 | 불러오기 실패: 기기에 저장하지 못했어요"; game {"id":[20261061,20],"cash":10000000,"T":"{\"r1\":3}","priv":0,"spd":0,"apAll":0} vs A {"id":[20261061,20],"cash":10000000,"T":"{\"r1\":3}","priv":0,"spd":0,"apAll":0}
+ok   I2 after the restore a tap works again (3× → speed 3)
+ok   I2 page: no page error 
+ok   I3 Android.save false (native file [20261061,20]): B pasted → "불러오기 실패: 기기에 저장하지 못했어요", game [20261061,20], after a reload [20261061,20]
+ok   I3 page: no page error 
+ALL OK
+exit 0
