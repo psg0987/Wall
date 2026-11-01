@@ -28,7 +28,7 @@ MAX_POLICY_BYTES = 65536
 # a C1 approved PR to edit its verifier, approval manifest, CI definitions,
 # financial engine, build infrastructure, or test harness.
 C1_UI_FILES = frozenset({"src/ui1.js", "src/ui2.js"})
-C1_TEST_FILE = re.compile(r"^tests/t[a-zA-Z0-9_]+\\.js$")
+C1_TEST_FILE = re.compile(r"^tests/t[a-zA-Z0-9_]+\.js$")
 
 
 def c1_safe_path(path):
