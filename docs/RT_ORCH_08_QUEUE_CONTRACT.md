@@ -13,7 +13,7 @@
 ## 파일
 
 - `verify/rt_orch_queue.py`: 오프라인 SQLite 영속 대기열 + 콘솔 인터페이스. **명시적 `init` 전에는 사용 불가**, 일반 명령은 지정된 queue ID가 일치하는 기존 SQLite 파일만 열 수 있다.
-- `verify/test_rt_orch_queue.py`: 57개 Python 단위/반례 테스트, 실제 실행.
+- `verify/test_rt_orch_queue.py`: 62개 Python 단위/반례 테스트, 실제 실행.
 - `docs/RT_ORCH_08_QUEUE_CONTRACT.md`: 이 문서.
 
 ## 처리 단계
@@ -62,7 +62,7 @@ python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite snapshot --queue-id rt-orc
 
 ## 검증 요약
 
-직접 실행한 57개 테스트는 다음을 포함한다.
+직접 실행한 62개 테스트는 다음을 포함한다.
 
 - SQLite 파일의 영속 상태 및 재열기.
 - 같은 DB에 두 스레드 및 **별도 프로세스 두 개**가 동시에 `claim`하여 정확히 하나만 성공.
@@ -75,7 +75,7 @@ python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite snapshot --queue-id rt-orc
 - SQLite 64비트 정수 상한(PR 번호) 검증, 읽기 트랜잭션으로 일관된 스냅샷, 실제 UNIQUE 인덱스 직접 위반 반례.
 - **DB 경로/ID 오류 차단:** 기존 DB가 없으면 자동 생성하지 않고 `QUEUE_NOT_INITIALIZED`로 거부; 명시적 `init`으로 새 파일만 원자적 생성, 기존 DB의 재초기화 거부, 잘못된 ID 및 실행 도중 DB 바꿔치기 거부.
 
-실제 테스트 실행 명령, 실행 환경 및 결과는 별도로 Issue/PR에 기록한다. GitHub `full-suite` 20개 JavaScript 테스트는 신규 Python 57개를 실행하지 않으므로 그 CI의 PASS로 대체하지 않는다.
+실제 테스트 실행 명령, 실행 환경 및 결과는 별도로 Issue/PR에 기록한다. GitHub `full-suite` 20개 JavaScript 테스트는 신규 Python 62개를 실행하지 않으므로 그 CI의 PASS로 대체하지 않는다.
 
 ## 운영 사용 전 해결할 차단 항목
 
@@ -101,3 +101,10 @@ python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite snapshot --queue-id rt-orc
 - R3 수정: 생성자를 더 이상 파일 생성·초기화에 사용하지 않음. `OfflineQueue.bootstrap` 및 CLI의 명시적 `init`으로만 최초 DB 생성(기존 파일은 `QUEUE_ALREADY_EXISTS`). 모든 연결에서 SQLite `mode=rw`와 고정된 `queue_id`를 대조해 없거나 다른 DB는 fail closed. 초기화 중 크래시로 불완전 파일이 남으면 삭제·자동 재생성하지 않고 진단 후 중단한다.
 - 경로 누락/잘못된 ID/다른 DB로 바꿔치기/중복 초기화/CLI 사용 시나리오를 포함해 총 **57/57 Python unittest PASS** (실제 업로드 코드 SHA 일치는 GitHub 최신 파일 확인 후 별도 검증).
 - 이 queue ID는 사용자 승인 자격 증명이 아니라 **경로 혼동 방지용 식별자**다. DB의 백업·복제본이 같은 ID라면 외부의 안전한 단일 기준 저장소 확인이 필요하고, SQLite 하나가 여러 원격 클라우드 간 원자성을 보장하지 않는다.
+
+## 세 번째 독립 리뷰의 위험·R4 국소 보완
+
+- `RT-ORCH-08-A-REVIEW-R3` Work run `db537050-3e90-832b-ba3d-88748cbbbce8`의 정적 결과: 암묵적 DB 초기화는 수정됐지만, **같은 queue ID의 다른 경로 DB 복제본**, **ID 조회와 실제 트랜잭션 진입 사이의 TOCTOU**, 제어 테이블 `halted` 값 손상, 저장소 오류 후 재시도 정책 미정의가 보고됨. 리뷰가 직접 Python을 실행한 것은 아니다.
+- R4 보완: `bootstrap` 시 **현재 파일의 절대 정규화 경로 `canonical_path`**를 함께 저장. 접속 시 고정 `queue_id` 및 `canonical_path`를 검사해 다른 경로의 DB 복제본 거부. `_tx`의 `BEGIN IMMEDIATE` **내부에서 동일 ID/경로 재검증**, `snapshot`의 읽기 트랜잭션 내부에서도 재검증한다. `halted` 값이 `0`/`1`이 아니거나 행이 없으면 `INVALID_HALT_CONTROL`로 차단한다.
+- 복제본 경로/동작 중 복제본 교체/검증과 잠금 사이의 ID 변조/중단값 손상·누락 **5개 반례 추가 → 62/62 Python unittest PASS** (GPT 직접 실행). GitHub에 업로드한 R4 코드의 Blob SHA/CI/독립 리뷰는 별도 확인.
+- **운영 보장 한계:** 동일 절대 경로와 ID로 복제해 서로 다른 호스트에서 실행한 경우, 또는 실제 클라우드 배포에서 분산 저장소가 분기된 경우는 SQLite 로컬 파일만으로 감지 불가능하다. 외부의 단일 신뢰 DB/상태 서비스와 서버측 원자적 점유·인증된 서비스 ID/복구 정책이 필요하다. DB가 잠겨 있는 동안 영속 안전 중단 기록을 할 수 없으므로, 외부 실행기가 예외를 만날 때 fail closed·재시도 금지 정책을 구현해야 한다. 이번 코드에는 **외부 자동 실행이 전혀 없어 해당 상태를 PASS로 처리하지 않는다.**
