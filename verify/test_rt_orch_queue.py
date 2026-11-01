@@ -258,5 +258,93 @@ class QueueTests(unittest.TestCase):
         self.assertEqual(json.loads(a.stdout)['status'],'BLOCKED')
 
 
+    def test_pr_above_sqlite_integer_range_denied(self):
+        x=task();x['pr_number']=2**63
+        self.blocked('INVALID_PR',x)
+
+    def test_largest_valid_sqlite_pr_number_accepted(self):
+        x=task();x['pr_number']=2**63-1
+        self.assertEqual(self.q.stage(x)['status'],'STAGED_UNTRUSTED')
+
+    def test_parallel_subprocess_claim_one_winner(self):
+        self.q.stage(task())
+        script=str(Path(__file__).with_name('rt_orch_queue.py'))
+        cmd=[sys.executable,script,self.db,'claim']
+        p1=subprocess.Popen([*cmd,'--worker','process1'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+        p2=subprocess.Popen([*cmd,'--worker','process2'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+        a,e1=p1.communicate(timeout=12)
+        b,e2=p2.communicate(timeout=12)
+        self.assertEqual(sorted([json.loads(a)['status'],json.loads(b)['status']]),
+                         ['BLOCKED_RUNNING','SIMULATION_CLAIMED'],(e1,e2))
+        self.assertEqual(sorted([p1.returncode,p2.returncode]),[0,2])
+
+    def test_sql_unique_index_rejects_same_pr_head(self):
+        self.q.stage(task())
+        x=task(2,pr=33,attempt=1,head=task()['head_sha'])
+        sql=('INSERT INTO tasks (task_id,event_key,repository,pr_number,base_sha,'
+             'head_sha,allowed_path,attempt,state) VALUES (?,?,?,?,?,?,?,?,?)')
+        conn=sqlite3.connect(self.db)
+        try:
+            with self.assertRaisesRegex(sqlite3.IntegrityError,'tasks.pr_number, tasks.head_sha'):
+                conn.execute(sql,tuple(x[k] for k in
+                    ('task_id','event_key','repository','pr_number','base_sha',
+                     'head_sha','allowed_path','attempt'))+('STAGED',))
+        finally:
+            conn.rollback();conn.close()
+
+    def test_partial_unique_index_rejects_second_claim(self):
+        self.q.stage(task(1,pr=33));self.q.stage(task(2,pr=34))
+        self.q.claim_for_simulation('worker')
+        conn=sqlite3.connect(self.db)
+        try:
+            with self.assertRaises(sqlite3.IntegrityError):
+                conn.execute("UPDATE tasks SET state='CLAIMED' WHERE task_id=?",(task(2,pr=34)['task_id'],))
+        finally:
+            conn.rollback();conn.close()
+
+    def test_cli_failed_simulation_returns_nonzero(self):
+        self.q.stage(task())
+        c=self.q.claim_for_simulation('worker')
+        script=str(Path(__file__).with_name('rt_orch_queue.py'))
+        proc=subprocess.run([sys.executable,script,self.db,'finish',
+                             '--task-id',c['task_id'],'--token',c['claim_token'],
+                             '--observed-head',c['head_sha'],'--fail'],
+                            capture_output=True,text=True)
+        self.assertEqual(proc.returncode,2,proc.stderr)
+        self.assertEqual(json.loads(proc.stdout)['status'],'FAILED')
+
+    def test_cli_stale_sha_returns_nonzero(self):
+        self.q.stage(task())
+        c=self.q.claim_for_simulation('worker')
+        script=str(Path(__file__).with_name('rt_orch_queue.py'))
+        proc=subprocess.run([sys.executable,script,self.db,'finish',
+                             '--task-id',c['task_id'],'--token',c['claim_token'],
+                             '--observed-head','f'*40],capture_output=True,text=True)
+        self.assertEqual(proc.returncode,2,proc.stderr)
+        self.assertEqual(json.loads(proc.stdout)['status'],'BLOCKED_STALE')
+
+    def test_cli_queue_halted_returns_nonzero(self):
+        self.q.stage(task())
+        c=self.q.claim_for_simulation('worker')
+        self.q.finish_simulation(c['task_id'],c['claim_token'],c['head_sha'],False)
+        script=str(Path(__file__).with_name('rt_orch_queue.py'))
+        proc=subprocess.run([sys.executable,script,self.db,'claim'],capture_output=True,text=True)
+        self.assertEqual(proc.returncode,2)
+        self.assertEqual(json.loads(proc.stdout)['status'],'QUEUE_HALTED')
+
+    def test_cli_db_busy_structured_block(self):
+        conn=sqlite3.connect(self.db,timeout=0.1)
+        try:
+            conn.execute('BEGIN EXCLUSIVE')
+            script=str(Path(__file__).with_name('rt_orch_queue.py'))
+            proc=subprocess.run([sys.executable,script,self.db,'snapshot'],
+                                capture_output=True,text=True,timeout=12)
+            self.assertEqual(proc.returncode,2,proc.stderr)
+            self.assertEqual(json.loads(proc.stdout)['reason'],'DB_BUSY')
+        finally:
+            conn.rollback();conn.close()
+
+
+
 if __name__=='__main__':
     unittest.main()
