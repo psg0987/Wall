@@ -113,3 +113,61 @@ jobs:
             if git diff --quiet HEAD^1 HEAD -- tests/golden.json; then echo "no Golden change committed in this change (HEAD^1..HEAD)"
             else echo "::warning::tests/golden.json is changed by the commits under test (HEAD^1..HEAD) - review it separately"; git diff --stat HEAD^1 HEAD -- tests/golden.json; fi
           else echo "::warning::HEAD^1 not available - committed Golden change not checked"; fi
+
+  rt-orch-04c-live-gate:
+    name: rt-orch-04c-live-gate
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+
+      - name: Assert merge-ref PR HEAD SHA
+        env:
+          EXPECTED_PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          test "$(git rev-parse HEAD^2)" = "$EXPECTED_PR_HEAD" || { echo "::error::PR HEAD mismatch"; exit 1; }
+          echo "verified PR HEAD: $EXPECTED_PR_HEAD"
+
+      - name: Test A, B and C offline fail-closed controls
+        run: |
+          python3 -m unittest discover -s verify -p 'test_rt_orch*.py' -v
+
+      - name: Live allowlisted positive control for original Draft PR 13
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 verify/rt_orch_ci_gate.py \
+            --pr 13 \
+            --base-sha 27abe48fd426a59148e528a3d11c87f64f29dd04 \
+            --head-sha 81534572628172d26ff953b0885c76bc45d515c6 \
+            --allow verify/rt_orch_gate.py \
+            --allow verify/test_rt_orch_gate.py
+
+      - name: Enforce fail-closed policy for THIS experimental PR
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # EXPECTED RED: this PR intentionally changes a protected workflow.
+          # This is an isolated experiment, not yet a required check/ruleset.
+          python3 verify/rt_orch_ci_gate.py \
+            --pr "$PR_NUMBER" \
+            --base-sha "$PR_BASE_SHA" \
+            --head-sha "$PR_HEAD_SHA" \
+            --allow verify/rt_orch_gate.py \
+            --allow verify/test_rt_orch_gate.py

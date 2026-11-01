@@ -1,0 +1,46 @@
+# RT-ORCH-04-C-R2 CANDIDATE — NOT ACTIVE UNTIL REVIEWED AND MERGED TO MAIN.
+# pull_request_target uses trusted BASE workflow and checkout; never checkout a PR head.
+# Does not execute changed PR files, scripts, workflows or build artifacts.
+name: rt-orch-trusted-guard
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: rt-orch-trusted-guard-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  rt-orch-trusted-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout the trusted BASE SHA (NEVER the PR head)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+
+      - name: Audit live PR evidence using base-owned approval
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$PR_BASE_SHA" || { echo "::error::Untrusted checkout"; exit 1; }
+          python3 verify/rt_orch_trusted_guard.py \
+            --pr "$PR_NUMBER" --base-sha "$PR_BASE_SHA" --head-sha "$PR_HEAD_SHA"
