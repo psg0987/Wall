@@ -14,6 +14,7 @@ import base64
 import binascii
 import json
 import os
+import re
 import sys
 
 from rt_orch_ci_gate import check
@@ -22,6 +23,23 @@ from rt_orch_gate import protected, safe_path
 
 MANIFEST_PATH = "verify/rt-orch-approved-prs.json"
 MAX_POLICY_BYTES = 65536
+
+# C1 is intentionally narrower than the generic offline A gate. Never allow
+# a C1 approved PR to edit its verifier, approval manifest, CI definitions,
+# financial engine, build infrastructure, or test harness.
+C1_UI_FILES = frozenset({"src/ui1.js", "src/ui2.js"})
+C1_TEST_FILE = re.compile(r"^tests/t[a-zA-Z0-9_]+\\.js$")
+
+
+def c1_safe_path(path):
+    if not safe_path(path) or protected(path):
+        return False
+    if path in C1_UI_FILES:
+        return True
+    if isinstance(path, str) and C1_TEST_FILE.fullmatch(path):
+        return path not in {"tests/t_golden.js"}
+    return False
+
 
 
 def ensure(condition, reason):
@@ -70,7 +88,7 @@ def approved_entry(reader, base_sha, pr_number, head_sha):
            "APPROVAL_SCOPE_MISMATCH")
     paths = entry.get("allowed_paths")
     ensure(isinstance(paths, list) and 1 <= len(paths) <= 6
-           and all(safe_path(p) and not protected(p) for p in paths)
+           and all(c1_safe_path(p) for p in paths)
            and len(set(paths)) == len(paths),
            "UNSAFE_APPROVED_PATHS")
     return entry
