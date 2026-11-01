@@ -10,6 +10,7 @@ module. All responses set may_dispatch=False.
 from __future__ import annotations
 
 import json
+import os
 import re
 import sqlite3
 import uuid
@@ -22,6 +23,7 @@ TASK_RE = re.compile(r"RT-ORCH-[A-Z0-9-]{2,70}\Z")
 EVENT_RE = re.compile(r"evt-[A-Za-z0-9_-]{4,116}\Z")
 PATH_RE = re.compile(r"docs/[A-Za-z0-9_-]+\.md\Z")
 MAX_REPAIRS = 2
+QUEUE_ID_RE = re.compile(r"rt-orch-[A-Za-z0-9_-]{8,80}\Z")
 
 
 class QueueBlocked(ValueError):
@@ -70,13 +72,33 @@ def _result(status, **extra):
 class OfflineQueue:
     """An atomic and durable demonstration, not an authorization service."""
 
-    def __init__(self, filename):
+    def __init__(self, filename, queue_id):
+        if not isinstance(queue_id, str) or not QUEUE_ID_RE.fullmatch(queue_id):
+            raise QueueBlocked("INVALID_QUEUE_ID")
         self.path = str(Path(filename))
-        # Preserve state across close/reopen. Must not share connection across threads.
+        self.queue_id = queue_id
+        # No implicit DB creation. An unknown path or queue identity is blocked.
         conn = self._connect()
+        conn.close()
+
+    @classmethod
+    def bootstrap(cls, filename, queue_id):
+        """Explicit first-time initialization only; never reset existing history."""
+        if not isinstance(queue_id, str) or not QUEUE_ID_RE.fullmatch(queue_id):
+            raise QueueBlocked("INVALID_QUEUE_ID")
+        path = str(Path(filename))
+        try:
+            fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        except FileExistsError as exc:
+            raise QueueBlocked("QUEUE_ALREADY_EXISTS") from exc
+        os.close(fd)
+        # If initialization crashes, a partial DB file remains and later
+        # operations MUST block instead of silently replacing history.
+        conn = sqlite3.connect(path, isolation_level=None, timeout=5)
         try:
             conn.executescript("""
-                CREATE TABLE IF NOT EXISTS tasks (
+                BEGIN IMMEDIATE;
+                CREATE TABLE tasks (
                     seq INTEGER PRIMARY KEY AUTOINCREMENT,
                     task_id TEXT NOT NULL UNIQUE,
                     event_key TEXT NOT NULL UNIQUE,
@@ -92,21 +114,36 @@ class OfflineQueue:
                     UNIQUE (pr_number, head_sha),
                     UNIQUE (pr_number, attempt)
                 );
-                CREATE UNIQUE INDEX IF NOT EXISTS one_claimed_task
+                CREATE UNIQUE INDEX one_claimed_task
                     ON tasks(state) WHERE state='CLAIMED';
-                CREATE TABLE IF NOT EXISTS control (
-                    key TEXT PRIMARY KEY,
-                    value TEXT NOT NULL
-                );
-                INSERT OR IGNORE INTO control(key, value) VALUES('halted','0');
+                CREATE TABLE control (key TEXT PRIMARY KEY, value TEXT NOT NULL);
             """)
+            conn.execute("INSERT INTO control(key,value) VALUES('halted','0')")
+            conn.execute("INSERT INTO control(key,value) VALUES('queue_id',?)",(queue_id,))
+            conn.execute("COMMIT")
+        except Exception:
+            if conn.in_transaction:
+                conn.execute("ROLLBACK")
+            raise
         finally:
             conn.close()
+        return cls(path,queue_id)
 
     def _connect(self):
-        conn = sqlite3.connect(self.path, isolation_level=None, timeout=5)
-        conn.execute("PRAGMA busy_timeout=5000")
-        return conn
+        if not Path(self.path).is_file():
+            raise QueueBlocked("QUEUE_NOT_INITIALIZED")
+        # mode=rw prohibits sqlite3 from creating a fresh DB by accident.
+        uri=Path(self.path).resolve().as_uri()+"?mode=rw"
+        conn = sqlite3.connect(uri, uri=True, isolation_level=None, timeout=5)
+        try:
+            conn.execute("PRAGMA busy_timeout=5000")
+            row=conn.execute("SELECT value FROM control WHERE key='queue_id'").fetchone()
+            if row is None or row[0]!=self.queue_id:
+                raise QueueBlocked("QUEUE_ID_MISMATCH")
+            return conn
+        except Exception:
+            conn.close()
+            raise
 
     @contextmanager
     def _tx(self):
@@ -223,7 +260,8 @@ def main():
     import argparse
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument("database")
-    ap.add_argument("command",choices=("stage", "claim", "finish", "quarantine", "snapshot"))
+    ap.add_argument("command",choices=("init", "stage", "claim", "finish", "quarantine", "snapshot"))
+    ap.add_argument("--queue-id",required=True,help="Pinned identifier, not an approval credential")
     ap.add_argument("--input",help="task JSON filename (stage only)")
     ap.add_argument("--worker",default="offline")
     ap.add_argument("--task-id")
@@ -232,19 +270,23 @@ def main():
     ap.add_argument("--fail",action="store_true")
     args=ap.parse_args()
     try:
-        q=OfflineQueue(args.database)
-        if args.command=="stage":
-            if not args.input:
-                raise QueueBlocked("MISSING_INPUT_FILE")
-            output=q.stage(json.loads(Path(args.input).read_text(encoding="utf-8")))
-        elif args.command=="claim":
-            output=q.claim_for_simulation(args.worker)
-        elif args.command=="finish":
-            output=q.finish_simulation(args.task_id,args.token,args.observed_head,not args.fail)
-        elif args.command=="quarantine":
-            output=q.quarantine_interrupted_claims()
+        if args.command=="init":
+            OfflineQueue.bootstrap(args.database,args.queue_id)
+            output=_result("INITIALIZED",queue_id=args.queue_id)
         else:
-            output=q.snapshot()
+            q=OfflineQueue(args.database,args.queue_id)
+            if args.command=="stage":
+                if not args.input:
+                    raise QueueBlocked("MISSING_INPUT_FILE")
+                output=q.stage(json.loads(Path(args.input).read_text(encoding="utf-8")))
+            elif args.command=="claim":
+                output=q.claim_for_simulation(args.worker)
+            elif args.command=="finish":
+                output=q.finish_simulation(args.task_id,args.token,args.observed_head,not args.fail)
+            elif args.command=="quarantine":
+                output=q.quarantine_interrupted_claims()
+            else:
+                output=q.snapshot()
     except QueueBlocked as exc:
         output=_result("BLOCKED", reason=str(exc))
     except sqlite3.OperationalError as exc:
