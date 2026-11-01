@@ -89,7 +89,8 @@ def evaluate(evidence: Any) -> list[str]:
     else:
         seen = set()
         for change in changes:
-            if not isinstance(change, dict) or change.get("status") not in ALLOWED_STATUSES:
+            if (not isinstance(change, dict) or not isinstance(change.get("status"), str)
+                    or change["status"] not in ALLOWED_STATUSES):
                 errors.append("INVALID_CHANGE_ENTRY")
                 continue
             new_path = change.get("filename")
@@ -156,7 +157,7 @@ def main(argv: list[str]) -> int:
         with open(argv[1], encoding="utf-8") as f:
             evidence = json.load(f)
         errors = evaluate(evidence)
-    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, TypeError) as exc:
         print(json.dumps({"verdict": "BLOCKED", "reasons": ["EVIDENCE_READ_ERROR"], "detail": str(exc)}, ensure_ascii=False))
         return 2
     print(json.dumps({"verdict": "PASS" if not errors else "BLOCKED", "reasons": errors}, ensure_ascii=False))

@@ -128,6 +128,23 @@ class GateTests(unittest.TestCase):
         d = good(); d["changes"] = [{"filename": FILE, "status": "unknown"}]
         self.assertIn("INVALID_CHANGE_ENTRY", evaluate(d))
 
+    def test_malformed_status_fails_closed(self):
+        for status in ([], {}, None, 7, True):
+            with self.subTest(status=status):
+                d = good(); d["changes"] = [{"filename": FILE, "status": status}]
+                self.assertIn("INVALID_CHANGE_ENTRY", evaluate(d))
+
+    def test_cli_malformed_status_returns_blocked(self):
+        script = Path(__file__).with_name("rt_orch_gate.py")
+        d = good(); d["changes"] = [{"filename": FILE, "status": []}]
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "bad.json"
+            path.write_text(json.dumps(d), encoding="utf-8")
+            r = subprocess.run([sys.executable, str(script), str(path)], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 2)
+            self.assertEqual(json.loads(r.stdout)["verdict"], "BLOCKED")
+            self.assertNotIn("Traceback", r.stderr)
+
     def test_cli_success_and_blocked_exit(self):
         script = Path(__file__).with_name("rt_orch_gate.py")
         with tempfile.TemporaryDirectory() as tmp:
