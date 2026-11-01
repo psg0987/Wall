@@ -1,0 +1,47 @@
+# AUTO-SETUP-03 CI pilot: run one game test on GitHub-hosted runners, without a phone or a personal PC.
+# Runs only on pushes to exp/rt-ci-pilot-01. Read-only token, no secrets, no Golden update, no APK build, no Pages deploy, no external API.
+name: ci-pilot
+
+on:
+  push:
+    branches:
+      - exp/rt-ci-pilot-01
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-pilot-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Versions
+        run: |
+          python3 --version
+          node --version
+
+      - name: Test t_save_atomic01
+        timeout-minutes: 20
+        env:
+          VERBOSE: '1'
+          UPDATE_GOLDEN: ''
+        run: VERBOSE=1 python3 tests/run.py t_save_atomic01
