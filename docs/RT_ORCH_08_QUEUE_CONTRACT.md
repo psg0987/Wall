@@ -12,8 +12,8 @@
 
 ## 파일
 
-- `verify/rt_orch_queue.py`: 오프라인 SQLite 영속 대기열 + 콘솔 인터페이스.
-- `verify/test_rt_orch_queue.py`: 49개 Python 단위/반례 테스트, 실제 실행.
+- `verify/rt_orch_queue.py`: 오프라인 SQLite 영속 대기열 + 콘솔 인터페이스. **명시적 `init` 전에는 사용 불가**, 일반 명령은 지정된 queue ID가 일치하는 기존 SQLite 파일만 열 수 있다.
+- `verify/test_rt_orch_queue.py`: 57개 Python 단위/반례 테스트, 실제 실행.
 - `docs/RT_ORCH_08_QUEUE_CONTRACT.md`: 이 문서.
 
 ## 처리 단계
@@ -39,9 +39,10 @@ PYTHONPATH=verify python3 -m unittest -v test_rt_orch_queue
 오프라인 CLI 예시(`input.json`에는 아래 계약을 기입):
 
 ```bash
-python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite stage --input input.json
-python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite claim --worker offline-test
-python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite snapshot
+python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite init --queue-id rt-orch-08-my-test-queue
+python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite stage --queue-id rt-orch-08-my-test-queue --input input.json
+python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite claim --queue-id rt-orch-08-my-test-queue --worker offline-test
+python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite snapshot --queue-id rt-orch-08-my-test-queue
 ```
 
 ```json
@@ -61,7 +62,7 @@ python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite snapshot
 
 ## 검증 요약
 
-직접 실행한 49개 테스트는 다음을 포함한다.
+직접 실행한 57개 테스트는 다음을 포함한다.
 
 - SQLite 파일의 영속 상태 및 재열기.
 - 같은 DB에 두 스레드 및 **별도 프로세스 두 개**가 동시에 `claim`하여 정확히 하나만 성공.
@@ -72,8 +73,9 @@ python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite snapshot
 - 최대 수정 시도 2회, 순서 건너뛰기 및 Boolean/잘못된 SHA 거절.
 - CLI의 JSON 입력·중복 오류·실패/차단 상태 **비정상 종료코드**, SQLite 잠금 시 `DB_BUSY` 진단.
 - SQLite 64비트 정수 상한(PR 번호) 검증, 읽기 트랜잭션으로 일관된 스냅샷, 실제 UNIQUE 인덱스 직접 위반 반례.
+- **DB 경로/ID 오류 차단:** 기존 DB가 없으면 자동 생성하지 않고 `QUEUE_NOT_INITIALIZED`로 거부; 명시적 `init`으로 새 파일만 원자적 생성, 기존 DB의 재초기화 거부, 잘못된 ID 및 실행 도중 DB 바꿔치기 거부.
 
-실제 테스트 실행 명령, 실행 환경 및 결과는 별도로 Issue/PR에 기록한다. GitHub `full-suite` 20개 JavaScript 테스트는 신규 Python 49개를 실행하지 않으므로 그 CI의 PASS로 대체하지 않는다.
+실제 테스트 실행 명령, 실행 환경 및 결과는 별도로 Issue/PR에 기록한다. GitHub `full-suite` 20개 JavaScript 테스트는 신규 Python 57개를 실행하지 않으므로 그 CI의 PASS로 대체하지 않는다.
 
 ## 운영 사용 전 해결할 차단 항목
 
@@ -90,5 +92,12 @@ python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite snapshot
 
 - 이전 HEAD `f1b3df9058dbf2c6a90778cf870043503e231c69`, 독립 GPT Work run `b7ab3042-5cf0-8327-a037-bf0ccb69971d`의 정적 코드 리뷰에서 **P2 두 건·P3 세 건** 발견(해당 Work 테스트는 NOT_RUN).
 - CLI 실패 상태 종료코드 0 문제, 과대 PR 번호의 SQLite overflow 가능성, DB_BUSY 오류 미정규화, snapshot 다중 조회의 읽기 일관성, 다중 프로세스/UNIQUE 실제 경합 테스트 누락을 본 수정으로 반영.
-- GPT 현재 세션 로컬 환경에서 수정 후 **49/49 Python unittest PASS**를 직접 재실행. 수정본의 실제 GitHub Blob SHA 일치는 PR 최신 커밋 업로드 후 확인해야 한다.
+- GPT 현재 세션 로컬 환경에서 첫 수정 후 **49/49 Python unittest PASS**를 직접 재실행. 수정본의 실제 GitHub Blob SHA 일치는 PR 최신 커밋 업로드 후 확인해야 한다.
 - 새 HEAD에 대한 Work 재리뷰·GitHub Actions 결과는 별도 검증이며, 이 문서에 자동 PASS로 표기하지 않는다.
+
+## 두 번째 독립 리뷰의 P2 차단 (RT-ORCH-08-A-REVIEW-R2)
+
+- R2 Work run `4837364a-89fc-8320-9b2e-fb6c496108db`가 첫 수정 HEAD `a42a34a4739ee7713362cd5a4c33b1a1a171aa8d`에 대해 기존 P2/P3 5건의 해결을 정적 확인했지만, **잘못된 DB 파일 경로에서 새 DB가 자동으로 생성되어 중단/중복 이력이 초기화될 수 있는 신규 P2**를 지적했다. Work는 코드를 실행하지 않았다.
+- R3 수정: 생성자를 더 이상 파일 생성·초기화에 사용하지 않음. `OfflineQueue.bootstrap` 및 CLI의 명시적 `init`으로만 최초 DB 생성(기존 파일은 `QUEUE_ALREADY_EXISTS`). 모든 연결에서 SQLite `mode=rw`와 고정된 `queue_id`를 대조해 없거나 다른 DB는 fail closed. 초기화 중 크래시로 불완전 파일이 남으면 삭제·자동 재생성하지 않고 진단 후 중단한다.
+- 경로 누락/잘못된 ID/다른 DB로 바꿔치기/중복 초기화/CLI 사용 시나리오를 포함해 총 **57/57 Python unittest PASS** (실제 업로드 코드 SHA 일치는 GitHub 최신 파일 확인 후 별도 검증).
+- 이 queue ID는 사용자 승인 자격 증명이 아니라 **경로 혼동 방지용 식별자**다. DB의 백업·복제본이 같은 ID라면 외부의 안전한 단일 기준 저장소 확인이 필요하고, SQLite 하나가 여러 원격 클라우드 간 원자성을 보장하지 않는다.
