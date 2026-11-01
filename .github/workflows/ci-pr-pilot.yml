@@ -1,0 +1,80 @@
+# AUTO-SETUP-06: Draft PR CI pilot - full regression suite (tests/run.py, 38 test files) on pull_request events (opened, synchronize, reopened)
+# for PRs whose base is exp/rt-ci-full-01 only (plain pull_request event; the privileged target-context variant is not used). Read-only token, no secrets, Golden never rewritten (UPDATE_GOLDEN unset), no APK build,
+# no Pages deploy, no external API. The suite's own exit code decides the job; the check step only adds a per-test record and fails on gaps.
+# synchronize test: this comment line was added by a second commit (comment-only change) to trigger the pull_request synchronize event.
+name: ci-pr-pilot
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - exp/rt-ci-full-01
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-pr-pilot-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Versions
+        run: |
+          python3 --version
+          node --version
+          git rev-parse HEAD
+          echo "event ${{ github.event_name }} / ${{ github.event.action }}, PR head ${{ github.event.pull_request.head.sha }}, base ${{ github.event.pull_request.base.sha }}"
+
+      - name: Full test suite (python3 tests/run.py)
+        timeout-minutes: 25
+        shell: bash
+        run: |
+          unset UPDATE_GOLDEN
+          set -o pipefail
+          start=$(date +%s)
+          python3 tests/run.py 2>&1 | tee ci-full.log
+          code=${PIPESTATUS[0]}
+          echo "exit code: $code, seconds: $(( $(date +%s) - start ))" | tee -a ci-full.log
+          exit $code
+
+      - name: Per-test record and coverage check
+        if: always()
+        shell: bash
+        run: |
+          test -f ci-full.log || { echo "no log"; exit 1; }
+          n=$(grep -cE '^(PASS|FAIL) t[^ ]*\.js$' ci-full.log || true)
+          pass=$(grep -cE '^PASS t[^ ]*\.js$' ci-full.log || true)
+          fail=$(grep -cE '^FAIL t[^ ]*\.js$' ci-full.log || true)
+          {
+            echo "## Full suite: $n test files, $pass PASS, $fail FAIL"
+            echo '```'
+            grep -E '^(PASS|FAIL) t[^ ]*\.js$|^ALL PASS|failed$|^exit code' ci-full.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          grep -E '^(PASS|FAIL) t[^ ]*\.js$|^ALL PASS|failed$|^exit code' ci-full.log
+          missing=0
+          for t in t_save_atomic01.js t_save_atomic02.js t_golden.js t_premerge_fix01.js t_ctl_r3_extra.js t_ctl_r3_failfirst.js t_ctl_r3_r2.js t_ctl_r3_r3b.js; do
+            grep -qE "^(PASS|FAIL) $t$" ci-full.log || { echo "missing result: $t"; missing=1; }
+          done
+          [ "$n" -eq 38 ] || { echo "expected 38 test results, got $n"; exit 1; }
+          [ "$missing" -eq 0 ] || exit 1
+          git diff --exit-code -- tests/golden.json || { echo "golden.json changed during the run"; exit 1; }
