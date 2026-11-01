@@ -1,0 +1,114 @@
+# CI for Raider Tycoon (AUTO-SETUP-08 staging). Full regression suite (python3 tests/run.py) on PRs to main, pushes to main and manual runs.
+# Read-only token, no secrets, persist-credentials false, Golden never rewritten (UPDATE_GOLDEN unset), no APK build, no Pages deploy.
+# tests/run.py's exit code decides the job. The check step adds: every test registered in tests/run.py TESTS has exactly one PASS/FAIL line,
+# at least MIN_TESTS are registered, every test file tests/t*.js is registered (helper files are listed apart), tests/golden.json was not changed
+# by the run (fails), and a Golden change committed in the PR / push is reported (warning, does not fail).
+# Actions pinned to full commit SHAs; each one runs on Node.js 24 (runs.using: node24 checked in its action.yml at that commit).
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  MIN_TESTS: '20'
+
+jobs:
+  full-suite:
+    name: full-suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1 (node24)
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0 (node24)
+        with:
+          python-version: '3.13'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0 (node24)
+        with:
+          node-version: '22'
+
+      - name: Versions and commits
+        shell: bash
+        run: |
+          python3 --version
+          node --version
+          echo "event: ${{ github.event_name }} ${{ github.event.action }}"
+          echo "tested commit (HEAD): $(git rev-parse HEAD)"
+          echo "PR head: ${{ github.event.pull_request.head.sha }}  PR base: ${{ github.event.pull_request.base.sha }}"
+
+      - name: Full test suite (python3 tests/run.py)
+        timeout-minutes: 25
+        shell: bash
+        run: |
+          unset UPDATE_GOLDEN
+          set -o pipefail
+          start=$(date +%s)
+          python3 tests/run.py 2>&1 | tee ci-full.log
+          code=${PIPESTATUS[0]}
+          echo "exit code: $code, seconds: $(( $(date +%s) - start ))" | tee -a ci-full.log
+          exit $code
+
+      - name: Test record, registration and Golden check
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ast, os, re, sys
+          src = open('tests/run.py', encoding='utf-8').read()
+          tests = None
+          for n in ast.parse(src).body:   # parse only; ast.literal_eval never runs code
+              if isinstance(n, ast.Assign) and any(getattr(t, 'id', '') == 'TESTS' for t in n.targets):
+                  tests = ast.literal_eval(n.value)
+          if not isinstance(tests, list): sys.exit('TESTS not found in tests/run.py')
+          names = [t[0] for t in tests]; pre = sorted({t[1] for t in tests if t[1]})
+          log = open('ci-full.log', encoding='utf-8').read().splitlines() if os.path.exists('ci-full.log') else []
+          res = {}
+          for l in log:
+              m = re.fullmatch(r'(PASS|FAIL) (\S+\.js)', l)
+              if m and m.group(2) in names: res.setdefault(m.group(2), []).append(m.group(1))
+          files = sorted(f for f in os.listdir('tests') if f.endswith('.js'))
+          testlike = [f for f in files if re.fullmatch(r't(\d+_|_)\w*\.js', f)]
+          unreg = [f for f in testlike if f not in names]
+          helpers = [f for f in files if f not in names]
+          missing = [n for n in names if n not in res]; dup = [n for n in names if len(res.get(n, [])) > 1]
+          npass = sum(1 for n in names if res.get(n) == ['PASS']); nfail = sum(1 for n in names if res.get(n) == ['FAIL'])
+          mn = int(os.environ.get('MIN_TESTS', '0'))
+          out = [f'registered {len(names)} (minimum {mn}), results {len(res)}, PASS {npass}, FAIL {nfail}',
+                 'missing results: ' + (', '.join(missing) or 'none'), 'duplicate results: ' + (', '.join(dup) or 'none'),
+                 'unregistered test files: ' + (', '.join(unreg) or 'none'),
+                 'helper files (not tests): ' + ', '.join(helpers) + (' | pre-scripts: ' + ', '.join(pre) if pre else '')]
+          out += [f'{(res.get(n) or ["NO RESULT"])[0]} {n}' for n in names]
+          print('\n'.join(out))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as f:
+              f.write(f'## full-suite: {len(names)} registered, {npass} PASS, {nfail} FAIL\n```\n' + '\n'.join(out) + '\n```\n')
+          bad = []
+          if len(names) < mn: bad.append(f'only {len(names)} tests registered (< {mn})')
+          if missing: bad.append('missing results')
+          if dup: bad.append('duplicate results')
+          if unreg: bad.append('unregistered test files')
+          if bad: sys.exit('check failed: ' + '; '.join(bad))
+          PY
+          git diff --exit-code -- tests/golden.json && echo "tests/golden.json not changed by the run" || { echo "::error::tests/golden.json was changed by the test run"; exit 1; }
+          if git rev-parse -q --verify HEAD^1 >/dev/null; then
+            if git diff --quiet HEAD^1 HEAD -- tests/golden.json; then echo "no Golden change committed in this change (HEAD^1..HEAD)"
+            else echo "::warning::tests/golden.json is changed by the commits under test (HEAD^1..HEAD) - review it separately"; git diff --stat HEAD^1 HEAD -- tests/golden.json; fi
+          else echo "::warning::HEAD^1 not available - committed Golden change not checked"; fi
