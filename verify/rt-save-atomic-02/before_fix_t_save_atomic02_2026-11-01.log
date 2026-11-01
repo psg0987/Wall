@@ -1,0 +1,11 @@
+game sha256 4bf1dfb7939c6f14 | t_save_atomic02.js
+FAIL N1 imp (Android.save false, native A): told "세이브를 불러왔어요 · 2027년 2월 1일", game [912,30], restart reads [911,20]
+FAIL N1 ld (Android.save false, native A): told "슬롯 4을 불러왔습니다", game [912,30], restart reads [911,20]
+FAIL N1 fLoad (Android.save false, native A): told "파일을 불러왔어요 · 2027년 2월 1일", game [912,30], restart reads [911,20]
+FAIL N1 cLoad (Android.save false, native A): told "클라우드 1을 불러왔어요 · 2027년 2월 1일", game [912,30], restart reads [911,20]
+FAIL N2 G.sv(1) with Android.save false and an older native slot [911,20]: told "슬롯 1에 저장했습니다", slot read back [911,20], game [911,25]
+FAIL N3 save() resolved true and the restart reads [911,20] (game [911,23])
+ok N4 native write ok + read back true; native copy wins on read true; key the native side refuses → localStorage, read back true; web localStorage true
+FAIL N5 slot 5 asked while B commits (game during the commit [912,30]): told "슬롯 5을 불러왔습니다 | 세이브를 불러왔어요 · 2027년 1월 16일", game [913,15], local [913,15] (want B [912,30], slot refused)
+ok N6 G.mk(불러오기): renders at the tap [{"a":true,"rsb":false}] show the old game; renders during the commit 0; game now [912,30]
+errs 0 fails 7

@@ -1,0 +1,14 @@
+# SAME smoke on the BASE page (2b6200c, before the fix) | 2026-11-01 09:03:59 KST
+page base_2b62_site.html sha256 5ea2bfa34e9d365059b2741c63ff2bbf6865530d7dea144e4a5cb5cc923dc93c
+info I1 during the hold: {"rsb":true,"seed":20261062}; taps: tender true, 3× true; renders while committing [20261062]
+FAIL I1 taps on the old screen while B commits: told "SLSF 공개매수 성공! 100% 비상장 자회사로 전환 (나 명의, 1,586억) | 세이브를 불러왔어요 · 2027년 1월 21일"; game {"id":[20261062,20],"cash":9998413.8114,"T":"{\"P\":100}","priv":1,"spd":0,"apAll":0} vs saved B {"id":[20261062,20],"cash":10000000,"T":"{}","priv":0,"spd":0,"apAll":0}; local {"id":[20261062,20],"cash":10000000,"T":"{}","priv":0,"spd":0}
+ok   I1 after the restore a tap works again (3× → speed 3)
+ok   I1 page: no page error 
+info I2 during the hold: {"rsb":true,"seed":20261062}; taps: tender true, 3× true; renders while committing [20261062]
+FAIL I2 device write fails, taps during the commit: told "SLSF 공개매수 성공! 100% 비상장 자회사로 전환 (나 명의, 1,586억) | 불러오기 실패: 기기에 저장하지 못했어요"; game {"id":[20261061,20],"cash":10000000,"T":"{\"r1\":3}","priv":0,"spd":0,"apAll":0} vs A {"id":[20261061,20],"cash":10000000,"T":"{\"r1\":3}","priv":0,"spd":0,"apAll":0}
+ok   I2 after the restore a tap works again (3× → speed 3)
+ok   I2 page: no page error 
+FAIL I3 Android.save false (native file [20261061,20]): B pasted → "세이브를 불러왔어요 · 2027년 1월 21일", game [20261062,20], after a reload [20261061,20]
+ok   I3 page: no page error 
+3 FAIL
+exit 1
