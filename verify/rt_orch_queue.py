@@ -225,6 +225,8 @@ class OfflineQueue:
     def finish_simulation(self, task_id, token, observed_head, succeeded):
         """One-time acknowledgement; a stale HEAD freezes all future claims."""
         with self._tx() as conn:
+            if self._halted(conn):
+                raise QueueBlocked("QUEUE_HALTED")
             row = conn.execute("SELECT state,claim_token,head_sha FROM tasks WHERE task_id=?",
                                (task_id,)).fetchone()
             if row is None or row[0] != 'CLAIMED' or row[1] != token:
@@ -244,6 +246,7 @@ class OfflineQueue:
     def quarantine_interrupted_claims(self):
         """Manual safety check after a crash; NEVER silently rerun a claim."""
         with self._tx() as conn:
+            self._halted(conn)  # Corrupt/missing control state must block writes.
             n = conn.execute("UPDATE tasks SET state='BLOCKED_CRASH',claim_token=NULL WHERE state='CLAIMED'").rowcount
             if n:
                 self._halt(conn)
