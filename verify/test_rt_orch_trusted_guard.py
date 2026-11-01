@@ -110,7 +110,7 @@ class TrustedGuardTests(unittest.TestCase):
 
     def test_moving_pr_head_is_blocked(self):
         r = PolicyReader(); r.last_head_sha = "c" * 40
-        self.blocked("CURRENT_BRANCH_SHA_MISMATCH", r)
+        self.blocked("STALE_HEAD_SHA", r)
 
     def test_non_draft_pr_is_blocked(self):
         r = PolicyReader(); r.pr["draft"] = False
