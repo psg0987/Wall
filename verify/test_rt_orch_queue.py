@@ -471,5 +471,41 @@ class QueueTests(unittest.TestCase):
 
 
 
+    def test_corrupt_halt_blocks_completion_write(self):
+        self.q.stage(task())
+        c=self.q.claim_for_simulation('worker')
+        conn=sqlite3.connect(self.db)
+        try:
+            conn.execute("UPDATE control SET value='unknown' WHERE key='halted'")
+            conn.commit()
+        finally:
+            conn.close()
+        with self.assertRaisesRegex(QueueBlocked,'INVALID_HALT_CONTROL'):
+            self.q.finish_simulation(c['task_id'],c['claim_token'],c['head_sha'],True)
+        conn=sqlite3.connect(self.db)
+        try:
+            self.assertEqual(conn.execute("SELECT state FROM tasks WHERE task_id=?",(c['task_id'],)).fetchone()[0], 'CLAIMED')
+        finally:
+            conn.close()
+
+    def test_missing_halt_blocks_quarantine_write(self):
+        self.q.stage(task())
+        c=self.q.claim_for_simulation('worker')
+        conn=sqlite3.connect(self.db)
+        try:
+            conn.execute("DELETE FROM control WHERE key='halted'")
+            conn.commit()
+        finally:
+            conn.close()
+        with self.assertRaisesRegex(QueueBlocked,'INVALID_HALT_CONTROL'):
+            self.q.quarantine_interrupted_claims()
+        conn=sqlite3.connect(self.db)
+        try:
+            self.assertEqual(conn.execute("SELECT state FROM tasks WHERE task_id=?",(c['task_id'],)).fetchone()[0], 'CLAIMED')
+        finally:
+            conn.close()
+
+
+
 if __name__=='__main__':
     unittest.main()
