@@ -84,8 +84,8 @@ class CombinedGateTests(unittest.TestCase):
     def test_invalid_status_blocks(self):
         r = FakeReader()
         r.files[0]["status"] = []
-        errors, _ = run(r)
-        self.assertIn("INVALID_CHANGE_ENTRY", errors)
+        with self.assertRaisesRegex(EvidenceError, "INVALID_FILE_STATUS"):
+            run(r)
 
     def test_protected_file_cannot_be_disguised(self):
         r = FakeReader()
