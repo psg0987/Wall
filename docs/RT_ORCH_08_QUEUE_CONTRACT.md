@@ -13,7 +13,7 @@
 ## 파일
 
 - `verify/rt_orch_queue.py`: 오프라인 SQLite 영속 대기열 + 콘솔 인터페이스.
-- `verify/test_rt_orch_queue.py`: 40개 Python 단위/반례 테스트, 실제 실행.
+- `verify/test_rt_orch_queue.py`: 49개 Python 단위/반례 테스트, 실제 실행.
 - `docs/RT_ORCH_08_QUEUE_CONTRACT.md`: 이 문서.
 
 ## 처리 단계
@@ -61,18 +61,19 @@ python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite snapshot
 
 ## 검증 요약
 
-직접 실행한 40개 테스트는 다음을 포함한다.
+직접 실행한 49개 테스트는 다음을 포함한다.
 
 - SQLite 파일의 영속 상태 및 재열기.
-- 같은 DB에 두 스레드가 동시에 `claim`하여 정확히 하나만 성공.
+- 같은 DB에 두 스레드 및 **별도 프로세스 두 개**가 동시에 `claim`하여 정확히 하나만 성공.
 - FIFO 작업 처리·두 작업의 단일 점유.
 - 재시작 후 `CLAIMED` 무단 재실행 방지 및 수동 격리.
 - 실패·stale SHA 시 전체 대기열 정지.
 - 중복 이벤트 키·작업 ID·PR HEAD, 허용 범위 밖 파일, 경로 순회·다른 저장소 차단.
 - 최대 수정 시도 2회, 순서 건너뛰기 및 Boolean/잘못된 SHA 거절.
-- CLI의 JSON 입력·중복 오류 비정상 종료코드.
+- CLI의 JSON 입력·중복 오류·실패/차단 상태 **비정상 종료코드**, SQLite 잠금 시 `DB_BUSY` 진단.
+- SQLite 64비트 정수 상한(PR 번호) 검증, 읽기 트랜잭션으로 일관된 스냅샷, 실제 UNIQUE 인덱스 직접 위반 반례.
 
-실제 테스트 실행 명령, 실행 환경 및 결과는 별도로 Issue/PR에 기록한다. GitHub `full-suite` 20개 JavaScript 테스트는 신규 Python 40개를 실행하지 않으므로 그 CI의 PASS로 대체하지 않는다.
+실제 테스트 실행 명령, 실행 환경 및 결과는 별도로 Issue/PR에 기록한다. GitHub `full-suite` 20개 JavaScript 테스트는 신규 Python 49개를 실행하지 않으므로 그 CI의 PASS로 대체하지 않는다.
 
 ## 운영 사용 전 해결할 차단 항목
 
@@ -84,3 +85,10 @@ python3 verify/rt_orch_queue.py /tmp/rt-orch08.sqlite snapshot
 6. **운영 품질**: 장애 복구/백업, DB 손상 검출, 파일 잠금/NFS 멀티호스트 한계, 로그·비용 한도·실제 프로세스 크래시 시 지속 중지, 서비스 재시작 수동 해제 설계 필요. SQLite 로컬 트랜잭션이 분산된 GitHub/Claude/Work 서비스 전체의 원자적 트랜잭션을 제공하지 않는다.
 
 **기존 Claude Routines 및 GPT Work 리뷰 자동화는 변경하지 않는다.** `main` 병합, Draft 해제, Ruleset·권한 변경, 빌드·배포는 여전히 사용자 별도 승인 사항이다. Gemini 자동 실행은 현 단계에서 제외하며, 향후 F2 회계 검증에 선택적으로 추가한다.
+
+## 독립 정적 리뷰 반영 (RT-ORCH-08-A-REVIEW-01)
+
+- 이전 HEAD `f1b3df9058dbf2c6a90778cf870043503e231c69`, 독립 GPT Work run `b7ab3042-5cf0-8327-a037-bf0ccb69971d`의 정적 코드 리뷰에서 **P2 두 건·P3 세 건** 발견(해당 Work 테스트는 NOT_RUN).
+- CLI 실패 상태 종료코드 0 문제, 과대 PR 번호의 SQLite overflow 가능성, DB_BUSY 오류 미정규화, snapshot 다중 조회의 읽기 일관성, 다중 프로세스/UNIQUE 실제 경합 테스트 누락을 본 수정으로 반영.
+- GPT 현재 세션 로컬 환경에서 수정 후 **49/49 Python unittest PASS**를 직접 재실행. 수정본의 실제 GitHub Blob SHA 일치는 PR 최신 커밋 업로드 후 확인해야 한다.
+- 새 HEAD에 대한 Work 재리뷰·GitHub Actions 결과는 별도 검증이며, 이 문서에 자동 PASS로 표기하지 않는다.
