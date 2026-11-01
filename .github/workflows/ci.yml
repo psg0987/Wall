@@ -113,3 +113,37 @@ jobs:
             if git diff --quiet HEAD^1 HEAD -- tests/golden.json; then echo "no Golden change committed in this change (HEAD^1..HEAD)"
             else echo "::warning::tests/golden.json is changed by the commits under test (HEAD^1..HEAD) - review it separately"; git diff --stat HEAD^1 HEAD -- tests/golden.json; fi
           else echo "::warning::HEAD^1 not available - committed Golden change not checked"; fi
+
+  rt-orch-04a-unit:
+    name: rt-orch-04a-unit
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+
+      - name: Verify PR HEAD tested by merge ref
+        env:
+          EXPECTED_PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          EXPECTED_PR_BASE: ${{ github.event.pull_request.base.sha }}
+        shell: bash
+        run: |
+          echo "checkout SHA: $(git rev-parse HEAD)"
+          echo "PR head SHA: $EXPECTED_PR_HEAD"
+          echo "PR base SHA: $EXPECTED_PR_BASE"
+          actual_pr_head=$(git rev-parse HEAD^2)
+          test "$actual_pr_head" = "$EXPECTED_PR_HEAD" || { echo "::error::PR HEAD mismatch"; exit 1; }
+
+      - name: RT-ORCH-04-A offline unit tests (18 cases)
+        shell: bash
+        run: |
+          python3 -m unittest discover -s verify -p 'test_rt_orch_gate.py' -v
