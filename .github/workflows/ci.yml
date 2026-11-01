@@ -113,3 +113,64 @@ jobs:
             if git diff --quiet HEAD^1 HEAD -- tests/golden.json; then echo "no Golden change committed in this change (HEAD^1..HEAD)"
             else echo "::warning::tests/golden.json is changed by the commits under test (HEAD^1..HEAD) - review it separately"; git diff --stat HEAD^1 HEAD -- tests/golden.json; fi
           else echo "::warning::HEAD^1 not available - committed Golden change not checked"; fi
+
+  rt-orch-04b-evidence-probe:
+    name: rt-orch-04b-evidence-probe
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+
+      - name: Assert PR test SHA
+        env:
+          EXPECTED_PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD^2)" = "$EXPECTED_PR_HEAD" || { echo "::error::Unexpected PR head"; exit 1; }
+          echo "tested PR HEAD: $EXPECTED_PR_HEAD"
+
+      - name: RT-ORCH-04-B offline API fixture tests (17 cases)
+        shell: bash
+        run: |
+          python3 -m unittest discover -s verify -p 'test_rt_orch_evidence.py' -v
+
+      - name: RT-ORCH-04-B live GitHub API read-only collection for source PR 14
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 verify/rt_orch_evidence.py \
+            --pr 14 \
+            --base-sha 27abe48fd426a59148e528a3d11c87f64f29dd04 \
+            --head-sha dcaf11e0f9a986c6a64befa9b9ee6d3ed67a86d4 \
+            --allow verify/rt_orch_evidence.py \
+            --allow verify/test_rt_orch_evidence.py > /tmp/rt-orch-04b-live.json
+          python3 - <<'PY'
+          import json
+          with open('/tmp/rt-orch-04b-live.json', encoding='utf-8') as f:
+              e = json.load(f)
+          assert e['repository'] == 'psg0987/Wall'
+          assert e['current_pr_number'] == 14
+          assert e['base_sha'] == '27abe48fd426a59148e528a3d11c87f64f29dd04'
+          assert e['head_sha'] == 'dcaf11e0f9a986c6a64befa9b9ee6d3ed67a86d4'
+          assert e['pr_list_complete'] is True
+          assert len(e['changes']) == 2
+          assert set(f['filename'] for f in e['changes']) == {'verify/rt_orch_evidence.py', 'verify/test_rt_orch_evidence.py'}
+          assert any(p['number'] == 14 for p in e['open_pull_requests'])
+          assert e['collector']['two_pass_ref_check'] is True
+          print('LIVE_COLLECTION_PASS pr=14 changed_files=2 open_prs=' + str(len(e['open_pull_requests'])))
+          PY
