@@ -1,0 +1,97 @@
+# AUTO-SETUP-05: failure detection / recovery pilot. Runs the full suite (python3 tests/run.py, 38 files), checks the per-test record and that
+# tests/golden.json did not change, then — only if all of that succeeded — an INTENTIONAL failure step controlled by INTENTIONAL_FAIL below.
+# A failure of the intentional step is not a test failure: the suite and check steps show their own result, and that step says so in its log.
+# Runs only on pushes to exp/rt-ci-guard-01. Read-only token, no secrets, Golden never rewritten, no APK, no Pages, no external API.
+name: ci-guard-pilot
+
+on:
+  push:
+    branches:
+      - exp/rt-ci-guard-01
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-guard-pilot-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  INTENTIONAL_FAIL: '1'   # 1 = first run (the experiment step exits 1), 0 = second run (released)
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Versions
+        run: |
+          python3 --version
+          node --version
+          git rev-parse HEAD
+
+      - name: Full test suite (python3 tests/run.py)
+        id: suite
+        timeout-minutes: 25
+        shell: bash
+        run: |
+          unset UPDATE_GOLDEN
+          set -o pipefail
+          start=$(date +%s)
+          python3 tests/run.py 2>&1 | tee ci-full.log
+          code=${PIPESTATUS[0]}
+          echo "exit code: $code, seconds: $(( $(date +%s) - start ))" | tee -a ci-full.log
+          exit $code
+
+      - name: Per-test record, 38-file and Golden check
+        id: check
+        if: always()
+        shell: bash
+        run: |
+          test -f ci-full.log || { echo "no log"; exit 1; }
+          n=$(grep -cE '^(PASS|FAIL) t[^ ]*\.js$' ci-full.log || true)
+          pass=$(grep -cE '^PASS t[^ ]*\.js$' ci-full.log || true)
+          fail=$(grep -cE '^FAIL t[^ ]*\.js$' ci-full.log || true)
+          {
+            echo "## Test suite (real tests): $n files, $pass PASS, $fail FAIL"
+            echo '```'
+            grep -E '^(PASS|FAIL) t[^ ]*\.js$|^ALL PASS|failed$|^exit code' ci-full.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          grep -E '^(PASS|FAIL) t[^ ]*\.js$|^ALL PASS|failed$|^exit code' ci-full.log
+          missing=0
+          for t in t_save_atomic01.js t_save_atomic02.js t_golden.js t_premerge_fix01.js t_ctl_r3_extra.js t_ctl_r3_failfirst.js t_ctl_r3_r2.js t_ctl_r3_r3b.js; do
+            grep -qE "^(PASS|FAIL) $t$" ci-full.log || { echo "missing result: $t"; missing=1; }
+          done
+          [ "$n" -eq 38 ] || { echo "expected 38 test results, got $n"; exit 1; }
+          [ "$missing" -eq 0 ] || exit 1
+          git diff --exit-code -- tests/golden.json || { echo "golden.json changed during the run"; exit 1; }
+          echo "golden.json unchanged"
+
+      - name: INTENTIONAL failure experiment (not a test)
+        if: success()
+        shell: bash
+        run: |
+          echo "suite step: ${{ steps.suite.outcome }}, check step: ${{ steps.check.outcome }}"
+          if [ "$INTENTIONAL_FAIL" = "1" ]; then
+            echo "::error title=Intentional failure (CI guard pilot)::INTENTIONAL_FAIL=1 - deliberate exit 1 after all 38 tests passed. This is NOT a test failure."
+            echo "## Intentional failure experiment: ON (deliberate exit 1, not a test failure)" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "INTENTIONAL_FAIL=$INTENTIONAL_FAIL - experiment released, no deliberate failure"
+          echo "## Intentional failure experiment: OFF" >> "$GITHUB_STEP_SUMMARY"
