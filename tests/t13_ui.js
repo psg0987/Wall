@@ -16,7 +16,8 @@ T('auto-pause',()=>{fresh();G.spd(10);note('🔔 가격 알림 TEST 100원 돌�
  S.day+=5;note('🦈 raider','i');ok(S.spd===0,'raid pauses');G.spd(3);S.day+=5;note('📢 공시','i');ok(S.spd===3,'disclosure no pause');
  S.cfg.ap={pa:0,raid:0,warn:0,bs:0,q:1,y:0};G.spd(30);let k=0;while(S.spd>0&&k<120){step();if(mdl)G.mk(mdl.o.length-1);k++}ok(S.spd===0&&S.day%90===0,'quarter rule pauses at '+S.day);
  G.spd(0);S.cfg.spec=1;G.spd(3);S.day+=9;note('🔔 가격 알림 spec','i');ok(S.spd===3,'spectate ignores rules');S.cfg.spec=0;G.spd(0);pg='set';render();clean('settings');ok(/편의 기능/.test(html()),'settings card');pg=''});
-T('menu',()=>{fresh();G.menu(1);const l=()=>document.getElementById('mnl').innerHTML;ok(/TRADE/.test(l())&&/RESEARCH/.test(l())&&/CORPORATE/.test(l()),'categories');
+T('menu',()=>{fresh();G.menu(1);const l=()=>document.getElementById('mnl').innerHTML;
+ ok(MENU.some(m=>m[0]==='help'&&m[2]==='게임 안내'),'guide label changed, route key unchanged');ok(/TRADE/.test(l())&&/RESEARCH/.test(l())&&/CORPORATE/.test(l()),'categories');
  const all=MCAT.flatMap(c=>c[3]);ok(MENU.every(m=>all.includes(m[0])),'every menu categorised '+MENU.filter(m=>!all.includes(m[0])).map(m=>m[0]));ok(new Set(all).size===all.length,'no duplicates');
  ok(mnMatch('ㅍㅅ').some(m=>m[0]==='dv'),'chosung finds 파생상품');ok(mnMatch('선물').some(m=>m[0]==='dv'),'keyword finds dv');ok(mnMatch('경제')[0][0]==='econ','econ');
  const c=S.co.find(x=>!x.dead&&!x.priv);ok(coMatch(c.tk)[0]===c,'ticker match');G.mq(c.tk.toLowerCase());ok(document.getElementById('mnr').innerHTML.includes('G.pick('+c.id+')'),'stock result row');
