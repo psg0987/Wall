@@ -18,4 +18,4 @@ def reviewed_head_is_current(reviewed_head: str, current_head: str) -> bool:
     if not isinstance(current_head, str) or not SHA40.fullmatch(current_head):
         return False
 
-    return reviewed_head[:12] == current_head[:12]
+    return reviewed_head == current_head
