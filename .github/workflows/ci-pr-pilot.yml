@@ -1,6 +1,7 @@
 # AUTO-SETUP-06: Draft PR CI pilot - full regression suite (tests/run.py, 38 test files) on pull_request events (opened, synchronize, reopened)
 # for PRs whose base is exp/rt-ci-full-01 only (plain pull_request event; the privileged target-context variant is not used). Read-only token, no secrets, Golden never rewritten (UPDATE_GOLDEN unset), no APK build,
 # no Pages deploy, no external API. The suite's own exit code decides the job; the check step only adds a per-test record and fails on gaps.
+# synchronize test: this comment line was added by a second commit (comment-only change) to trigger the pull_request synchronize event.
 name: ci-pr-pilot
 
 on:
