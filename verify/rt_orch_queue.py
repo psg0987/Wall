@@ -47,7 +47,8 @@ def _validate(s):
         raise QueueBlocked("INVALID_EVENT_KEY")
     if s["repository"] != REPO:
         raise QueueBlocked("REPOSITORY_DENIED")
-    if type(s["pr_number"]) is not int or s["pr_number"] < 1:
+    if (type(s["pr_number"]) is not int
+            or not 1 <= s["pr_number"] <= 2**63 - 1):
         raise QueueBlocked("INVALID_PR")
     if not _valid_sha(s["base_sha"]) or not _valid_sha(s["head_sha"]):
         raise QueueBlocked("INVALID_SHA")
@@ -203,8 +204,14 @@ class OfflineQueue:
     def snapshot(self):
         conn = self._connect()
         try:
+            conn.execute("BEGIN")  # Both reads observe the same SQLite snapshot.
             rows=conn.execute("SELECT task_id,pr_number,head_sha,attempt,state FROM tasks ORDER BY seq").fetchall()
             halted=self._halted(conn)
+            conn.execute("COMMIT")
+        except Exception:
+            if conn.in_transaction:
+                conn.execute("ROLLBACK")
+            raise
         finally:
             conn.close()
         return _result("SNAPSHOT", halted=halted,
@@ -224,8 +231,8 @@ def main():
     ap.add_argument("--observed-head")
     ap.add_argument("--fail",action="store_true")
     args=ap.parse_args()
-    q=OfflineQueue(args.database)
     try:
+        q=OfflineQueue(args.database)
         if args.command=="stage":
             if not args.input:
                 raise QueueBlocked("MISSING_INPUT_FILE")
@@ -238,10 +245,18 @@ def main():
             output=q.quarantine_interrupted_claims()
         else:
             output=q.snapshot()
-    except (QueueBlocked,ValueError,OSError) as exc:
-        output=_result("BLOCKED", reason=str(exc) if isinstance(exc,QueueBlocked) else "INPUT_ERROR")
+    except QueueBlocked as exc:
+        output=_result("BLOCKED", reason=str(exc))
+    except sqlite3.OperationalError as exc:
+        reason="DB_BUSY" if "locked" in str(exc).lower() or "busy" in str(exc).lower() else "STORAGE_ERROR"
+        output=_result("BLOCKED", reason=reason)
+    except (sqlite3.Error, ValueError, OSError, OverflowError):
+        output=_result("BLOCKED", reason="INPUT_OR_STORAGE_ERROR")
     print(json.dumps(output,sort_keys=True,ensure_ascii=False))
-    return 0 if output["status"]!="BLOCKED" else 2
+    unsafe_status={"BLOCKED","BLOCKED_RUNNING","QUEUE_HALTED","FAILED","BLOCKED_STALE"}
+    if output["status"] in unsafe_status or (output["status"]=="QUARANTINED" and output["count"]>0):
+        return 2
+    return 0
 
 
 if __name__=="__main__":
