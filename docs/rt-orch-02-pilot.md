@@ -6,3 +6,4 @@
 - synchronize 재시험: 2026-11-01, PR #6에 문서 한 줄을 추가하는 커밋으로 pull_request synchronize 이벤트를 발생시킨다.
 RT-ORCH-02-FIX: GitHub 웹훅 조건 수정 후 이벤트 전달 재시험.
 - 재연결 후 웹훅 재시험: RT-ORCH-02-RECONNECT-VERIFY-01.
+- RT-ORCH-02-FIX-R2-VERIFY-01: R2 수정 후 GPT Work의 자동 독립 리뷰 수행 여부를 검증한다.
