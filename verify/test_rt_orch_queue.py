@@ -34,7 +34,8 @@ class QueueTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.db = str(Path(self.tmp.name) / 'queue.sqlite3')
-        self.q = OfflineQueue(self.db)
+        self.queue_id = 'rt-orch-08-test-queue'
+        self.q = OfflineQueue.bootstrap(self.db,self.queue_id)
 
     def blocked(self, reason, spec):
         with self.assertRaisesRegex(QueueBlocked, f'^{reason}$'):
@@ -52,7 +53,7 @@ class QueueTests(unittest.TestCase):
 
     def test_snapshot_is_persistent_after_reopen(self):
         self.q.stage(task())
-        self.assertEqual(OfflineQueue(self.db).snapshot()['tasks'][0]['state'], 'STAGED')
+        self.assertEqual(OfflineQueue(self.db,self.queue_id).snapshot()['tasks'][0]['state'], 'STAGED')
 
     def test_normal_claim_and_finish_is_only_simulated(self):
         self.q.stage(task())
@@ -67,7 +68,7 @@ class QueueTests(unittest.TestCase):
     def test_atomic_claim_two_threads_one_winner(self):
         self.q.stage(task())
         def try_claim(n):
-            return OfflineQueue(self.db).claim_for_simulation(f'w{n}')
+            return OfflineQueue(self.db,self.queue_id).claim_for_simulation(f'w{n}')
         with ThreadPoolExecutor(max_workers=2) as pool:
             out=list(pool.map(try_claim,[1,2]))
         statuses=sorted(x['status'] for x in out)
@@ -85,12 +86,12 @@ class QueueTests(unittest.TestCase):
     def test_claim_reopened_db_still_blocks(self):
         self.q.stage(task())
         self.q.claim_for_simulation('worker')
-        self.assertEqual(OfflineQueue(self.db).claim_for_simulation('second')['status'],'BLOCKED_RUNNING')
+        self.assertEqual(OfflineQueue(self.db,self.queue_id).claim_for_simulation('second')['status'],'BLOCKED_RUNNING')
 
     def test_crashed_claim_requires_manual_quarantine(self):
         self.q.stage(task())
         self.q.claim_for_simulation('worker')
-        reopened=OfflineQueue(self.db)
+        reopened=OfflineQueue(self.db,self.queue_id)
         self.assertEqual(reopened.claim_for_simulation('another')['status'],'BLOCKED_RUNNING')
         self.assertEqual(reopened.quarantine_interrupted_claims()['count'],1)
         self.assertEqual(reopened.claim_for_simulation('another')['status'],'QUEUE_HALTED')
@@ -241,10 +242,10 @@ class QueueTests(unittest.TestCase):
         jsonfile=Path(self.tmp.name)/'spec.json'
         jsonfile.write_text(json.dumps(task()),encoding='utf-8')
         script=str(Path(__file__).with_name('rt_orch_queue.py'))
-        a=subprocess.run([sys.executable,script,self.db,'stage','--input',str(jsonfile)],capture_output=True,text=True)
+        a=subprocess.run([sys.executable,script,self.db,'stage','--queue-id',self.queue_id,'--input',str(jsonfile)],capture_output=True,text=True)
         self.assertEqual(a.returncode,0,a.stderr)
         self.assertFalse(json.loads(a.stdout)['may_dispatch'])
-        b=subprocess.run([sys.executable,script,self.db,'snapshot'],capture_output=True,text=True)
+        b=subprocess.run([sys.executable,script,self.db,'snapshot','--queue-id',self.queue_id],capture_output=True,text=True)
         self.assertEqual(b.returncode,0,b.stderr)
         self.assertEqual(json.loads(b.stdout)['tasks'][0]['state'],'STAGED')
 
@@ -253,7 +254,7 @@ class QueueTests(unittest.TestCase):
         jsonfile=Path(self.tmp.name)/'spec.json'
         jsonfile.write_text(json.dumps(task()),encoding='utf-8')
         script=str(Path(__file__).with_name('rt_orch_queue.py'))
-        a=subprocess.run([sys.executable,script,self.db,'stage','--input',str(jsonfile)],capture_output=True,text=True)
+        a=subprocess.run([sys.executable,script,self.db,'stage','--queue-id',self.queue_id,'--input',str(jsonfile)],capture_output=True,text=True)
         self.assertEqual(a.returncode,2)
         self.assertEqual(json.loads(a.stdout)['status'],'BLOCKED')
 
@@ -269,7 +270,7 @@ class QueueTests(unittest.TestCase):
     def test_parallel_subprocess_claim_one_winner(self):
         self.q.stage(task())
         script=str(Path(__file__).with_name('rt_orch_queue.py'))
-        cmd=[sys.executable,script,self.db,'claim']
+        cmd=[sys.executable,script,self.db,'claim','--queue-id',self.queue_id]
         p1=subprocess.Popen([*cmd,'--worker','process1'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
         p2=subprocess.Popen([*cmd,'--worker','process2'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
         a,e1=p1.communicate(timeout=12)
@@ -306,7 +307,7 @@ class QueueTests(unittest.TestCase):
         self.q.stage(task())
         c=self.q.claim_for_simulation('worker')
         script=str(Path(__file__).with_name('rt_orch_queue.py'))
-        proc=subprocess.run([sys.executable,script,self.db,'finish',
+        proc=subprocess.run([sys.executable,script,self.db,'finish','--queue-id',self.queue_id,
                              '--task-id',c['task_id'],'--token',c['claim_token'],
                              '--observed-head',c['head_sha'],'--fail'],
                             capture_output=True,text=True)
@@ -317,7 +318,7 @@ class QueueTests(unittest.TestCase):
         self.q.stage(task())
         c=self.q.claim_for_simulation('worker')
         script=str(Path(__file__).with_name('rt_orch_queue.py'))
-        proc=subprocess.run([sys.executable,script,self.db,'finish',
+        proc=subprocess.run([sys.executable,script,self.db,'finish','--queue-id',self.queue_id,
                              '--task-id',c['task_id'],'--token',c['claim_token'],
                              '--observed-head','f'*40],capture_output=True,text=True)
         self.assertEqual(proc.returncode,2,proc.stderr)
@@ -328,7 +329,7 @@ class QueueTests(unittest.TestCase):
         c=self.q.claim_for_simulation('worker')
         self.q.finish_simulation(c['task_id'],c['claim_token'],c['head_sha'],False)
         script=str(Path(__file__).with_name('rt_orch_queue.py'))
-        proc=subprocess.run([sys.executable,script,self.db,'claim'],capture_output=True,text=True)
+        proc=subprocess.run([sys.executable,script,self.db,'claim','--queue-id',self.queue_id],capture_output=True,text=True)
         self.assertEqual(proc.returncode,2)
         self.assertEqual(json.loads(proc.stdout)['status'],'QUEUE_HALTED')
 
@@ -337,12 +338,74 @@ class QueueTests(unittest.TestCase):
         try:
             conn.execute('BEGIN EXCLUSIVE')
             script=str(Path(__file__).with_name('rt_orch_queue.py'))
-            proc=subprocess.run([sys.executable,script,self.db,'snapshot'],
+            proc=subprocess.run([sys.executable,script,self.db,'snapshot','--queue-id',self.queue_id],
                                 capture_output=True,text=True,timeout=12)
             self.assertEqual(proc.returncode,2,proc.stderr)
             self.assertEqual(json.loads(proc.stdout)['reason'],'DB_BUSY')
         finally:
             conn.rollback();conn.close()
+
+
+
+    def test_uninitialized_path_does_not_create_new_queue(self):
+        missing=str(Path(self.tmp.name)/'uninitialized.sqlite3')
+        with self.assertRaisesRegex(QueueBlocked,'QUEUE_NOT_INITIALIZED'):
+            OfflineQueue(missing,self.queue_id)
+        self.assertFalse(Path(missing).exists())
+
+    def test_wrong_queue_id_rejected(self):
+        with self.assertRaisesRegex(QueueBlocked,'QUEUE_ID_MISMATCH'):
+            OfflineQueue(self.db,'rt-orch-08-another-queue')
+
+    def test_changed_db_path_with_different_id_rejected(self):
+        other=str(Path(self.tmp.name)/'another.sqlite3')
+        OfflineQueue.bootstrap(other,'rt-orch-08-another-queue')
+        self.q.path=other
+        with self.assertRaisesRegex(QueueBlocked,'QUEUE_ID_MISMATCH'):
+            self.q.claim_for_simulation('worker')
+
+    def test_duplicate_bootstrap_never_resets_history(self):
+        self.q.stage(task())
+        with self.assertRaisesRegex(QueueBlocked,'QUEUE_ALREADY_EXISTS'):
+            OfflineQueue.bootstrap(self.db,self.queue_id)
+        self.assertEqual(self.q.snapshot()['tasks'][0]['state'],'STAGED')
+
+    def test_invalid_queue_id_rejected(self):
+        with self.assertRaisesRegex(QueueBlocked,'INVALID_QUEUE_ID'):
+            OfflineQueue(self.db,'random')
+
+    def test_cli_wrong_path_fails_closed_without_creating_db(self):
+        missing=str(Path(self.tmp.name)/'never-before-seen.sqlite3')
+        script=str(Path(__file__).with_name('rt_orch_queue.py'))
+        proc=subprocess.run([sys.executable,script,missing,'stage',
+                             '--queue-id',self.queue_id,'--input','missing.json'],
+                            capture_output=True,text=True)
+        self.assertEqual(proc.returncode,2)
+        self.assertEqual(json.loads(proc.stdout)['reason'],'QUEUE_NOT_INITIALIZED')
+        self.assertFalse(Path(missing).exists())
+
+    def test_cli_explicit_init_then_duplicate_init_is_refused(self):
+        other=str(Path(self.tmp.name)/'created-via-cli.sqlite3')
+        script=str(Path(__file__).with_name('rt_orch_queue.py'))
+        cmd=[sys.executable,script,other,'init','--queue-id',self.queue_id]
+        a=subprocess.run(cmd,capture_output=True,text=True)
+        self.assertEqual(a.returncode,0,a.stderr)
+        self.assertEqual(json.loads(a.stdout)['status'],'INITIALIZED')
+        b=subprocess.run(cmd,capture_output=True,text=True)
+        self.assertEqual(b.returncode,2)
+        self.assertEqual(json.loads(b.stdout)['reason'],'QUEUE_ALREADY_EXISTS')
+
+    def test_identity_check_each_operation(self):
+        self.q.stage(task())
+        # Tamper with expected DB ID after construction: every operation must refuse.
+        conn=sqlite3.connect(self.db)
+        try:
+            conn.execute("UPDATE control SET value=? WHERE key='queue_id'",('rt-orch-08-another-queue',))
+            conn.commit()
+        finally:
+            conn.close()
+        with self.assertRaisesRegex(QueueBlocked,'QUEUE_ID_MISMATCH'):
+            self.q.snapshot()
 
 
 
