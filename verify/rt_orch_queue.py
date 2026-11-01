@@ -120,6 +120,8 @@ class OfflineQueue:
             """)
             conn.execute("INSERT INTO control(key,value) VALUES('halted','0')")
             conn.execute("INSERT INTO control(key,value) VALUES('queue_id',?)",(queue_id,))
+            conn.execute("INSERT INTO control(key,value) VALUES('canonical_path',?)",
+                         (str(Path(path).resolve()),))
             conn.execute("COMMIT")
         except Exception:
             if conn.in_transaction:
@@ -137,19 +139,25 @@ class OfflineQueue:
         conn = sqlite3.connect(uri, uri=True, isolation_level=None, timeout=5)
         try:
             conn.execute("PRAGMA busy_timeout=5000")
-            row=conn.execute("SELECT value FROM control WHERE key='queue_id'").fetchone()
-            if row is None or row[0]!=self.queue_id:
-                raise QueueBlocked("QUEUE_ID_MISMATCH")
+            self._assert_identity(conn)
             return conn
         except Exception:
             conn.close()
             raise
+
+    def _assert_identity(self, conn):
+        fields=dict(conn.execute("SELECT key,value FROM control WHERE key IN ('queue_id','canonical_path')"))
+        if fields.get('queue_id') != self.queue_id:
+            raise QueueBlocked("QUEUE_ID_MISMATCH")
+        if fields.get('canonical_path') != str(Path(self.path).resolve()):
+            raise QueueBlocked("QUEUE_PATH_MISMATCH")
 
     @contextmanager
     def _tx(self):
         conn = self._connect()
         try:
             conn.execute("BEGIN IMMEDIATE")
+            self._assert_identity(conn)  # Recheck under the same write lock.
             yield conn
             conn.execute("COMMIT")
         except Exception:
@@ -161,7 +169,10 @@ class OfflineQueue:
 
     @staticmethod
     def _halted(conn):
-        return conn.execute("SELECT value FROM control WHERE key='halted'").fetchone()[0] == '1'
+        row = conn.execute("SELECT value FROM control WHERE key='halted'").fetchone()
+        if row is None or row[0] not in ('0', '1'):
+            raise QueueBlocked("INVALID_HALT_CONTROL")
+        return row[0] == '1'
 
     @staticmethod
     def _halt(conn):
@@ -242,6 +253,7 @@ class OfflineQueue:
         conn = self._connect()
         try:
             conn.execute("BEGIN")  # Both reads observe the same SQLite snapshot.
+            self._assert_identity(conn)
             rows=conn.execute("SELECT task_id,pr_number,head_sha,attempt,state FROM tasks ORDER BY seq").fetchall()
             halted=self._halted(conn)
             conn.execute("COMMIT")
