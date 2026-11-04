@@ -1,6 +1,6 @@
 # RT-ORCH-03-E2E-19 — native review read probe
 
-DO NOT MERGE. Document-only experiment.
+DO NOT MERGE. Document-only experiment; GitHub review retrieval does not authenticate the GPT Work publisher.
 
 ## Source of results
 Values below come from a GET executed in this Claude session (`gh api repos/psg0987/Wall/pulls/47/reviews/5762345457`), not copied from the Issue text. This is not independent GPT Work evidence or user approval.
