@@ -17,3 +17,4 @@
 - `DO NOT MERGE` / `NO DEPLOY` / `NO CLAUDE REPAIR`.
 - GPT Work 진단 COMMENT에 `CLAUDE_MAY_FIX=false`가 있으면 그 결과로 자동 코드 수정을 하지 않는다.
 - `MAY_DISPATCH_NEXT=false`, `MAY_MERGE=false`, `MAY_DEPLOY=false`.
+- WORK-28: 이 설명 한 줄은 GPT Work의 synchronize 이벤트 리뷰와 진단 COMMENT 직접 게시를 확인하는 시험이며, Claude 수정·병합·배포 권한이 아니다.
