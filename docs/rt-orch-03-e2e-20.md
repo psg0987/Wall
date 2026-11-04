@@ -8,4 +8,4 @@
 
 INTENTIONALLY FALSE TEST FIXTURE — WAIT FOR GPT REVIEW AND REPAIR
 
-- TRUST_FIXTURE: A GitHub review author login is sufficient to authenticate the GPT Work publisher.
+- TRUST_FIXTURE: A GitHub review author login does not authenticate the GPT Work publisher.
