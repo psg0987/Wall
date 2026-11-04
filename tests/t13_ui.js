@@ -28,6 +28,13 @@ T('trade bar + toast',()=>{fresh();const c=S.co.find(x=>!x.dead&&!x.priv);G.pick
  G.qbT();render();ok(!/class="qtb"/.test(html()),'trade bar can be turned off');G.qbT();G.pick(-1);
  document.getElementById('ts').hidden=true;toast('a');toast('b');toast('c');ok(/\+2/.test(document.getElementById('ts').innerHTML),'burst counter');toast('⚠ 마진콜');ok(document.getElementById('ts').className==='w','warn colour');
  G.fz(1.1);ok(uiP('r13fz',1)===1.1,'font size saved');G.fz(1)});
+T('price-alert deduplication',()=>{fresh();const c=S.co.find(x=>!x.dead&&!x.priv);ok(!!c,'live price alert company');if(!c)return;
+ const p=c.p;G.alert(c.id,10);ok(S.al.length===1,'one price alert registered');
+ const target=S.al[0].px;G.alert(c.id,10);ok(S.al.length===1,'same target does not consume two slots');
+ G.alert(c.id,-10);ok(S.al.length===2,'opposite direction retained');
+ c.p=p*1.05;G.alert(c.id,10);ok(S.al.length===3,'new reference price retained');
+ const snapshot=JSON.stringify(S);S=migrate(JSON.parse(snapshot));v8fix();
+ ok(S.al.length===3&&S.al[0].px===target,'alert schema survives save roundtrip');render();clean('price-alert deduplication')});
 T('save roundtrip',()=>{fresh();G.spd(3);G.ffGo('y');const j=JSON.stringify(S);S=migrate(JSON.parse(j));v8fix();render();ok(S.ff&&S.ff.k==='y','ff survives save');G.spd(0)});
 T('long run with clock',()=>{fresh();G.spd(30);let k=0;const t0=Date.now();for(let d=0;d<720;d++){step();if(mdl)G.mk(mdl.o.length-1);if(!S.spd)G.spd(30);k++}ok(!isNaN(nw()),'nw ok');console.log('720 days ms',Date.now()-t0);render();clean('after run')});
 console.log('errs',errs,'fails',fails);
