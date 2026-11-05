@@ -19,7 +19,7 @@
 다음 중 하나라도 발생하면 중단하고 아무것도 더 쓰지 않는다.
 
 - 중복 PR 또는 중복 이벤트
-- 기준 main SHA와 다른 40자리 HEAD SHA
+- 실제 base SHA가 고정한 기준 main SHA와 불일치하거나, 실제 PR HEAD SHA가 검토 시작 시 고정한 HEAD SHA와 불일치
 - 다른 base 브랜치
 - 허용 범위(단일 docs 파일) 위반
 - CI 실패 또는 CI 결과 미확인
