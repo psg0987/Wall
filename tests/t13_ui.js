@@ -34,7 +34,14 @@ T('price-alert deduplication',()=>{fresh();const c=S.co.find(x=>!x.dead&&!x.priv
  G.alert(c.id,-10);ok(S.al.length===2,'opposite direction retained');
  c.p=p*1.05;G.alert(c.id,10);ok(S.al.length===3,'new reference price retained');
  const snapshot=JSON.stringify(S);S=migrate(JSON.parse(snapshot));v8fix();
- ok(S.al.length===3&&S.al[0].px===target,'alert schema survives save roundtrip');render();clean('price-alert deduplication')});
+ ok(S.al.length===3&&S.al[0].px===target,'alert schema survives save roundtrip');
+ {const c2=S.co.find(x=>x.id===c.id),ts=document.getElementById('ts'),keepAl=S.al,keepP=c2.p;
+ try{c2.p=p;S.al=[];G.alert(c2.id,10);const ex=S.al[0];
+ while(S.al.length<30)S.al.push(Object.assign({},ex,{px:ex.px+S.al.length}));
+ G.alert(c2.id,10);ok(S.al.length===30,'30 alerts: existing same alert keeps count');ok(ts.innerHTML.includes('이미 같은 가격 알림이 설정돼 있어요'),'30 alerts: existing same alert shows duplicate notice');
+ G.alert(c2.id,-10);ok(S.al.length===30,'30 alerts: new alert keeps count');ok(ts.innerHTML.includes('알림은 최대 30개'),'30 alerts: new alert shows max notice')}
+ finally{S.al=keepAl;c2.p=keepP}}
+ render();clean('price-alert deduplication')});
 T('save roundtrip',()=>{fresh();G.spd(3);G.ffGo('y');const j=JSON.stringify(S);S=migrate(JSON.parse(j));v8fix();render();ok(S.ff&&S.ff.k==='y','ff survives save');G.spd(0)});
 T('long run with clock',()=>{fresh();G.spd(30);let k=0;const t0=Date.now();for(let d=0;d<720;d++){step();if(mdl)G.mk(mdl.o.length-1);if(!S.spd)G.spd(30);k++}ok(!isNaN(nw()),'nw ok');console.log('720 days ms',Date.now()-t0);render();clean('after run')});
 console.log('errs',errs,'fails',fails);
