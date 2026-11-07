@@ -30,7 +30,7 @@ G.fut=q=>{const n=S.ft.q+q;if(Math.abs(n)*S.ix*.2>S.cash+pRoom()&&Math.abs(n)>Ma
 G.cbuy=(j,x)=>{const m=S.cm[j];if(!ePay("P",x*1.005))return toast("자금 부족");m.h+=x*1e8/m.p;m.b+=x*1.005;rec(m.n+" 매수",{tk:m.k},x,"나");toast(m.n+" "+F(x)+" 매수");render()};
 G.csell=(j,f)=>{const m=S.cm[j];if(m.h<=0)return toast("보유 수량이 없습니다");const u=m.h*f,x=u*m.p/1e8*.995,b=m.b*f,g=x-b,t=g>0?g*.22:0;if(g>0)S.fl.cm=1;S.cash+=x-t;m.h-=u;m.b-=b;if(m.h<1e-9){m.h=0;m.b=0}rec(m.n+" 매도",{tk:m.k},x,"나");toast(m.n+" 매도 "+F(x-t));render()};
 G.wl=i=>{const k=S.wl.indexOf(i);k<0?S.wl.push(i):S.wl.splice(k,1);render()};
-G.alert=(i,pc)=>{if(S.al.length>=30)return toast("알림은 최대 30개");const c=S.co[i];S.al.push({i,d:pc>0?1:-1,px:c.p*(1+pc/100)});toast("알림 설정: "+W(c.p*(1+pc/100)));render()};
+G.alert=(i,pc)=>{const c=S.co[i],d=pc>0?1:-1,px=c.p*(1+pc/100);if(S.al.some(a=>a.i===i&&a.d===d&&a.px===px))return toast("이미 같은 가격 알림이 설정돼 있어요");if(S.al.length>=30)return toast("알림은 최대 30개");S.al.push({i,d,px});toast("알림 설정: "+W(px));render()};
 G.borrow=x=>{x=Math.min(x,pRoom());if(x<=0)return toast("개인 대출 한도를 다 썼습니다");S.loan+=x;S.cash+=x;render()};
 G.repay=x=>{x=Math.min(x,S.loan,S.cash);if(x<=0)return toast("갚을 현금이나 대출이 없습니다");S.cash-=x;S.loan-=x;render()};
 G.cborrow=(i,x)=>{const c=S.co[i];if(!mine(c))return;x=Math.min(x,cRoom(c));if(x<=0)return toast(c.tk+" 대출 한도가 없습니다");c.D+=x;c.cs+=x;L(c.tk+" 은행 차입 "+F(x),1);render()};
